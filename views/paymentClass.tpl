@@ -1,12 +1,12 @@
 <?php
 
 /**
-*Altapay module for Woocommerce
+ * AltaPay module for WooCommerce
 
-*Copyright © 2020 Altapay. All rights reserved.
-*For the full copyright and license information, please view the LICENSE
-*file that was distributed with this source code.
-*/
+ * Copyright © 2020 AltaPay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
     require_once(dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'classes'.DIRECTORY_SEPARATOR .'util' . DIRECTORY_SEPARATOR . 'UtilMethods.php');
     require_once(dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'AltapayHelpers.php');
@@ -20,8 +20,8 @@
 			// Set default gateway values
 			$this->id = strtolower('altapay_{key}');
 			$this->has_fields = false;
-			$this->method_title = 'Altapay - {name}';
-			$this->method_description = __( 'Adds Altapay Payment Gateway to use with WooCommerce', 'altapay');
+			$this->method_title = 'AltaPay - {name}';
+			$this->method_description = __( 'Adds AltaPay Payment Gateway to use with WooCommerce', 'altapay');
 			$this->supports = array(
 				'refunds',
 				'subscriptions',
@@ -36,14 +36,14 @@
 			$this->enabled = $this->get_option( 'enabled' );
 			$this->title = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
-            $this->token = $this->get_option('token');
+			$this->token = $this->get_option('token');
 			$this->payment_action = $this->get_option( 'payment_action' );
 			$this->currency = $this->get_option( 'currency' );
 			$currency = explode(' ', '{name}');
 			$this->default_currency = end($currency);
 
-            if($this->get_option( 'payment_icon' ) != 'default') {
-			$this->icon = plugins_url()."/altapay-for-woocommerce/assets/images/payment_icons/".$this->get_option( 'payment_icon' );
+			if($this->get_option( 'payment_icon' ) !== 'default') {
+				$this->icon = plugins_url()."/altapay-for-woocommerce/assets/images/payment_icons/".$this->get_option( 'payment_icon' );
 			}
 			// Load form fields
 			$this->init_form_fields();
@@ -59,6 +59,11 @@
 
 		}
 
+		/**
+		* Settings page  
+		*
+		* @return void
+		*/
 		public function admin_options() {
 			echo '<h3>{name}</h3>';
 			echo '<table class="form-table">';
@@ -66,6 +71,11 @@
 			echo '</table>';
 		}
 
+		/**
+		* @param int $order_id
+		*
+		* @return void
+		*/
 		public function receipt_page_altapay( $order_id ) {
 			// Show text
 			$return = $this->createPaymentRequest( $order_id );
@@ -77,9 +87,14 @@
 			}
 		}
 
+		/**
+		* Load form fields
+		*
+		* @return void
+		*/
 		public function init_form_fields() {
 		    $tokenStatus = '{tokenStatus}';
-		    if($tokenStatus == 'CreditCard'){
+		    if($tokenStatus === 'CreditCard'){
             $this->form_fields = include __DIR__."/../includes/AltapayFormFieldsToken.php";
         }
 		else {
@@ -97,7 +112,7 @@
 			$api = $this->apiLogin();
 			if ($api instanceof WP_Error) {
 				$_SESSION['altapay_login_error'] = $api->get_error_message();
-				echo '<p><b>' . __('Could not connect to Altapay!', 'altapay') . '</b></p>';
+				echo '<p><b>' . __('Could not connect to AltaPay!', 'altapay') . '</b></p>';
 				return;
 			}
 			// Create payment request
@@ -165,7 +180,7 @@
 				$language = $languages[get_locale()];
 			}
 
-			// Get chosen page from Altapay's settings
+			// Get chosen page from AltaPay's settings
 			$form_page_id = esc_attr( get_option('altapay_payment_page') );
 			$config = array(
 				'callback_form' => get_page_link($form_page_id),
@@ -177,15 +192,15 @@
 
 			// Make these as settings
 			$payment_type = 'payment';
-			if ($this->payment_action == 'authorize_capture') {
+			if ($this->payment_action === 'authorize_capture') {
 				$payment_type = 'paymentAndCapture';
 			}
 
 			// Check if WooCommerce subscriptions is enabled
 			if (class_exists( 'WC_Subscriptions_Order' )) {
-				// Check if cart containt subscription product
+				// Check if cart contain subscription product
 				if( WC_Subscriptions_Order::order_contains_subscription( $order_id ) ) {
-					if ($this->payment_action == 'authorize_capture') {
+					if ($this->payment_action === 'authorize_capture') {
 						$payment_type = 'subscriptionAndCharge';
 					} else {
 						$payment_type = 'subscriptionAndReserve';
@@ -210,7 +225,7 @@
 
 			$transactionInfo = $altapayHelpers->transactionInfo();
 
-			// Add orderlines to Altapay request
+			// Add orderlines to AltaPay request
 			$orderLines = $utilMethods->createOrderLines($order);
 			if ($orderLines instanceof WP_Error) {
 				return $orderLines; // Some error occurred
@@ -236,7 +251,7 @@
 					return $errorMessage;
 				}
 
-				echo '<p>'.__('You are now going to be redirected to Altapay Payment Gateway','altapay').'</p>';
+				echo '<p>'.__('You are now going to be redirected to AltaPay Payment Gateway','altapay').'</p>';
 				$redirectURL = $response->getRedirectURL();
 				return $redirectURL;
 			}
@@ -247,126 +262,109 @@
 			}
 		}
 
+		/**
+		* Check for Gateway Response
+		*
+		* @return void
+		*/
 		public function checkAltapayResponse() {
 			// Check if callback is altapay and the allowed IP
-			if ( $_GET['wc-api'] == 'WC_Gateway_'.$this->id ) {
+			if ( isset($_GET['wc-api']) && $_GET['wc-api'] === 'WC_Gateway_'.$this->id ) {
 				global $woocommerce;
-				$postdata = $_POST;
-				$xmlResponse = preg_replace('/\\\\/', '', $_POST['xml']);
-                $xml = new SimpleXMLElement($xmlResponse);
-                $xmlToJson = json_encode($xml->Body->Transactions->Transaction);
-                $jsonToArray = json_decode($xmlToJson,TRUE);
 
+				$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
+				$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
+				$cardNo         = isset( $_POST['masked_credit_card'] ) ? sanitize_text_field( wp_unslash( $_POST['masked_credit_card'] ) ) : '';
+				$amount         = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
+				$credToken      = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
+				$merchantError  = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
+				$errorMessage   = isset( $_POST['error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['error_message'] ) ) : '';
+				$payment_status = isset( $_POST['payment_status'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_status'] ) ) : '';
+				$status         = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+				$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+				$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
 
-				$order_id = sanitize_text_field($postdata['shop_orderid']);
-			 	$order = new WC_Order($order_id);
-			 	$txnid = sanitize_text_field($postdata['transaction_id']);
-			 	$cardno = sanitize_text_field($postdata['masked_credit_card']);
-			 	$amount = sanitize_text_field($postdata['amount']);
-			 	$credtoken = sanitize_text_field($postdata['credit_card_token']);
-				$merchant_error_message = '';
-				$error_message = '';
-				if (array_key_exists('merchant_error_message', $postdata)) {
-					$merchant_error_message = sanitize_text_field($postdata['merchant_error_message']);
+				$xmlResponse          = wp_unslash( $_POST['xml'] );
+				$xml                  = new SimpleXMLElement( $xmlResponse );
+				$xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
+				$jsonToArray          = json_decode( $xmlToJson, true );
+				$creditCardCardBrand  = $jsonToArray['PaymentSchemeName'];
+				$creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'];
+
+				$order = new WC_Order( $order_id );
+
+				// If order already on-hold
+				if ( $order->has_status( 'on-hold' ) ) {
+
+					if ( $status === 'succeeded' ) {
+
+						$order->add_order_note( __( 'Notification completed', 'Altapay' ) );
+						$order->payment_complete();
+
+						update_post_meta( $order_id, '_transaction_id', $txnId );
+						update_post_meta( $order_id, '_cardno', $cardNo );
+						update_post_meta( $order_id, '_credit_card_token', $credToken );
+						update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
+						update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );
+
+					} else {
+						if ( $status === 'error' || $status === 'failed' ) {
+							$order->update_status( 'failed', 'Payment failed: ' . $errorMessage );
+							$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'Altapay' ) );
+						}
+					}
+
+					exit;
 				}
-				if (array_key_exists('error_message', $postdata)) {
-					$error_message = sanitize_text_field($postdata['error_message']);
-				}
-				$payment_status = sanitize_text_field($postdata['payment_status']);
-				$status = sanitize_text_field($postdata['status']);
 
-				$creditCardCardBrand = $jsonToArray['PaymentSchemeName'];
-                $creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'].'/'.$jsonToArray['CreditCardExpiry']['Year'];
-
-			 	// TODO Clean up
-
-			 	// If order already on-hold
-			 	if ($order->has_status('on-hold')) {
-
-			 		if ($status == 'succeeded') {
-
-			 			$order->add_order_note(__('Notification completed', 'Altapay'));
-			 			$order->payment_complete();
-
-						update_post_meta($order_id, '_transaction_id', $txnid);
-						update_post_meta($order_id, '_cardno', $cardno);
-						update_post_meta($order_id, '_credit_card_token', $credtoken);
-						update_post_meta($order_id, '_credit_card_brand', $creditCardCardBrand);
-						update_post_meta($order_id, '_credit_card_expiry_date', $creditCardExpiryDate);
-
-			 		} else {
-			 			if ($status == 'error' || $status == 'failed') {
-			 				$order->update_status('failed', 'Payment failed: ' . $error_message);
-			 				$order->add_order_note( __('Payment failed: ' . $error_message .' Merchant error: ' . $merchant_error_message, 'Altapay') );
-			 			}
-			 		}
-
-			 		exit;
-			 	}
-
-			 	if ($status == 'open') {
+			 	if ($status === 'open') {
 			 		$order->update_status('on-hold', 'The payment is pending an update from the payment provider.');
 			 		$redirect = $this->get_return_url($order);
 					wp_redirect($redirect);
 			 		exit;
 			 	}
 
-			 	if ($payment_status == 'released') {
+			 	if ($payment_status === 'released') {
 			 		$order->add_order_note( __('Payment failed: payment released', 'Altapay') );
 					wc_add_notice( __('Payment error:', 'altapay') . ' Payment released', 'error' );
 					wp_redirect(wc_get_cart_url());
 					exit;
 			 	}
 
-			 	if (array_key_exists('cancel_order', $_GET)) {
-					$order->add_order_note( __('Payment failed: ' . $error_message .' Merchant error: ' . $merchant_error_message, 'Altapay') );
-					wc_add_notice( __('Payment error:', 'altapay') . ' '.$error_message, 'error' );
-					wp_redirect(wc_get_cart_url());
+				if ( array_key_exists( 'cancel_order', $_GET ) ) {
+					$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'Altapay' ) );
+					wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $errorMessage, 'error' );
+					wp_redirect( wc_get_cart_url() );
 					exit;
 				}
 
-			 	// Make some validation
-			 	if ($error_message || $merchant_error_message) {
-			 		$order->add_order_note( __('Payment failed: ' . $error_message .' Merchant error: ' . $merchant_error_message, 'Altapay') );
-					wc_add_notice( __('Payment error:', 'altapay') . ' '.$error_message, 'error' );
-					wp_redirect(wc_get_cart_url());
+				// Make some validation
+				if ( $errorMessage || $merchantError ) {
+					$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'Altapay' ) );
+					wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $errorMessage, 'error' );
+					wp_redirect( wc_get_cart_url() );
 					exit;
-			 	}
+				}
 
-			 	if( $order->has_status('pending') && $status == 'succeeded' ) {
+				if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
 					// Payment completed
-					$order->add_order_note(__('Callback completed', 'Altapay'));
+					$order->add_order_note( __( 'Callback completed', 'Altapay' ) );
 					$order->payment_complete();
-					update_post_meta($order_id, '_transaction_id', $txnid);
-					update_post_meta($order_id, '_cardno', $cardno);
-					update_post_meta($order_id, '_credit_card_token', $credtoken);
-					update_post_meta($order_id, '_credit_card_brand', $creditCardCardBrand);
-					update_post_meta($order_id, '_credit_card_expiry_date', $creditCardExpiryDate);
+					update_post_meta( $order_id, '_transaction_id', $txnId );
+					update_post_meta( $order_id, '_cardno', $cardNo );
+					update_post_meta( $order_id, '_credit_card_token', $credToken );
+					update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
+					update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );
 				}
 
-			 	// Redirect to Custom Order Confirmation page
-			 	if(is_user_logged_in()) {
-			 	    if ($postdata['type']=='paymentAndCapture' && $postdata['require_capture'] == 'true') {
-			 	        $api = $this->apiLogin();
-                        $api->captureReservation($txnid, $amount,array(), null);
-                    }
-                    $redirect = $this->get_return_url($order);
-                    wp_redirect($redirect);
-                    exit;
-                }
 				// Redirect to Order Confirmation Page
-				else {
-                    if ($postdata['type']=='paymentAndCapture' && $postdata['require_capture'] == 'true') {
-                        $api = $this->apiLogin();
-                        $api->captureReservation($txnid, $amount,array(), null);
-                    }
-                    $redirect = $this->get_return_url($order);
-                    wp_redirect($redirect);
-                    exit;
-                }
+				if ( $type === 'paymentAndCapture' && $requireCapture == 'true' ) {
+					$api = $this->apiLogin();
+					$api->captureReservation( $txnId, $amount, array(), null );
+				}
+				$redirect = $this->get_return_url($order);
+				wp_redirect($redirect);
+				exit;
 			}
 		}
-
 }
-
-?>
