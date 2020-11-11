@@ -86,10 +86,10 @@ class AltapaySettings {
 				);
 
 				return;
-			} else {
-				update_post_meta( $orderID, '_captured', true );
-				$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
 			}
+
+			update_post_meta( $orderID, '_captured', true );
+			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
 		}
 	}
 
