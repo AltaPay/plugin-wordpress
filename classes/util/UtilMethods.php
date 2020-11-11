@@ -137,9 +137,9 @@ class UtilMethods {
 	/**
 	 * Returns product Details based on product type and tax configuration settings
 	 *
-	 * @param $orderline
-	 * @param $taxConfiguration
-	 * @param $couponDiscountPercentage
+	 * @param object[] $orderline
+	 * @param string   $taxConfiguration
+	 * @param float    $couponDiscountPercentage
 	 * @return array
 	 */
 	private function getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage ) {
@@ -159,7 +159,7 @@ class UtilMethods {
 		$orderlineTax = array_sum( $orderline['taxes']['total'] ) / $orderline['subtotal'];
 		$taxRate      = $orderlineTax;
 
-		// calculate total generated from Woocommerce after calculations
+		// Calculate total generated from WooCommerce after calculations
 		$totalCMS = number_format( $orderline['subtotal'] + $orderline['subtotal_tax'], 2, '.', '' );
 
 		// set product ID based on the sku provided
@@ -208,7 +208,7 @@ class UtilMethods {
 					$totalCMS           = $orderline['total'] + $orderline['total_tax'];
 				}
 				$productPrice = $productRegularPrice;
-				$taxAmount    = ( $productPrice * $taxRate );
+				$taxAmount    = $productPrice * $taxRate;
 				break;
 		}
 
@@ -280,7 +280,7 @@ class UtilMethods {
 			$shippingID = $orderShippingMethods['method_id'];
 		}
 		// In a refund it's possible to have order_shipping == 0 and order_shipping_tax != 0 at the same time
-		if ( $order->get_shipping_total() <> 0 || $order->get_shipping_tax() <> 0 ) {
+		if ( $order->get_shipping_total() != 0 || $order->get_shipping_tax() != 0 ) {
 			if ( ! empty( $products ) ) {
 				if ( ! in_array( $shippingID, $products['skuList'] ) ) {
 					return false;

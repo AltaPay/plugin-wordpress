@@ -66,7 +66,6 @@ trait AltapayMaster {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		global $woocommerce;
 		$order = new WC_Order( $order_id );
 
 		// Return goto payment url
@@ -85,14 +84,7 @@ trait AltapayMaster {
 			return false;
 		}
 
-		// Check on payment currency
-		$active_currency = get_woocommerce_currency();
-
-		if ( $active_currency != $this->currency ) {
-			return false;
-		}
-
-		return true;
+		return get_woocommerce_currency() == $this->currency;
 	}
 
 	/**
@@ -100,7 +92,7 @@ trait AltapayMaster {
 	 *
 	 * @param float    $amount
 	 * @param WC_Order $renewal_order
-	 * @return bool|void
+	 * @return void
 	 */
 	public function scheduledSubscriptionsPayment( $amount, $renewal_order ) {
 		try {
@@ -109,7 +101,6 @@ trait AltapayMaster {
 				return;
 			}
 
-			$transaction_id = '';
 			if ( wcs_order_contains_renewal( $renewal_order->id ) ) {
 				$parent_order_id = WC_Subscriptions_Renewal_Order::get_parent_order_id( $renewal_order->id );
 			}
@@ -120,7 +111,7 @@ trait AltapayMaster {
 			if ( ! $transaction_id ) {
 				// Set subscription payment as failure
 				$renewal_order->update_status( 'failed', __( 'AltaPay could not locate transaction ID', 'altapay' ) );
-				return false;
+				return;
 			}
 
 			$api = $this->apiLogin();

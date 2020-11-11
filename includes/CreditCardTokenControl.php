@@ -37,10 +37,8 @@ function savedCreditCardMenuLink( $menuLinks ) {
  * @return void
  */
 function savedCreditCardEndpoint() {
-	// WP_Rewrite is my Achilles' heel, so please do not ask me for detailed explanation
 	add_rewrite_endpoint( 'saved-credit-cards', EP_PAGES );
 	flush_rewrite_rules();
-
 }
 
 /**
@@ -70,12 +68,11 @@ function savedCreditCardEndpointContent() {
  * @return void
  */
 function createCreditCardDB() {
-	 global $wpdb;
-	global $creditCardDBVersion;
-
+	global $wpdb;
 	$tableName      = $wpdb->prefix . 'altapayCreditCardDetails';
 	$charsetCollate = $wpdb->get_charset_collate();
-	$sql            = "CREATE TABLE $tableName (
+
+	$sql = "CREATE TABLE $tableName (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             userID varchar(200) DEFAULT '' NOT NULL,
@@ -88,7 +85,6 @@ function createCreditCardDB() {
 
 	require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 	dbDelta( $sql );
-	add_option( '$creditCardDBVersion', $creditCardDBVersion );
 }
 
 /**
@@ -168,7 +164,7 @@ function filterSaveCreditCardDetailsButton( $text, $order ) {
 		saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate );
 	}
 
-	if ( ! empty( $orderMeta['_cardno'][0] ) && empty( $results ) && is_user_logged_in() ) {
+	if ( ! empty( $orderMeta['_cardno'][0] ) && ! $results && is_user_logged_in() ) {
 		if ( $paymentMethods[ $orderPaymentMethod ]->settings['enabled'] === 'yes' && $paymentMethods[ $orderPaymentMethod ]->settings['token_control'] === 'yes' ) {
 			return '<form method="post" action="">
 		<input type="submit" name="test" id="test" value="' . $buttonText . '" /><br/>

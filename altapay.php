@@ -46,7 +46,7 @@ function init_altapay_settings() {
 	/**
 	 * Add gateways to WooCommerce.
 	 *
-	 * @param $methods
+	 * @param array $methods
 	 *
 	 * @return array
 	 */
@@ -68,7 +68,7 @@ function init_altapay_settings() {
 					if ( $term->key === $terminal ) {
 						$terminalName   = $term->name;
 						$terminalNature = $term->nature;
-						if ( in_array( 'CreditCard', $terminalNature ) ) {
+						if ( in_array( 'CreditCard', $terminalNature, true ) ) {
 							$tokenStatus = 'CreditCard';
 						}
 					}
@@ -79,10 +79,10 @@ function init_altapay_settings() {
 
 				if ( file_exists( $path ) ) {
 					require_once $path;
-					$methods[ $terminal ] = 'WC_Gateway_' . $terminal;
+					$methods[] = 'WC_Gateway_' . $terminal;
 				} elseif ( file_exists( $tmpPath ) ) {
 					require_once $tmpPath;
-					$methods[ $terminal ] = 'WC_Gateway_' . $terminal;
+					$methods[] = 'WC_Gateway_' . $terminal;
 				} else {
 					// Create file
 					$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
@@ -121,7 +121,7 @@ function init_altapay_settings() {
 
 			// If no template override load template from plugin
 			if ( ! $template ) {
-				$template = dirname( __FILE__ ) . '/views/altapay-payment-form.php';
+				$template = __DIR__ . '/views/altapay-payment-form.php';
 			}
 		}
 
@@ -142,7 +142,7 @@ function init_altapay_settings() {
 	 * Register meta box for order details page
 	 */
 	function altapayAddMetaBoxes() {
-		global $post, $woocommerce;
+		global $post;
 
 		if ( $post->post_type !== 'shop_order' ) {
 			return true;
@@ -310,7 +310,6 @@ function init_altapay_settings() {
 	 * @return WP_Error
 	 */
 	function altapayCaptureCallback() {
-		 global $wpdb;
 		$utilMethods = new UtilMethods();
 		$orderID     = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
 		$amount      = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
@@ -586,7 +585,6 @@ function init_altapay_settings() {
 	 * @return WP_Error
 	 */
 	function altapayReleasePayment() {
-		global $wpdb;
 		$orderID  = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 		$order    = new WC_Order( $orderID );
 		$txnID    = $order->get_transaction_id();

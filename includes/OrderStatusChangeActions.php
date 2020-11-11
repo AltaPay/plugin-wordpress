@@ -51,9 +51,9 @@ function orderStatusChanged( $order ) {
 
 	}
 
-	if ( $currentOrderStatus == 'cancelled' ) {
+	if ( $currentOrderStatus === 'cancelled' ) {
 		try {
-			if ( $status == 'released' ) {
+			if ( $status === 'released' ) {
 				return;
 			} elseif ( $captured == 0 && $refunded == 0 ) {
 				$releaseResult = $api->releaseReservation( $txnID );
@@ -83,9 +83,9 @@ function orderStatusChanged( $order ) {
 		} catch ( Exception $e ) {
 			return WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
-	} elseif ( $currentOrderStatus == 'completed' ) {
+	} elseif ( $currentOrderStatus === 'completed' ) {
 		try {
-			if ( $status == 'captured' ) {
+			if ( $status === 'captured' ) {
 				return;
 			} elseif ( $captured == 0 ) {
 				$captureResult = $api->captureReservation( $txnID );

@@ -110,10 +110,9 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function saveCaptureFailedMessage( $newMessage ) {
+		$message = '';
 		if ( isset( $_SESSION['altapay_capture_failed'] ) ) {
 			$message = $_SESSION['altapay_capture_failed'] . '<br/>';
-		} else {
-			$message = '';
 		}
 
 		$_SESSION['altapay_capture_failed'] = $message . $newMessage;
@@ -235,7 +234,7 @@ class AltapaySettings {
 	 * @throws AltapayMerchantAPIException
 	 */
 	public function altapaySettings() {
-		 $terminals        = false;
+		$terminals         = false;
 		$disabledTerminals = array();
 		$enabledTerminals  = array();
 		$gatewayURL        = esc_attr( get_option( 'altapay_gateway_url' ) );
@@ -381,7 +380,7 @@ class AltapaySettings {
 	}
 
 	/**
-	 * Form with refresh connection button on altapay page
+	 * Form with refresh connection button on AltaPay page
 	 *
 	 * @return void
 	 */
