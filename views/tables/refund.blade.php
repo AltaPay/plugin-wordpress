@@ -1,10 +1,12 @@
-<!--
-  ~ Altapay module for Woocommerce
-  ~
-  ~ Copyright © 2020 Altapay. All rights reserved.
-  ~ For the full copyright and license information, please view the LICENSE
-  ~ file that was distributed with this source code.
-  -->
+<?php
+/**
+ * AltaPay module for WooCommerce
+ *
+ * Copyright © 2020 AltaPay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+?>
 
 <table class="w-100 center" cellspacing="0">
     <tbody>

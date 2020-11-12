@@ -1,13 +1,13 @@
+<?php
+/**
+ * AltaPay module for WooCommerce
+ *
+ * Copyright © 2020 AltaPay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-
-<!--
-  ~ Altapay module for Woocommerce
-  ~
-  ~ Copyright © 2020 Altapay. All rights reserved.
-  ~ For the full copyright and license information, please view the LICENSE
-  ~ file that was distributed with this source code.
-  -->
-
 <html lang="en">
 <head>
     <style>
