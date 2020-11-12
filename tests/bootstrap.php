@@ -25,7 +25,7 @@ require_once $_tests_dir . '/includes/functions.php';
  * @return void
  */
 function _manually_load_plugin() {
-	include dirname( dirname( __FILE__ ) ) . '/altapay.php';
+	include dirname( __DIR__ ) . '/altapay.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 

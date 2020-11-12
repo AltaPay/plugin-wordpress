@@ -341,7 +341,7 @@ function init_altapay_settings() {
 				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
-			if ( ! empty( $postOrderLines ) ) {
+			if ( $postOrderLines ) {
 				$selectedProducts = array(
 					'skuList' => array(),
 					'skuQty'  => array(),
@@ -459,7 +459,7 @@ function init_altapay_settings() {
 				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = wp_unslash( $_POST['orderLines'] );
-			if ( ! empty( $postOrderLines ) ) {
+			if ( $postOrderLines ) {
 				$selectedProducts = array(
 					'skuList' => array(),
 					'skuQty'  => array(),

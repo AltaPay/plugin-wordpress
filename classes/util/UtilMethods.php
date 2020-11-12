@@ -18,7 +18,6 @@ class UtilMethods {
 	 * @return array  list of order lines
 	 */
 	public function createOrderLines( $order, $products = array(), $returnRefundOrderLines = false ) {
-		global $wpdb;
 		$orderlineDetails         = array();
 		$itemsToCapture           = array();
 		$couponDiscountPercentage = 0; // set initial coupon discount to 0
@@ -26,7 +25,7 @@ class UtilMethods {
 		$cartItems                = $order->get_items(); // get cart items
 
 		// If capture request is triggered
-		if ( ! empty( $products ) ) {
+		if ( $products ) {
 			foreach ( $cartItems as $key => $value ) {
 				if ( in_array( $key, $products['skuList'] ) ) {
 					$itemsToCapture[ $key ] = $value;
@@ -36,7 +35,7 @@ class UtilMethods {
 		}
 
 		// if cart is empty
-		if ( empty( $cartItems ) ) {
+		if ( ! $cartItems ) {
 			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
 		// generate Orderlines product by product
@@ -49,7 +48,7 @@ class UtilMethods {
 			$productType = $product->product_type;
 			// get product details for each orderline
 			$productDetails = $this->getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage );
-			if ( $productType == 'bundle' && $productDetails['product']['unitPrice'] == 0 ) {
+			if ( $productType === 'bundle' && $productDetails['product']['unitPrice'] == 0 ) {
 				continue;
 			}
 			$orderlineDetails [] = $productDetails['product'];
@@ -67,7 +66,7 @@ class UtilMethods {
 			)
 		);
 
-		if ( ! empty( $shippingDetails ) ) {
+		if ( $shippingDetails ) {
 			$orderlineDetails [] = $shippingDetails;
 		}
 
@@ -281,7 +280,7 @@ class UtilMethods {
 		}
 		// In a refund it's possible to have order_shipping == 0 and order_shipping_tax != 0 at the same time
 		if ( $order->get_shipping_total() != 0 || $order->get_shipping_tax() != 0 ) {
-			if ( ! empty( $products ) ) {
+			if ( $products ) {
 				if ( ! in_array( $shippingID, $products['skuList'] ) ) {
 					return false;
 				}

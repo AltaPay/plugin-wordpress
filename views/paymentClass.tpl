@@ -59,10 +59,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* Settings page
-	*
-	* @return void
-	*/
+	 * Settings page
+	 *
+	 * @return void
+	 */
 	public function admin_options() {
 		echo '<h3>{name}</h3>';
 		echo '<table class="form-table">';
@@ -71,10 +71,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* @param int $order_id
-	*
-	* @return void
-	*/
+	 * @param int $order_id
+	 *
+	 * @return void
+	 */
 	public function receipt_page_altapay( $order_id ) {
 		// Show text
 		$return = $this->createPaymentRequest( $order_id );
@@ -86,10 +86,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* Load form fields
-	*
-	* @return void
-	*/
+	 * Load form fields
+	 *
+	 * @return void
+	 */
 	public function init_form_fields() {
 		$tokenStatus = '{tokenStatus}';
 		if($tokenStatus === 'CreditCard'){
@@ -265,14 +265,13 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$response = $api->createPaymentRequest($terminal, $order_id, $amount, $currency, $payment_type, $customerInfo, $cookie, $language, $config, $transactionInfo, $orderLines, false, $ccToken, null, null, null, null, null,$customerCreatedDate);
 			$responseError = $response->getErrorMessage();
 
-			if(!empty($responseError)) {
-				$errorMessage = new WP_Error('ResponseError', $responseError);
-				return $errorMessage;
+			if ( $responseError ) {
+				return new WP_Error( 'ResponseError', $responseError );
 			}
 
 			echo '<p>'.__('You are now going to be redirected to AltaPay Payment Gateway','altapay').'</p>';
-			$redirectURL = $response->getRedirectURL();
-			return $redirectURL;
+
+			return $response->getRedirectURL();
 		} catch ( Exception $e ) {
 				error_log('Could not create the payment request: ' . $e->getMessage());
 				$order->add_order_note( __('Could not create the payment request: ' . $e->getMessage(), 'altapay') );
@@ -281,10 +280,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* Check for Gateway Response
-	*
-	* @return void
-	*/
+	 * Check for Gateway Response
+	 *
+	 * @return void
+	 */
 	public function checkAltapayResponse() {
 		// Check if callback is altapay and the allowed IP
 		if ( isset($_GET['wc-api']) && $_GET['wc-api'] === 'WC_Gateway_'.$this->id ) {
@@ -376,7 +375,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			// Redirect to Order Confirmation Page
-			if ( $type === 'paymentAndCapture' && $requireCapture == 'true' ) {
+			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' ) {
 				$api = $this->apiLogin();
 				$api->captureReservation( $txnId, $amount, array(), null );
 			}

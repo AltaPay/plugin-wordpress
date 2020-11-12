@@ -95,10 +95,10 @@ class AltapaySettings {
 
 
 	/**
-	* Starts the session
-	*
-	* @return void
-	*/
+	 * Starts the session
+	 *
+	 * @return void
+	 */
 	public function startSession() {
 		if ( session_id() === '' ) {
 			session_start();
@@ -244,10 +244,10 @@ class AltapaySettings {
 		$terminalDetails   = get_option( 'altapay_terminals' );
 		$terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
 
-		if ( ! empty( $terminalDetails ) ) {
+		if ( $terminalDetails ) {
 			$terminals = json_decode( get_option( 'altapay_terminals' ) );
 		}
-		if ( ! empty( $terminalsEnabled ) ) {
+		if ( $terminalsEnabled ) {
 			$enabledTerminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
 		}
 		$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
