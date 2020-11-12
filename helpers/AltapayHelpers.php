@@ -58,7 +58,7 @@ class AltapayHelpers {
 		$shippingAddress = $customerInfo['shipping_address'];
 		$shippingPostal  = $customerInfo['shipping_postal'];
 		// Use billing address in case one of the shipping parameters is missing
-		if ( empty( $shippingCountry ) || empty( $shippingCity ) || empty( $shippingAddress ) || empty( $shippingPostal ) ) {
+		if ( ! $shippingCountry || ! $shippingCity || ! $shippingAddress || ! $shippingPostal ) {
 			if ( empty( $customerInfo['billing_country'] ) ) {
 				// Throw error since the payment cannot be made without shipping country, even for virtual products
 				return new WP_Error( 'error', __( 'Shipping country is required', 'altapay' ) );
