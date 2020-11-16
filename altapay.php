@@ -93,7 +93,6 @@ function init_altapay_settings() {
 				}
 			}
 		}
-
 		return $methods;
 	}
 
@@ -157,7 +156,6 @@ function init_altapay_settings() {
 				'normal'
 			);
 		}
-
 		return true;
 	}
 
@@ -179,7 +177,6 @@ function init_altapay_settings() {
 			if ( $api instanceof WP_Error ) {
 				$_SESSION['altapay_login_error'] = $api->get_error_message();
 				echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-
 				return;
 			}
 
@@ -461,7 +458,6 @@ function init_altapay_settings() {
 				$api->login();
 			} catch ( Exception $e ) {
 				$_SESSION['altapay_login_error'] = $e->getMessage();
-
 				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = wp_unslash( $_POST['orderLines'] );
@@ -607,7 +603,6 @@ function init_altapay_settings() {
 			$api->login();
 		} catch ( Exception $e ) {
 			$_SESSION['altapay_login_error'] = $e->getMessage();
-
 			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
 		try {
