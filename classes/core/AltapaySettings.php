@@ -7,10 +7,12 @@
  * file that was distributed with this source code.
  */
 
+namespace Altapay\Classes\Core;
+
+use Altapay\Helpers;
+use Altapay\Helpers\Traits\AltapayMaster;
+
 require_once dirname( __DIR__, 2 ) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'altapay' . DIRECTORY_SEPARATOR . 'altapay-php-sdk' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'AltapayMerchantAPI.class.php';
-require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'util' . DIRECTORY_SEPARATOR . 'UtilMethods.php';
-require_once dirname( __DIR__, 2 ) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'traits' . DIRECTORY_SEPARATOR . 'traits.php';
-require_once dirname( __DIR__, 2 ) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'AltapayHelpers.php';
 
 class AltapaySettings {
 
@@ -44,7 +46,7 @@ class AltapaySettings {
 	public function altapayOrderStatusCompleted( $orderID ) {
 		$this->startSession();
 		// Load order
-		$order = new WC_Order( $orderID );
+		$order = new \WC_Order( $orderID );
 		$txnID = $order->get_transaction_id();
 
 		if ( ! $txnID ) {
@@ -220,7 +222,7 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function altapayRegisterSettings() {
-		 register_setting( 'altapay-settings-group', 'altapay_gateway_url' );
+		register_setting( 'altapay-settings-group', 'altapay_gateway_url' );
 		register_setting( 'altapay-settings-group', 'altapay_username' );
 		register_setting( 'altapay-settings-group', 'altapay_password' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
@@ -291,7 +293,7 @@ class AltapaySettings {
 			if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 				wp_die( sprintf( 'AltaPay for WooCommerce requires PHP 5.4 or higher. You’re still on %s.', PHP_VERSION ) );
 			} else {
-				$blade = new AltapayHelpers();
+				$blade = new Helpers\AltapayHelpers();
 				echo $blade->loadBladeLibrary()->run(
 					'forms.adminSettings',
 					array(

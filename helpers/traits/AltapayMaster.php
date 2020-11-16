@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Altapay\Helpers\Traits;
+
 trait AltapayMaster {
 
 	/**
@@ -66,7 +68,7 @@ trait AltapayMaster {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		$order = new WC_Order( $order_id );
+		$order = new \WC_Order( $order_id );
 
 		// Return goto payment url
 		return array(
@@ -92,7 +94,7 @@ trait AltapayMaster {
 	 *
 	 * @param float    $amount
 	 * @param WC_Order $renewal_order
-	 * @return void
+	 * @return bool|void
 	 */
 	public function scheduledSubscriptionsPayment( $amount, $renewal_order ) {
 		try {
@@ -101,17 +103,18 @@ trait AltapayMaster {
 				return;
 			}
 
+			$transaction_id = '';
 			if ( wcs_order_contains_renewal( $renewal_order->id ) ) {
 				$parent_order_id = WC_Subscriptions_Renewal_Order::get_parent_order_id( $renewal_order->id );
 			}
 
-			$orderinfo      = new WC_Order( $parent_order_id );
+			$orderinfo      = new \WC_Order( $parent_order_id );
 			$transaction_id = $orderinfo->get_transaction_id();
 
 			if ( ! $transaction_id ) {
 				// Set subscription payment as failure
 				$renewal_order->update_status( 'failed', __( 'AltaPay could not locate transaction ID', 'altapay' ) );
-				return;
+				return false;
 			}
 
 			$api = $this->apiLogin();
@@ -146,7 +149,7 @@ trait AltapayMaster {
 	 */
 	public function apiLogin() {
 		if ( $this->api === false ) {
-			$this->api = new AltapayMerchantAPI(
+			$this->api = new \AltapayMerchantAPI(
 				esc_attr( get_option( 'altapay_gateway_url' ) ),
 				esc_attr( get_option( 'altapay_username' ) ),
 				esc_attr( get_option( 'altapay_password' ) ),
@@ -155,7 +158,7 @@ trait AltapayMaster {
 			try {
 				$this->api->login();
 			} catch ( Exception $e ) {
-				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+				return new \WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 		}
 

@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+namespace Altapay\Classes\Util;
+
 class UtilMethods {
 
 	/**
@@ -36,7 +38,7 @@ class UtilMethods {
 
 		// if cart is empty
 		if ( ! $cartItems ) {
-			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
+			return new \WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
 		// generate Orderlines product by product
 		foreach ( $cartItems as $orderlineKey => $orderline ) {
@@ -103,7 +105,7 @@ class UtilMethods {
 				$couponPostObj = get_page_by_title( $item->get_name(), OBJECT, 'shop_coupon' );
 				$couponID      = $couponPostObj->ID;
 				// Get an instance of WC_Coupon object (necessary to use WC_Coupon methods)
-				$coupon         = new WC_Coupon( $couponID );
+				$coupon         = new \WC_Coupon( $couponID );
 				$couponType     = $coupon->discount_type;
 				$appliedCoupons = reset( $coupon );
 				// Filtering with your coupon custom types

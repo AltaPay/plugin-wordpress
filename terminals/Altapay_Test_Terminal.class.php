@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'util' . DIRECTORY_SEPARATOR . 'UtilMethods.php';
-require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'AltapayHelpers.php';
-require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'traits' . DIRECTORY_SEPARATOR . 'traits.php';
+use Altapay\Helpers\Traits\AltapayMaster;
+use Altapay\Classes\Util;
+use Altapay\Helpers;
 
 class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 
@@ -104,8 +104,8 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
     public function createPaymentRequest( $order_id ) {
         global $wpdb;
         $currentUserId  = get_current_user_id();
-        $utilMethods    = new UtilMethods();
-        $altapayHelpers = new AltapayHelpers();
+        $utilMethods = new Util\UtilMethods;
+        $altapayHelpers = new Helpers\AltapayHelpers;
         // Create form request etc.
         $api = $this->apiLogin();
         if ( $api instanceof WP_Error ) {
@@ -115,7 +115,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
             return;
         }
         // Create payment request
-        $order = new WC_Order( $order_id );
+        $order = new \WC_Order( $order_id );
 
         // TODO Get terminal form instance
         $terminal     = $this->terminal;
@@ -288,7 +288,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
             $responseError = $response->getErrorMessage();
 
             if ( $responseError ) {
-                return new WP_Error( 'ResponseError', $responseError );
+                return new \WP_Error( 'ResponseError', $responseError );
             }
 
             echo '<p>' . __( 'You are now going to be redirected to AltaPay Payment Gateway', 'altapay' ) . '</p>';
@@ -298,7 +298,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
             error_log( 'Could not create the payment request: ' . $e->getMessage() );
             $order->add_order_note( __( 'Could not create the payment request: ' . $e->getMessage(), 'altapay' ) );
 
-            return new WP_Error( 'error', 'Could not create the payment request' );
+            return new \WP_Error( 'error', 'Could not create the payment request' );
         }
     }
 
@@ -325,13 +325,13 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
             $requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
 
             $xmlResponse          = wp_unslash( $_POST['xml'] );
-            $xml                  = new SimpleXMLElement( $xmlResponse );
+            $xml                  = new \SimpleXMLElement( $xmlResponse );
             $xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
             $jsonToArray          = json_decode( $xmlToJson, true );
             $creditCardCardBrand  = $jsonToArray['PaymentSchemeName'];
             $creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'];
 
-            $order = new WC_Order( $order_id );
+            $order = new \WC_Order( $order_id );
 
             // If order already on-hold
             if ( $order->has_status( 'on-hold' ) ) {
