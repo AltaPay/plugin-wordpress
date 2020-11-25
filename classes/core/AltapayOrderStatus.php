@@ -9,6 +9,9 @@
 
 namespace Altapay\Classes\Core;
 
+use AltapayMerchantAPI;
+use WP_Error;
+
 class AltapayOrderStatus {
 
 	/**
@@ -43,7 +46,7 @@ class AltapayOrderStatus {
 		$refunded = 0;
 		$status   = '';
 
-		$api = new \AltapayMerchantAPI(
+		$api = new AltapayMerchantAPI(
 			esc_attr( get_option( 'altapay_gateway_url' ) ),
 			esc_attr( get_option( 'altapay_username' ) ),
 			esc_attr( get_option( 'altapay_password' ) ),
@@ -54,7 +57,7 @@ class AltapayOrderStatus {
 		} catch ( Exception $e ) {
 			$_SESSION['altapay_login_error'] = $e->getMessage();
 
-			return new \WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
 
 		$payment  = $api->getPayment( $txnID );

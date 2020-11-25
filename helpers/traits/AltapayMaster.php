@@ -9,6 +9,10 @@
 
 namespace Altapay\Helpers\Traits;
 
+use AltapayMerchantAPI;
+use WC_Order;
+use WP_Error;
+
 trait AltapayMaster {
 
 	/**
@@ -68,7 +72,7 @@ trait AltapayMaster {
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		$order = new \WC_Order( $order_id );
+		$order = new WC_Order( $order_id );
 
 		// Return goto payment url
 		return array(
@@ -107,7 +111,7 @@ trait AltapayMaster {
 				$parent_order_id = WC_Subscriptions_Renewal_Order::get_parent_order_id( $renewal_order->id );
 			}
 
-			$orderinfo      = new \WC_Order( $parent_order_id );
+			$orderinfo      = new WC_Order( $parent_order_id );
 			$transaction_id = $orderinfo->get_transaction_id();
 
 			if ( ! $transaction_id ) {
@@ -148,7 +152,7 @@ trait AltapayMaster {
 	 */
 	public function apiLogin() {
 		if ( $this->api === false ) {
-			$this->api = new \AltapayMerchantAPI(
+			$this->api = new AltapayMerchantAPI(
 				esc_attr( get_option( 'altapay_gateway_url' ) ),
 				esc_attr( get_option( 'altapay_username' ) ),
 				esc_attr( get_option( 'altapay_password' ) ),
@@ -157,7 +161,7 @@ trait AltapayMaster {
 			try {
 				$this->api->login();
 			} catch ( Exception $e ) {
-				return new \WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 		}
 

@@ -342,7 +342,7 @@ function init_altapay_settings() {
 			} catch ( Exception $e ) {
 				$_SESSION['altapay_login_error'] = $e->getMessage();
 
-                		return new \WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+                		return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 			if ( $postOrderLines ) {

@@ -11,6 +11,7 @@ namespace Altapay\Classes\Core;
 
 use Altapay\Helpers;
 use Altapay\Helpers\Traits\AltapayMaster;
+use WC_Order;
 
 require_once dirname( __DIR__, 2 ) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'altapay' . DIRECTORY_SEPARATOR . 'altapay-php-sdk' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'AltapayMerchantAPI.class.php';
 
@@ -46,7 +47,7 @@ class AltapaySettings {
 	public function altapayOrderStatusCompleted( $orderID ) {
 		$this->startSession();
 		// Load order
-		$order = new \WC_Order( $orderID );
+		$order = new WC_Order( $orderID );
 		$txnID = $order->get_transaction_id();
 
 		if ( ! $txnID ) {

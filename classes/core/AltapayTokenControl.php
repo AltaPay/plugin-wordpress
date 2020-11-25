@@ -10,6 +10,7 @@
 namespace Altapay\Classes\Core;
 
 use Altapay\Helpers;
+use WC_Checkout;
 
 class AltapayTokenControl {
 
@@ -92,7 +93,7 @@ class AltapayTokenControl {
 	public function creditCardCustomDescription( $description, $payment_id ) {
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 
-		$checkout = new \WC_Checkout();
+		$checkout = new WC_Checkout();
 		if ( $gateways ) {
 			foreach ( $gateways as $gateway ) {
 

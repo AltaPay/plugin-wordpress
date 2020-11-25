@@ -62,7 +62,7 @@ function altapay_namespace_autoload( $class_name ) {
 	}
 
 	// Now build a path to the file using mapping to the file location.
-	$filepath  = trailingslashit( dirname( dirname( __FILE__ ) ) . strtolower( $namespace ) );
+	$filepath  = trailingslashit( dirname( __DIR__ ) . strtolower( $namespace ) );
 	$filepath .= $file_name;
 
 	// If the file exists in the specified path, then include it.

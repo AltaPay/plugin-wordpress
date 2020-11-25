@@ -11,7 +11,9 @@ namespace Altapay\Helpers;
 
 require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'blade' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'BladeOne.php';
 
+use DateTime;
 use eftec\bladeone;
+use WP_Error;
 
 class AltapayHelpers {
 
@@ -63,7 +65,7 @@ class AltapayHelpers {
 		if ( ! $shippingCountry || ! $shippingCity || ! $shippingAddress || ! $shippingPostal ) {
 			if ( empty( $customerInfo['billing_country'] ) ) {
 				// Throw error since the payment cannot be made without shipping country, even for virtual products
-				return new \WP_Error( 'error', __( 'Shipping country is required', 'altapay' ) );
+				return new WP_Error( 'error', __( 'Shipping country is required', 'altapay' ) );
 			}
 			$customerInfo['shipping_country'] = $customerInfo['billing_country'];
 			$customerInfo['shipping_address'] = $customerInfo['billing_address'];
@@ -83,7 +85,7 @@ class AltapayHelpers {
 	 * @throws Exception
 	 */
 	public function convertDateTimeFormat( $date ) {
-		$dateTime = new \DateTime( $date );
+		$dateTime = new DateTime( $date );
 		return $dateTime->format( 'Y-m-d' );
 	}
 
