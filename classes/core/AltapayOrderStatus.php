@@ -9,7 +9,13 @@
 
 namespace Altapay\Classes\Core;
 
+use AltapayConnectionFailedException;
+use AltapayInvalidResponseException;
 use AltapayMerchantAPI;
+use AltapayMerchantAPIException;
+use AltapayRequestTimeoutException;
+use AltapayUnauthorizedAccessException;
+use AltapayUnknownMerchantAPIException;
 use WP_Error;
 
 class AltapayOrderStatus {
@@ -32,12 +38,12 @@ class AltapayOrderStatus {
 	 * @param WC_Order $order
 	 *
 	 * @return WP_Error
-	 * @throws \AltapayConnectionFailedException
-	 * @throws \AltapayInvalidResponseException
-	 * @throws \AltapayMerchantAPIException
-	 * @throws \AltapayRequestTimeoutException
-	 * @throws \AltapayUnauthorizedAccessException
-	 * @throws \AltapayUnknownMerchantAPIException
+	 * @throws AltapayConnectionFailedException
+	 * @throws AltapayInvalidResponseException
+	 * @throws AltapayMerchantAPIException
+	 * @throws AltapayRequestTimeoutException
+	 * @throws AltapayUnauthorizedAccessException
+	 * @throws AltapayUnknownMerchantAPIException
 	 */
 	public function orderStatusChanged( $orderID, $currentStatus, $nextStatus, $order ) {
 		$txnID    = $order->get_transaction_id();
