@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-require_once dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'classes'.DIRECTORY_SEPARATOR .'util' . DIRECTORY_SEPARATOR . 'UtilMethods.php';
-require_once dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'AltapayHelpers.php';
-require_once dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'traits' . DIRECTORY_SEPARATOR . 'traits.php';
+use Altapay\Helpers\Traits\AltapayMaster;
+use Altapay\Classes\Util;
+use Altapay\Helpers;
 
 class WC_Gateway_{key} extends WC_Payment_Gateway {
 
@@ -103,8 +103,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	public function createPaymentRequest( $order_id ) {
 		global $wpdb;
 		$currentUserId = get_current_user_id();
-		$utilMethods = new UtilMethods;
-		$altapayHelpers = new AltapayHelpers;
+		$utilMethods = new Util\UtilMethods;
+		$altapayHelpers = new Helpers\AltapayHelpers;
 		// Create form request etc.
 		$api = $this->apiLogin();
 		if ($api instanceof WP_Error) {

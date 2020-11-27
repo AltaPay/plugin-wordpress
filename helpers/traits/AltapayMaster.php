@@ -7,6 +7,12 @@
  * file that was distributed with this source code.
  */
 
+namespace Altapay\Helpers\Traits;
+
+use AltapayMerchantAPI;
+use WC_Order;
+use WP_Error;
+
 trait AltapayMaster {
 
 	/**

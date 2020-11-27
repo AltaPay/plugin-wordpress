@@ -1,33 +1,28 @@
 <?php
 /**
- * AltaPay module for WooCommerce
- *
- * Copyright © 2020 AltaPay. All rights reserved.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
-/*
-* Plugin Name: Altapay for WooCommerce - Payments less complicated
-* Plugin URI: https://www.altapay.com/knowledge-base/omni-channel/integration-manuals/
-* Description: Payment Gateway to use with WordPress WooCommerce
-* Author: AltaPay
-* Author URI: https://www.altapay.com/knowledge-base/omni-channel/
+ * Plugin Name: Altapay for WooCommerce - Payments less complicated
+ * Plugin URI: https://www.altapay.com/knowledge-base/omni-channel/integration-manuals/
+ * Description: Payment Gateway to use with WordPress WooCommerce
+ * Author: AltaPay
+ * Author URI: https://www.altapay.com/knowledge-base/omni-channel/
  * Version: 3.1.1
  * Name: SDM_Altapay
  * WC requires at least: 3.0.0
- * WC tested up to: 4.5.2
-*/
+ * WC tested up to: 4.7.0
+ *
+ * @package Altapay
+ */
+
+use Altapay\Classes\Core;
+use Altapay\Classes\Util;
+use Altapay\Helpers;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-// Load AltaPay API Library
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'AltapaySettings.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'AltapayHelpers.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'CreditCardTokenControl.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'OrderStatusChangeActions.php';
+// Include the autoloader so we can dynamically include the rest of the classes.
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'includes/Autoloader.php';
 
 /**
  * Init AltaPay settings and gateway
@@ -37,7 +32,7 @@ function init_altapay_settings() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 		return;
 	}
-	$settings = new AltapaySettings();
+	$settings = new Core\AltapaySettings();
 	// Add Gateway to WooCommerce if enabled
 	if ( json_decode( get_option( 'altapay_terminals_enabled' ) ) ) {
 		add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );
@@ -161,6 +156,7 @@ function init_altapay_settings() {
 				'normal'
 			);
 		}
+
 		return true;
 	}
 
@@ -177,11 +173,12 @@ function init_altapay_settings() {
 		$txnID      = $order->get_transaction_id();
 
 		if ( $txnID ) {
-			$settings = new AltapaySettings();
+			$settings = new Core\AltapaySettings();
 			$api      = $settings->apiLogin();
 			if ( $api instanceof WP_Error ) {
 				$_SESSION['altapay_login_error'] = $api->get_error_message();
 				echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+
 				return;
 			}
 
@@ -201,7 +198,7 @@ function init_altapay_settings() {
 						if ( $charge <= 0 ) {
 							$charge = 0.00;
 						}
-						$blade = new AltapayHelpers();
+						$blade = new Helpers\AltapayHelpers();
 						echo $blade->loadBladeLibrary()->run(
 							'tables.index',
 							array(
@@ -242,7 +239,13 @@ function init_altapay_settings() {
 					'1.1.0',
 					true
 				);
-				wp_register_script( 'jQuery', 'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js', null, '2.1.3', true );
+				wp_register_script(
+					'jQuery',
+					'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js',
+					null,
+					'2.1.3',
+					true
+				);
 				wp_enqueue_script( 'jQuery' );
 				wp_enqueue_script(
 					'refundScript',
@@ -310,7 +313,7 @@ function init_altapay_settings() {
 	 * @return WP_Error
 	 */
 	function altapayCaptureCallback() {
-		$utilMethods = new UtilMethods();
+		$utilMethods = new Util\UtilMethods();
 		$orderID     = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
 		$amount      = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
 
@@ -338,7 +341,8 @@ function init_altapay_settings() {
 				$api->login();
 			} catch ( Exception $e ) {
 				$_SESSION['altapay_login_error'] = $e->getMessage();
-				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+
+                		return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 			if ( $postOrderLines ) {
@@ -425,7 +429,7 @@ function init_altapay_settings() {
 	 * @return WP_Error
 	 */
 	function altapayRefundCallback() {
-		$utilMethods        = new UtilMethods();
+		$utilMethods        = new Util\UtilMethods();
 		$orderLines         = array( array() );
 		$wcRefundOrderLines = array( array() );
 		$orderID            = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
@@ -456,6 +460,7 @@ function init_altapay_settings() {
 				$api->login();
 			} catch ( Exception $e ) {
 				$_SESSION['altapay_login_error'] = $e->getMessage();
+
 				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 			$postOrderLines = wp_unslash( $_POST['orderLines'] );
@@ -601,6 +606,7 @@ function init_altapay_settings() {
 			$api->login();
 		} catch ( Exception $e ) {
 			$_SESSION['altapay_login_error'] = $e->getMessage();
+
 			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
 		try {
@@ -655,8 +661,21 @@ function init_altapay_settings() {
 		}
 		wp_die();
 	}
+
+	$objTokenControl = new Core\AltapayTokenControl();
+	$objTokenControl->registerHooks();
+
+	$objOrderStatus = new Core\AltapayOrderStatus();
+	$objOrderStatus->registerHooks();
 }
 
-register_activation_hook( __FILE__, 'createCreditCardDB' );
+/**
+ * Perform functionality required during plugin activation
+ */
+function altapayPluginActivation() {
+	Core\AltapayPluginInstall::createPluginTables();
+}
+
+register_activation_hook( __FILE__, 'altapayPluginActivation' );
 // Make sure plugins are loaded before running gateway
 add_action( 'plugins_loaded', 'init_altapay_settings', 0 );

@@ -7,6 +7,11 @@
  * file that was distributed with this source code.
  */
 
+namespace Altapay\Classes\Util;
+
+use WC_Coupon;
+use WP_Error;
+
 class UtilMethods {
 
 	/**
