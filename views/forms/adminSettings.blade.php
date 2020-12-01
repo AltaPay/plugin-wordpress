@@ -17,21 +17,21 @@
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'Gateway URL', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="text" placeholder="{{__('Enter gateway url','altapay')}}" name="altapay_gateway_url"
-					   value="{{$gatewayURL}}"/>
+					   value="{{$gatewayURL}}" required />
 			   <i><p style="font-size: 10px;">{{__('e.g. https://www.testgateway.altapaysecure.com/', 'altapay')}}</p></i>
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'API username', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="text" placeholder="{{__('Enter API username','altapay')}}" name="altapay_username"
-					   value="{{$username}}"/>
+					   value="{{$username}}" required />
 			</td>
 		</tr>
 
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'API password', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="password" placeholder="{{__('Enter API password','altapay')}}" name="altapay_password"
-					   value="{{$password}}"/>
+					   value="{{$password}}" required />
 			</td>
 		</tr>
 		<tr valign="top">
@@ -64,9 +64,7 @@
 		@if ($terminals)
 			<tr valign="top">
 				<th scope="row" colspan="2">
-					<div style="background: #006064; height: 30px;">
-					<h2 style="color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Terminals', 'altapay' ); ?></h2>
-					</div>
+					<h2 style="background: #006064; color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Terminals', 'altapay' ); ?></h2>
 				</th>
 			</tr>
 			@foreach ($terminals as $terminal)

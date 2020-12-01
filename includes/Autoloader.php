@@ -32,6 +32,7 @@ function altapay_namespace_autoload( $class_name ) {
 
 	// Do a reverse loop through $file_parts to build the path to the file.
 	$namespace = '';
+	$file_name = '';
 	for ( $i = count( $file_parts ) - 1; $i > 0; $i-- ) {
 		$current = $file_parts[ $i ];
 		$current = str_ireplace( '_', '-', $current );
@@ -61,16 +62,18 @@ function altapay_namespace_autoload( $class_name ) {
 		}
 	}
 
-	// Now build a path to the file using mapping to the file location.
-	$filepath  = trailingslashit( dirname( __DIR__ ) . strtolower( $namespace ) );
-	$filepath .= $file_name;
+	if ( $namespace ) {
+		// Now build a path to the file using mapping to the file location.
+		$filepath  = trailingslashit( dirname( __DIR__ ) . strtolower( $namespace ) );
+		$filepath .= $file_name;
 
-	// If the file exists in the specified path, then include it.
-	if ( file_exists( $filepath ) ) {
-		include_once $filepath;
-	} else {
-		wp_die(
-			esc_html( "The file attempting to be loaded at $filepath does not exist." )
-		);
+		// If the file exists in the specified path, then include it.
+		if ( file_exists( $filepath ) ) {
+			include_once $filepath;
+		} else {
+			wp_die(
+				esc_html( "The file attempting to be loaded at $filepath does not exist." )
+			);
+		}
 	}
 }
