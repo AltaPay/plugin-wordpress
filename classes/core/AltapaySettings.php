@@ -23,7 +23,7 @@ class AltapaySettings {
 	 * AltapaySettings constructor.
 	 */
 	public function __construct() {
-		 // Load localization files
+		// Load localization files
 		add_action( 'init', array( $this, 'altapayLocalizationInit' ) );
 		// Add admin menu
 		add_action( 'admin_menu', array( $this, 'altapaySettingsMenu' ), 60 );
@@ -58,6 +58,7 @@ class AltapaySettings {
 		if ( $api instanceof WP_Error ) {
 			$_SESSION['altapay_login_error'] = $api->get_error_message();
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+
 			return;
 		}
 
@@ -188,6 +189,7 @@ class AltapaySettings {
 		$newLink = array(
 			'<a href="' . admin_url( 'admin.php?page=altapay-settings' ) . '">Settings</a>',
 		);
+
 		return array_merge( $links, $newLink );
 	}
 
@@ -227,8 +229,27 @@ class AltapaySettings {
 		register_setting( 'altapay-settings-group', 'altapay_username' );
 		register_setting( 'altapay-settings-group', 'altapay_password' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
-		register_setting( 'altapay-settings-group', 'altapay_terminals_enabled', 'json_encode' );
+		register_setting(
+			'altapay-settings-group',
+			'altapay_terminals_enabled',
+			array( $this, 'encodeTerminalsData' )
+		);
 	}
+
+	/**
+	 * Encode the data before saving
+	 *
+	 * @param array $val
+	 * @return string
+	 */
+	public function encodeTerminalsData( $val ) {
+		if ( $val ) {
+			$val = wp_json_encode( $val );
+		}
+
+		return $val;
+	}
+
 
 	/**
 	 * AltaPay settings page with actions and controls
@@ -255,10 +276,12 @@ class AltapaySettings {
 		}
 		$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 
-		foreach ( $terminalInfo as $term ) {
-			// The key is the terminal name
-			if ( ! in_array( $term->key, $enabledTerminals ) ) {
-				array_push( $disabledTerminals, $term->key );
+		if ( is_array( $terminalInfo ) ) {
+			foreach ( $terminalInfo as $term ) {
+				// The key is the terminal name
+				if ( ! in_array( $term->key, $enabledTerminals ) ) {
+					array_push( $disabledTerminals, $term->key );
+				}
 			}
 		}
 
@@ -286,10 +309,7 @@ class AltapaySettings {
 		?>
 
 		<div class="wrap" style="margin-top:2%;">
-			<?php echo '<img style="width:10%; height:auto;" src="' . esc_url( plugins_url( '../../assets/images/altapay-logo.jpg', __FILE__ ) ) . '" > '; ?>
-			<div style="background: #006064; height: 30px;">
-				<h2 style="color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Settings', 'altapay' ); ?></h2>
-			</div>
+			<h1><?php esc_html_e( 'AltaPay Settings', 'altapay' ); ?></h1>
 			<?php
 			if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
 				wp_die( sprintf( 'AltaPay for WooCommerce requires PHP 5.4 or higher. You’re still on %s.', PHP_VERSION ) );
@@ -351,8 +371,8 @@ class AltapaySettings {
 			$_SESSION['altapay_login_error'] = $api->get_error_message();
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 			// Delete terminals and enabled terminals from database
-			update_option( 'altapay_terminals', array() );
-			update_option( 'altapay_terminals_enabled', array() );
+			update_option( 'altapay_terminals', '' );
+			update_option( 'altapay_terminals_enabled', '' );
 			?>
 			<script>
 				setTimeout("location.reload()", 1500);
