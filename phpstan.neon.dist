@@ -2,12 +2,5 @@ parameters:
     paths:
         - %currentWorkingDirectory%/
     excludes_analyse:
-          - %currentWorkingDirectory%/vendor/php-stubs/wordpress-stubs/wordpress-stubs.php 
-    autoload_files:
-#        # Procedural code
-         - %currentWorkingDirectory%/util.php
-         #- %currentWorkingDirectory%/altapay.php
-         #stubs
-         - %currentWorkingDirectory%/stubs/wc_get_product.php
-    autoload_directories:
-         - %currentWorkingDirectory%/
+        - %currentWorkingDirectory%/vendor/
+    level: max
