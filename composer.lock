@@ -4,72 +4,34 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7a75a769068904feb0e7bec766799030",
+    "content-hash": "ec37f9524843c5c5b6d980f059fbf2f6",
     "packages": [],
     "packages-dev": [
         {
-            "name": "giacocorsiglia/wordpress-stubs",
-            "version": "v5.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/GiacoCorsiglia/wordpress-stubs.git",
-                "reference": "1c6f011f5c241bab7293315d7fb7fca27fe79473"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/GiacoCorsiglia/wordpress-stubs/zipball/1c6f011f5c241bab7293315d7fb7fca27fe79473",
-                "reference": "1c6f011f5c241bab7293315d7fb7fca27fe79473",
-                "shasum": ""
-            },
-            "require-dev": {
-                "ext-gettext": "*",
-                "giacocorsiglia/stubs-generator": "^0.5.0",
-                "johnpbloch/wordpress": "5.1.1",
-                "php": "^7.1"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Giaco Corsiglia",
-                    "email": "GiacoCorsiglia@gmail.com"
-                }
-            ],
-            "description": "WordPress function, class, and global variable declaration stubs for easier static analysis.",
-            "homepage": "https://github.com/GiacoCorsiglia/wordpress-stubs",
-            "keywords": [
-                "static analysis",
-                "wordpress"
-            ],
-            "time": "2019-03-13T21:16:05+00:00"
-        },
-        {
             "name": "php-stubs/wordpress-stubs",
-            "version": "v5.2.3",
+            "version": "v5.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-stubs/wordpress-stubs.git",
-                "reference": "a64715d13dfb81eb87b5e610baa002247300e167"
+                "reference": "7a8d0009b38c5fdec777a0a5333552ff6e445065"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/a64715d13dfb81eb87b5e610baa002247300e167",
-                "reference": "a64715d13dfb81eb87b5e610baa002247300e167",
+                "url": "https://api.github.com/repos/php-stubs/wordpress-stubs/zipball/7a8d0009b38c5fdec777a0a5333552ff6e445065",
+                "reference": "7a8d0009b38c5fdec777a0a5333552ff6e445065",
                 "shasum": ""
             },
+            "replace": {
+                "giacocorsiglia/wordpress-stubs": "*"
+            },
             "require-dev": {
-                "ext-gettext": "*",
-                "ext-hash": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-openssl": "*",
-                "ext-sodium": "*",
                 "giacocorsiglia/stubs-generator": "^0.5.0",
-                "johnpbloch/wordpress": "5.2.3",
                 "php": "~7.1"
+            },
+            "suggest": {
+                "paragonie/sodium_compat": "Pure PHP implementation of libsodium",
+                "symfony/polyfill-php73": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+                "szepeviktor/phpstan-wordpress": "WordPress extensions for PHPStan"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -83,24 +45,80 @@
                 "static analysis",
                 "wordpress"
             ],
-            "time": "2019-10-12T20:35:31+00:00"
+            "support": {
+                "issues": "https://github.com/php-stubs/wordpress-stubs/issues",
+                "source": "https://github.com/php-stubs/wordpress-stubs/tree/v5.5.3"
+            },
+            "time": "2020-10-31T01:42:05+00:00"
         },
         {
-            "name": "phpstan/phpstan",
-            "version": "0.12.4",
+            "name": "phpstan/extension-installer",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "100a25ba8561223f6bf5a5ff4204f951c0ec007c"
+                "url": "https://github.com/phpstan/extension-installer.git",
+                "reference": "5c2da3846819f951385cb6a25d3277051481c48a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/100a25ba8561223f6bf5a5ff4204f951c0ec007c",
-                "reference": "100a25ba8561223f6bf5a5ff4204f951c0ec007c",
+                "url": "https://api.github.com/repos/phpstan/extension-installer/zipball/5c2da3846819f951385cb6a25d3277051481c48a",
+                "reference": "5c2da3846819f951385cb6a25d3277051481c48a",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1"
+                "composer-plugin-api": "^1.1 || ^2.0",
+                "php": "^7.1 || ^8.0",
+                "phpstan/phpstan": ">=0.11.6"
+            },
+            "require-dev": {
+                "composer/composer": "^1.8",
+                "consistence/coding-standard": "^3.8",
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+                "ergebnis/composer-normalize": "^2.0.2",
+                "phing/phing": "^2.16",
+                "php-parallel-lint/php-parallel-lint": "^1.2.0",
+                "phpstan/phpstan-strict-rules": "^0.11",
+                "slevomat/coding-standard": "^5.0.4"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "PHPStan\\ExtensionInstaller\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\ExtensionInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Composer plugin for automatic installation of PHPStan extensions",
+            "support": {
+                "issues": "https://github.com/phpstan/extension-installer/issues",
+                "source": "https://github.com/phpstan/extension-installer/tree/1.0.5"
+            },
+            "time": "2020-08-30T12:06:42+00:00"
+        },
+        {
+            "name": "phpstan/phpstan",
+            "version": "0.12.59",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan.git",
+                "reference": "cf4107257c8ca2ad967efdd6a00f12b21acbb779"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/cf4107257c8ca2ad967efdd6a00f12b21acbb779",
+                "reference": "cf4107257c8ca2ad967efdd6a00f12b21acbb779",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1|^8.0"
+            },
+            "conflict": {
+                "phpstan/phpstan-shim": "*"
             },
             "bin": [
                 "phpstan",
@@ -122,29 +140,51 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2020-01-06T06:38:17+00:00"
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan/issues",
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.59"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ondrejmirtes",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpstan",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-12-07T14:46:03+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
-            "version": "v1.13.1",
+            "version": "v1.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php73.git",
-                "reference": "4b0e2222c55a25b4541305a053013d5647d3a25f"
+                "reference": "8ff431c517be11c78c48a39a66d37431e26a6bed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php73/zipball/4b0e2222c55a25b4541305a053013d5647d3a25f",
-                "reference": "4b0e2222c55a25b4541305a053013d5647d3a25f",
+                "url": "https://api.github.com/repos/symfony/polyfill-php73/zipball/8ff431c517be11c78c48a39a66d37431e26a6bed",
+                "reference": "8ff431c517be11c78c48a39a66d37431e26a6bed",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=7.1"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.13-dev"
+                    "dev-main": "1.20-dev"
+                },
+                "thanks": {
+                    "name": "symfony/polyfill",
+                    "url": "https://github.com/symfony/polyfill"
                 }
             },
             "autoload": {
@@ -180,35 +220,51 @@
                 "portable",
                 "shim"
             ],
-            "time": "2019-11-27T16:25:15+00:00"
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php73/tree/v1.20.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-10-23T14:02:19+00:00"
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
-            "version": "v0.5.0",
+            "version": "v0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/szepeviktor/phpstan-wordpress.git",
-                "reference": "1946738cdec130df4727f780ac541f8c6fd746a2"
+                "reference": "6195a6a19830d5ad187df0a3fb350e77cd571a5f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/1946738cdec130df4727f780ac541f8c6fd746a2",
-                "reference": "1946738cdec130df4727f780ac541f8c6fd746a2",
+                "url": "https://api.github.com/repos/szepeviktor/phpstan-wordpress/zipball/6195a6a19830d5ad187df0a3fb350e77cd571a5f",
+                "reference": "6195a6a19830d5ad187df0a3fb350e77cd571a5f",
                 "shasum": ""
             },
             "require": {
-                "php": "~7.1",
+                "php": "^7.1 || ^8.0",
                 "php-stubs/wordpress-stubs": "^4.7 || ^5.0",
-                "phpstan/phpstan": "^0.12.0",
+                "phpstan/phpstan": "^0.12.26",
                 "symfony/polyfill-php73": "^1.12.0"
             },
             "require-dev": {
                 "composer/composer": "^1.8.6",
-                "consistence/coding-standard": "^3.8",
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.5",
-                "jakub-onderka/php-parallel-lint": "^1.0",
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+                "php-parallel-lint/php-parallel-lint": "^1.1",
                 "phpstan/phpstan-strict-rules": "^0.12",
-                "slevomat/coding-standard": "^5.0.4"
+                "szepeviktor/phpcs-psr-12-neutron-hybrid-ruleset": "^0.4.3"
             },
             "type": "phpstan-extension",
             "extra": {
@@ -235,16 +291,25 @@
                 "static analysis",
                 "wordpress"
             ],
-            "time": "2019-12-05T22:19:53+00:00"
+            "support": {
+                "issues": "https://github.com/szepeviktor/phpstan-wordpress/issues",
+                "source": "https://github.com/szepeviktor/phpstan-wordpress/tree/v0.7.1"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/szepeviktor",
+                    "type": "custom"
+                }
+            ],
+            "time": "2020-11-05T00:12:19+00:00"
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": [],
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": {
-        "php": ">=7.1"
-    },
-    "platform-dev": []
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
 }
