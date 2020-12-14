@@ -11,6 +11,7 @@ namespace Altapay\Classes\Util;
 
 use WC_Coupon;
 use WP_Error;
+use Altapay\Request\OrderLine;
 
 class UtilMethods {
 
@@ -49,16 +50,15 @@ class UtilMethods {
 			if ( $appliedCouponItems ) {
 				$couponDiscountPercentage = $this->getCouponDiscount( $appliedCouponItems, $orderline );
 			}
-			$product     = wc_get_product( $orderline['product_id'] );
-			$productType = $product->product_type;
+			$product = wc_get_product( $orderline['product_id'] );
 			// get product details for each orderline
 			$productDetails = $this->getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage );
-			if ( $productType === 'bundle' && $productDetails['product']['unitPrice'] == 0 ) {
+			if ( $product && 'bundle' === $product->get_type() && $productDetails['product']['unitPrice'] == 0 ) {
 				continue;
 			}
 			$orderlineDetails [] = $productDetails['product'];
 			// check if compensation exists to bind it in orderline details
-			if ( $productDetails['compensation']['unitPrice'] != 0 ) {
+			if ( $productDetails['compensation']->unitPrice != 0 ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 		}
@@ -223,23 +223,25 @@ class UtilMethods {
 		// generate compensation amount orderline using product id and amount
 		$compensationOrderline = $this->compensationAmountOrderline( $productId, $compensationAmount );
 		// generate linedate with all the calculated parameters
-		$linedata[] = array(
-			'description' => $orderline['name'],
-			'itemId'      => $productId,
-			'quantity'    => $productQuantity,
-			'unitPrice'   => number_format( $productPrice, 2, '.', '' ),
-			'taxAmount'   => number_format( $taxAmount * $productQuantity, 2, '.', '' ),
-			'taxPercent'  => number_format( ( $taxAmount / $productPrice ) * 100, 2, '.', '' ),
-			'unitCode'    => $unitCode,
-			'discount'    => number_format( $discountPercentage, 2, '.', '' ),
-			'goodsType'   => 'handling',
-			'imageUrl'    => wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) ),
-			'productUrl'  => get_permalink( $singleProduct->get_id() ),
+		$orderLine = new OrderLine(
+			$orderline['name'],
+			$productId,
+			$productQuantity,
+			number_format( $productPrice, 2, '.', '' )
 		);
+
+		$orderLine->discount   = number_format( $discountPercentage, 2, '.', '' );
+		$orderLine->taxAmount  = number_format( $taxAmount * $productQuantity, 2, '.', '' );
+		$orderLine->taxPercent = number_format( ( $taxAmount / $productPrice ) * 100, 2, '.', '' );
+		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
+		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
+		$orderLine->unitCode   = $unitCode;
+		$orderLine->setGoodsType( 'item' );
+		$lineData[] = $orderLine;
 
 		// return array with product and compensation linedata
 		return array(
-			'product'      => reset( $linedata ),
+			'product'      => reset( $lineData ),
 			'compensation' => reset( $compensationOrderline ),
 		);
 	}
@@ -253,17 +255,20 @@ class UtilMethods {
 	 */
 	public function compensationAmountOrderline( $productId, $compensationAmount ) {
 		// Generate compensation amount orderline for payment, capture and refund requests
-		$compensationAmountOrderline[] = array(
-			'description' => 'Compensation',
-			'itemId'      => $productId . '-' . 'Comp',
-			'quantity'    => 1,
-			'unitPrice'   => $compensationAmount,
-			'taxAmount'   => '',
-			'discount'    => '',
-			'goodsType'   => 'handling',
+		$compensation          = array();
+		$orderLine             = new OrderLine(
+			'Compensation',
+			'comp-' . $productId,
+			1,
+			$compensationAmount
 		);
+		$orderLine->taxAmount  = 0.00;
+		$orderLine->taxPercent = 0.00;
+		$orderLine->unitCode   = 'unit';
+		$orderLine->discount   = 0.00;
+		$compensation[]        = $orderLine;
 
-		return $compensationAmountOrderline;
+		return $compensation;
 	}
 
 	/**
@@ -275,7 +280,7 @@ class UtilMethods {
 	 * @return array|bool
 	 */
 	private function getShippingDetails( $order, $products, $returnRefundOrderLines ) {
-		 // Get the shipping method
+		// Get the shipping method
 		$orderShippingMethods = $order->get_shipping_methods();
 		$shippingID           = 'NaN';
 		$shippingDetails      = array();
@@ -302,15 +307,17 @@ class UtilMethods {
 					'refund_tax'   => wc_format_decimal( $totalShippingTax ),
 				);
 			} else {
-				$shippingDetails[] = array(
-					'description' => $order->get_shipping_method(),
-					'itemId'      => $shippingID,
-					'quantity'    => 1,
-					'unitPrice'   => number_format( $totalShipping, 2, '.', '' ),
-					'taxAmount'   => number_format( $totalShippingTax, 2, '.', '' ),
-					'taxPercent'  => number_format( ( $totalShippingTax / $totalShipping ) * 100, 2, '.', '' ),
-					'goodsType'   => 'shipment',
+				$orderLine             = new OrderLine(
+					$order->get_shipping_method(),
+					$shippingID,
+					1,
+					number_format( $totalShipping, 2, '.', '' )
 				);
+				$orderLine->taxAmount  = number_format( $totalShippingTax, 2, '.', '' );
+				$orderLine->taxPercent = number_format( ( $totalShippingTax / $totalShipping ) * 100, 2, '.', '' );
+
+				$orderLine->setGoodsType( 'shipment' );
+				$shippingDetails[] = $orderLine;
 			}
 		}
 		return $shippingDetails;

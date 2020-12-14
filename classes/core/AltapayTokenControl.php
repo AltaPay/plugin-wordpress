@@ -149,7 +149,7 @@ class AltapayTokenControl {
 		// Get payment methods
 		$paymentMethods = WC()->payment_gateways->get_available_payment_gateways();
 
-		$orderMeta          = get_metadata( 'post', $order->id );
+		$orderMeta          = get_metadata( 'post', $order->get_id() );
 		$cardNo             = $orderMeta['_cardno'][0];
 		$ccToken            = $orderMeta['_credit_card_token'][0];
 		$ccBrand            = $orderMeta['_credit_card_brand'][0];
@@ -163,7 +163,7 @@ class AltapayTokenControl {
 		);
 
 		if ( array_key_exists( 'test', $_POST ) ) {
-			saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate );
+			$this->saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate );
 		}
 
 		if ( ! empty( $orderMeta['_cardno'][0] ) && ! $results && is_user_logged_in() ) {

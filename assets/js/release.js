@@ -24,12 +24,12 @@ jQuery( document ).ready(
 					ajaxurl,
 					data,
 					function (response) {
-						result = jQuery.parseJSON( response );
-						if (result.status == 'ok') {
+						var result = response.data;
+						if (response.success === true) {
 							alert( 'Payment released' );
 							location.reload();
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Release failed: ' + result.message + '</b>' );
+							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Release failed: ' + result.error + '</b>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}

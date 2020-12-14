@@ -9,63 +9,15 @@
 
 namespace Altapay\Helpers\Traits;
 
-use AltapayMerchantAPI;
+use Exception;
 use WC_Order;
 use WP_Error;
+use Altapay\Authentication;
+use Altapay\Api\Test\TestAuthentication;
+use GuzzleHttp\Exception\ClientException;
+use WC_Subscriptions_Renewal_Order;
 
 trait AltapayMaster {
-
-	/**
-	 * @var bool
-	 */
-	private $api = false;
-
-	/**
-	 * Initialization of Woocommerce Payment module specifics
-	 *
-	 * @return void
-	 */
-	public function intFormFields() {
-		// Define form setting fields
-		$this->form_fields = array(
-			'enabled'        => array(
-				'title'   => __( 'Enable/Disable', 'woocommerce' ),
-				'type'    => 'checkbox',
-				'label'   => __( ' ', 'altapay' ),
-				'default' => 'yes',
-			),
-			'title'          => array(
-				'title'       => __( 'Title', 'woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Title to show during checkout.', 'altapay' ),
-				'default'     => __( 'AltaPay', 'woocommerce' ),
-				'desc_tip'    => true,
-			),
-			'description'    => array(
-				'title'       => __( 'Message', 'woocommerce' ),
-				'description' => __( 'Message to show during checkout.', 'altapay' ),
-				'type'        => 'textarea',
-				'default'     => '',
-			),
-			'payment_action' => array(
-				'title'       => __( 'Payment action', 'woocommerce' ),
-				'description' => __( 'Make payment authorized or authorized and captured', 'altapay' ),
-				'type'        => 'select',
-				'options'     => array(
-					'authorize'         => __( 'Authorize Only', 'altapay' ),
-					'authorize_capture' => __( 'Authorize and Capture', 'altapay' ),
-				),
-				'default'     => '',
-			),
-			'currency'       => array(
-				'title'       => __( 'Currency', 'altapay' ),
-				'type'        => 'select',
-				'description' => __( 'Select the currency does this terminal work with' ),
-				'options'     => get_woocommerce_currencies(),
-				'default'     => $this->default_currency,
-			),
-		);
-	}
 
 	/**
 	 * @param int $order_id
@@ -79,18 +31,6 @@ trait AltapayMaster {
 			'result'   => 'success',
 			'redirect' => $order->get_checkout_payment_url( true ),
 		);
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function isAvailable() {
-		 // Check if payment method is enabled
-		if ( 'yes' !== $this->enabled ) {
-			return false;
-		}
-
-		return get_woocommerce_currency() == $this->currency;
 	}
 
 	/**
@@ -120,9 +60,8 @@ trait AltapayMaster {
 				return;
 			}
 
-			$api = $this->apiLogin();
-			if ( $api instanceof WP_Error ) {
-				$_SESSION['altapay_login_error'] = $api->get_error_message();
+			$api = $this->altapayApiLogin();
+			if ( ! $api || is_wp_error( $api ) ) {
 				echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 				return;
 			}
@@ -145,27 +84,40 @@ trait AltapayMaster {
 	}
 
 	/**
+	 * @return Authentication
+	 */
+	public function getAuth() {
+
+		$apiUser = esc_attr( get_option( 'altapay_username' ) );
+		$apiPass = esc_attr( get_option( 'altapay_password' ) );
+		$url     = esc_attr( get_option( 'altapay_gateway_url' ) );
+
+		return new Authentication( $apiUser, $apiPass, $url );
+
+	}
+
+	/**
 	 * Method for AltaPay api login using credentials provided in AltaPay settings page
 	 *
-	 * @return bool|AltapayMerchantAPI|WP_Error
-	 * @throws Exception
+	 * @return bool|WP_Error
 	 */
-	public function apiLogin() {
-		if ( $this->api === false ) {
-			$this->api = new AltapayMerchantAPI(
-				esc_attr( get_option( 'altapay_gateway_url' ) ),
-				esc_attr( get_option( 'altapay_username' ) ),
-				esc_attr( get_option( 'altapay_password' ) ),
-				null
-			);
-			try {
-				$this->api->login();
-			} catch ( Exception $e ) {
-				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+	public function altapayApiLogin() {
+		try {
+			$api      = new TestAuthentication( $this->getAuth() );
+			$response = $api->call();
+			if ( ! $response ) {
+				$_SESSION['altapay_login_error'] = 'Could not login to the Merchant API';
+				return false;
 			}
+		} catch ( ClientException $e ) {
+			$_SESSION['altapay_login_error'] = wp_kses_post( $e->getMessage() );
+			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+		} catch ( Exception $e ) {
+			$_SESSION['altapay_login_error'] = wp_kses_post( $e->getMessage() );
+			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
 
-		return $this->api;
+		return true;
 	}
 
 	/**
