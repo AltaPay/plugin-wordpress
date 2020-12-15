@@ -25,16 +25,16 @@ jobs:
          rm woocommerce.latest-stable.zip
          pwd
          ls -al
-       working-directory: /home/runner/work/TestRepo/TestRepo/wordpress/wp-content/plugins
+       working-directory: /home/runner/work/plugin-wordpress/plugin-wordpress/wordpress/wp-content/plugins
      
-     - run: mkdir /home/runner/work/TestRepo/TestRepo/wordpress/wp-content/plugins/plugin-wordpress
+     - run: mkdir /home/runner/work/plugin-wordpress/plugin-wordpress/wordpress/wp-content/plugins/plugin-wordpress
      - uses: actions/checkout@v2 
        with: 
-         path: '/home/runner/work/TestRepo/TestRepo/wordpress/wp-content/plugins/plugin-wordpress'
-     - run: ls -al /home/runner/work/TestRepo/TestRepo/wordpress/wp-content/plugins
+         path: '/home/runner/work/plugin-wordpress/plugin-wordpress/wordpress/wp-content/plugins/plugin-wordpress'
+     - run: ls -al /home/runner/work/plugin-wordpress/plugin-wordpress/wordpress/wp-content/plugins
      - name: Install composer and run PhpStan
        run: |
          composer install
          vendor/bin/phpstan analyze
-       working-directory: /home/runner/work/TestRepo/TestRepo/wordpress/wp-content/plugins/plugin-wordpress
+       working-directory: /home/runner/work/plugin-wordpress/plugin-wordpress/wordpress/wp-content/plugins/plugin-wordpress
       
