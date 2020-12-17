@@ -29,7 +29,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Include the autoloader so we can dynamically include the rest of the classes.
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'includes/Autoloader.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
 /**
@@ -364,7 +363,7 @@ function init_altapay_settings() {
 
 			try {
 				$api = new CaptureReservation( $settings->getAuth() );
-				$api->setAmount( (float) number_format( $amount, 2, '.', '' ) );
+				$api->setAmount( (float) round( $amount, 2 ) );
 				$api->setOrderLines( $orderLines );
 				$api->setTransaction( $txnID );
 				$response = $api->call();
@@ -386,10 +385,10 @@ function init_altapay_settings() {
 			$captured    = 0;
 			$refunded    = 0;
 
-			if ( ! empty( $rawResponse ) ) {
+			if ( $rawResponse ) {
 				$body = $rawResponse->getBody();
 				// Update comments if capture fail
-				$xml = simplexml_load_string( $body );
+				$xml = new SimpleXMLElement( $body );
 				if ( (string) $xml->Body->Result === 'Error' || (string) $xml->Body->Result === 'Failed' ) {
 					// log to history
 					$order->add_order_note( __( 'Capture failed: ' . (string) $xml->Body->MerchantErrorMessage, 'Altapay' ) );
@@ -423,7 +422,7 @@ function init_altapay_settings() {
 					'captured'   => $captured,
 					'reserved'   => $reserved,
 					'refunded'   => $refunded,
-					'chargeable' => number_format( $charge, 2 ),
+					'chargeable' => round( $charge, 2 ),
 					'note'       => $noteHtml,
 				)
 			);
@@ -485,7 +484,7 @@ function init_altapay_settings() {
 			if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
 
 				$api = new RefundCapturedReservation( $auth );
-				$api->setAmount( (float) number_format( $amount ) );
+				$api->setAmount( round( $amount ) );
 				$api->setOrderLines( $orderLines );
 				$api->setTransaction( $txnID );
 
@@ -520,10 +519,10 @@ function init_altapay_settings() {
 				}
 			} elseif ( $order->get_remaining_refund_amount() == 0 ) {
 
-				/** @var ReleaseReservationResponse $response */
 				try {
 					$api = new ReleaseReservation( $auth );
 					$api->setTransaction( $txnID );
+					/** @var ReleaseReservationResponse $response */
 					$response = $api->call();
 					if ( $response->Result === 'Success' ) {
 						$releaseFlag = true;

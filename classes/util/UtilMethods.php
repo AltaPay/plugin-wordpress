@@ -164,7 +164,7 @@ class UtilMethods {
 		$taxRate      = $orderlineTax;
 
 		// Calculate total generated from WooCommerce after calculations
-		$totalCMS = number_format( $orderline['subtotal'] + $orderline['subtotal_tax'], 2, '.', '' );
+		$totalCMS = round( $orderline['subtotal'] + $orderline['subtotal_tax'], 2 );
 
 		// set product ID based on the sku provided
 		if ( $singleProduct->get_sku() ) {
@@ -184,12 +184,8 @@ class UtilMethods {
 		// calculate discount if catalogue rule is applied on orderline i.e. product sale price is set
 		if ( $singleProduct->is_on_sale() ) {
 			$productDiscountAmount = $productRegularPrice - $productSalePrice; // calculate discount amount
-			$discountPercentage    = number_format(
-				( $productDiscountAmount / $productRegularPrice ) * 100,
-				2,
-				'.',
-				''
-			); // convert discount amount into percentage
+			// convert discount amount into percentage
+			$discountPercentage = round( ( $productDiscountAmount / $productRegularPrice ) * 100, 2 );
 		}
 
 		// conditional switch for calculations based on discount and tax configuration settings
@@ -201,7 +197,7 @@ class UtilMethods {
 					$discountPercentage = $couponDiscountPercentage;
 					$totalCMS           = $orderline['total'] + $orderline['total_tax'];
 				}
-				$productPrice = number_format( $productRegularPrice / $taxRate, 2, '.', '' );
+				$productPrice = round( $productRegularPrice / $taxRate, 2 );
 				$taxAmount    = $productRegularPrice - $productPrice;
 				break;
 			// calculate product price if discount is applied either catalogue or cart with tax excluded configurations
@@ -227,12 +223,12 @@ class UtilMethods {
 			$orderline['name'],
 			$productId,
 			$productQuantity,
-			number_format( $productPrice, 2, '.', '' )
+			round( $productPrice, 2 )
 		);
 
-		$orderLine->discount   = number_format( $discountPercentage, 2, '.', '' );
-		$orderLine->taxAmount  = number_format( $taxAmount * $productQuantity, 2, '.', '' );
-		$orderLine->taxPercent = number_format( ( $taxAmount / $productPrice ) * 100, 2, '.', '' );
+		$orderLine->discount   = round( $discountPercentage, 2 );
+		$orderLine->taxAmount  = round( $taxAmount * $productQuantity, 2 );
+		$orderLine->taxPercent = round( ( $taxAmount / $productPrice ) * 100, 2 );
 		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
 		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
 		$orderLine->unitCode   = $unitCode;
@@ -311,10 +307,10 @@ class UtilMethods {
 					$order->get_shipping_method(),
 					$shippingID,
 					1,
-					number_format( $totalShipping, 2, '.', '' )
+					round( $totalShipping, 2 )
 				);
-				$orderLine->taxAmount  = number_format( $totalShippingTax, 2, '.', '' );
-				$orderLine->taxPercent = number_format( ( $totalShippingTax / $totalShipping ) * 100, 2, '.', '' );
+				$orderLine->taxAmount  = round( $totalShippingTax, 2 );
+				$orderLine->taxPercent = round( ( $totalShippingTax / $totalShipping ) * 100, 2 );
 
 				$orderLine->setGoodsType( 'shipment' );
 				$shippingDetails[] = $orderLine;

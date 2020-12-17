@@ -46,9 +46,9 @@ class AltapayOrderStatus {
 		$status   = '';
 
 		$settings = new Core\AltapaySettings();
-		$api      = $settings->altapayApiLogin();
+		$login    = $settings->altapayApiLogin();
 
-		if ( ! $api || is_wp_error( $api ) ) {
+		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 			return;
 		}
@@ -71,7 +71,7 @@ class AltapayOrderStatus {
 			try {
 				if ( $status === 'released' ) {
 					return;
-				} elseif ( $captured == 0 && $refunded == 0 ) {
+				} elseif ( $captured === 0 && $refunded === 0 ) {
 					$orderStatus = 'cancelled';
 				} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
 					$orderStatus = 'refunded';

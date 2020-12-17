@@ -272,12 +272,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
 					->setShopOrderId( $order_id )
-					->setAmount( (float) number_format( $amount, 2, '.', '' ) )
+					->setAmount( round( $amount, 2 ) )
 					->setCurrency( $currency )
 					->setCustomerInfo( $customerInfo )
 					->setConfig( $config )
 					->setTransactionInfo( $transactionInfo )
-					->setSalesTax( (float) number_format( $order->get_total_tax(), 2, '.', '' ) )
+					->setSalesTax( round( $order->get_total_tax(), 2 ) )
 					->setCookie( $cookie )
 					->setCcToken( $ccToken )
 					->setFraudService( null )
@@ -326,7 +326,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	public function checkAltapayResponse() {
 		// Check if callback is altapay and the allowed API
 		if ( isset( $_GET['wc-api'] ) && $_GET['wc-api'] === 'WC_Gateway_' . $this->id ) {
-			global $woocommerce;
 
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
@@ -421,7 +420,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					return;
 				}
 				$api = new CaptureReservation( $this->getAuth() );
-				$api->setAmount( (float) number_format( $amount, 2, '.', '' ) );
+				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
 
 				/** @var CaptureReservationResponse $response */
@@ -443,9 +442,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param array   $addressInfo
 	 * @param Address $address
 	 *
-	 * @return object
+	 * @return Address
 	 */
-	private function createAddressObject( $addressInfo, $address ) {
+	private function populateAddressObject( $addressInfo, $address ) {
 		$address->Firstname  = $addressInfo['firstname'];
 		$address->Lastname   = $addressInfo['lastname'];
 		$address->Address    = $addressInfo['address'];
@@ -485,12 +484,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			'country'   => $order->get_shipping_country(),
 		);
 		if ( $order->get_billing_address_1() ) {
-			$address = $this->createAddressObject( $billingInfo, $address );
+			$this->populateAddressObject( $billingInfo, $address );
 		}
 		$customer = new Customer( $address );
 		if ( $order->get_shipping_address_1() ) {
 			$address         = new Address();
-			$shippingAddress = $this->createAddressObject( $shippingInfo, $address );
+			$shippingAddress = $this->populateAddressObject( $shippingInfo, $address );
 			$customer->setShipping( $shippingAddress );
 		} else {
 			$customer->setShipping( $address );

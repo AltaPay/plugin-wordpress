@@ -77,7 +77,7 @@ class AltapaySettings {
 		} else { // Order wasn't captured and must be captured now.
 			$amount = $pay->ReservedAmount; // Amount to capture.
 			$api    = new CaptureReservation( $this->getAuth() );
-			$api->setAmount( (float) number_format( $amount, 2, '.', '' ) );
+			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
 			$response = $api->call();
 			if ( $response->Result !== 'Success' ) {
