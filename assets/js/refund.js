@@ -60,8 +60,8 @@ jQuery( document ).ready(
 					ajaxurl,
 					data,
 					function (response) {
-						result = jQuery.parseJSON( response );
-						if (result.status == 'ok') {
+						var result = response.data;
+						if (response.success === true) {
 							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Payment refunded.</b>' )
 							jQuery( '.payment-reserved' ).text( result.reserved );
 							jQuery( '.payment-captured' ).text( result.captured );
@@ -70,7 +70,7 @@ jQuery( document ).ready(
 							jQuery( 'ul.order_notes' ).prepend( result.note );
 							location.reload();
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Refund failed: ' + result.message + '</b>' );
+							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Refund failed: ' + result.error + '</b>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}

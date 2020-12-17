@@ -10,10 +10,53 @@
 use Altapay\Helpers\Traits\AltapayMaster;
 use Altapay\Classes\Util;
 use Altapay\Helpers;
+use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Request\Address;
+use Altapay\Request\Customer;
+use Altapay\Request\Config;
+use Altapay\Exceptions\ClientException;
+use Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Exceptions\ResponseMessageException;
+use Altapay\Api\Payments\CaptureReservation;
 
 class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 	use AltapayMaster;
+
+    /**
+     * Terminal name.
+     *
+     * @var string
+     */
+    public $terminal = '';
+
+    /**
+     * Terminal name.
+     *
+     * @var string
+     */
+    public $token = '';
+
+    /**
+     * Payment type.
+     *
+     * @var string
+     */
+    public $payment_action = '';
+
+    /**
+     * Currency for the terminal.
+     *
+     * @var string
+     */
+    private $currency;
+
+    /**
+     * Default currency for the terminal.
+     *
+     * @var string
+     */
+    private $default_currency;
 
 	public function __construct() {
 		// Set default gateway values
@@ -42,7 +85,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->default_currency	= end($currency);
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
-			$this->icon = plugins_url().'/altapay-for-woocommerce/assets/images/payment_icons/'.$this->get_option( 'payment_icon' );
+			$this->icon = plugin_dir_url( __DIR__ ) .'assets/images/payment_icons/'.$this->get_option( 'payment_icon' );
 		}
 		// Load form fields
 		$this->init_form_fields();
@@ -74,14 +117,15 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param int $order_id
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function receipt_page_altapay( $order_id ) {
 		// Show text
-		$return = $this->createPaymentRequest( $order_id );
-		if ($return instanceof WP_Error) {
-			echo '<p>' . $return->get_error_message() . '</p>';
+		$requestParams = $this->createPaymentRequest( $order_id );
+		if ( is_wp_error( $requestParams ) ) {
+			echo '<p>' . $requestParams->get_error_message() . '</p>';
 		} else {
-			echo '<script type="text/javascript">window.location.href = "' . $return . '"</script>';
+			echo '<script type="text/javascript">window.location.href = "' . $requestParams['formurl'] . '"</script>';
 		}
 	}
 
@@ -99,18 +143,20 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		}
 
 	}
-
+	/**
+	 * @param int $order_id
+	 *
+	 * @return array|WP_Error
+	 * @throws Exception
+	 */
 	public function createPaymentRequest( $order_id ) {
 		global $wpdb;
-		$currentUserId = get_current_user_id();
 		$utilMethods = new Util\UtilMethods;
 		$altapayHelpers = new Helpers\AltapayHelpers;
 		// Create form request etc.
-		$api = $this->apiLogin();
-		if ($api instanceof WP_Error) {
-			$_SESSION['altapay_login_error'] = $api->get_error_message();
-			echo '<p><b>' . __('Could not connect to AltaPay!', 'altapay') . '</b></p>';
-			return;
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
+			return new WP_Error( 'error', 'Could not connect to AltaPay!' );
 		}
 		// Create payment request
 		$order = new WC_Order( $order_id );
@@ -119,40 +165,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$terminal = $this->terminal;
 		$amount = $order->get_total();
 		$currency = $order->get_currency();
-		$customerInfo = array(
-			'billing_firstname'		=> $order->get_billing_first_name(),
-			'billing_lastname' 		=> $order->get_billing_last_name(),
-			'billing_address' 		=> $order->get_billing_address_1(),
-			'billing_postal' 		=> $order->get_billing_postcode(),
-			'billing_city' 			=> $order->get_billing_city(),
-			'billing_region' 		=> $order->get_billing_state(),
-			'billing_country'		=> $order->get_billing_country(),
-			'email'					=> $order->get_billing_email(),
-			'customer_phone' 		=> $order->get_billing_phone(),
-			'shipping_firstname'	=> $order->get_shipping_first_name(),
-			'shipping_lastname'		=> $order->get_shipping_last_name(),
-			'shipping_address' 		=> $order->get_shipping_address_1(),
-			'shipping_postal' 		=> $order->get_shipping_postcode(),
-			'shipping_city' 		=> $order->get_shipping_city(),
-			'shipping_region' 		=> $order->get_shipping_state(),
-			'shipping_country' 		=> $order->get_shipping_country(),
-		);
-
-		//If user is logged in set username in customerInfo and set customer created date to send in payment request
-		if (is_user_logged_in()) {
-			$users = get_users();
-			$customerInfo['username'] = $currentUserId;
-			foreach( $users as $user ) {
-				$userdata = get_userdata( $currentUserId );
-				$customerCreatedDate = $altapayHelpers->convertDateTimeFormat($userdata->user_registered);
-			}
-		}
-
-		$customerInfo = $altapayHelpers->setShippingAddress($customerInfo);
-		if ($customerInfo instanceof WP_Error) {
-			return $customerInfo; // Shipping country is missing
-		}
-
+		$customerInfo = $this->setCustomer( $order );
 		$cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
 		$language = 'en';
 		$languages = array(
@@ -179,7 +192,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		// Get chosen page from AltaPay's settings
 		$form_page_id = esc_attr( get_option('altapay_payment_page') );
-		$config = array(
+		$configUrl = array(
 			'callback_form' 		=> get_page_link($form_page_id),
 			'callback_ok' 			=> add_query_arg(
 					array(
@@ -211,17 +224,24 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			),
 		);
 
+		$config       = new Config();
+		$config->setCallbackOk( $configUrl['callback_ok'] );
+		$config->setCallbackFail( $configUrl['callback_fail'] );
+		$config->setCallbackOpen( $configUrl['callback_open'] );
+		$config->setCallbackNotification( $configUrl['callback_notification'] );
+		$config->setCallbackForm( $configUrl['callback_form'] );
+
 		// Make these as settings
 		$payment_type = 'payment';
-		if ($this->payment_action === 'authorize_capture') {
+		if ( $this->payment_action === 'authorize_capture' ) {
 			$payment_type = 'paymentAndCapture';
 		}
 
 		// Check if WooCommerce subscriptions is enabled
-		if (class_exists( 'WC_Subscriptions_Order' )) {
+		if ( class_exists( 'WC_Subscriptions_Order' ) ) {
 			// Check if cart contain subscription product
 			if( WC_Subscriptions_Order::order_contains_subscription( $order_id ) ) {
-				if ($this->payment_action === 'authorize_capture') {
+				if ( $this->payment_action === 'authorize_capture' ) {
 					$payment_type = 'subscriptionAndCharge';
 				} else {
 					$payment_type = 'subscriptionAndReserve';
@@ -229,32 +249,17 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 		}
 
-		//Get user registration date
-		if(is_user_logged_in()) {
-			$users = get_users();
-			$currentUserId = get_current_user_id();
-			foreach( $users as $user ) {
-
-				$userdata = get_userdata( $currentUserId );
-				$customerCreatedDate = $altapayHelpers->convertDateTimeFormat($userdata->user_registered);
-			}
-		}
-
-		if(is_null($customerCreatedDate)) {
-			$customerCreatedDate = null;
-		}
-
 		$transactionInfo = $altapayHelpers->transactionInfo();
 
 		// Add orderlines to AltaPay request
-		$orderLines = $utilMethods->createOrderLines($order);
-		if ($orderLines instanceof WP_Error) {
+		$orderLines = $utilMethods->createOrderLines( $order );
+		if ( $orderLines instanceof WP_Error ) {
 			return $orderLines; // Some error occurred
 		}
 
 		try {
-			$savedCardNumber = WC()->session->get('cardNumber', 0);
-			if(is_null($savedCardNumber)) {
+			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
+			if ( !$savedCardNumber ) {
 				$ccToken = null;
 			} else {
 				$results = $wpdb->get_results("SELECT ccToken FROM {$wpdb->prefix}altapayCreditCardDetails WHERE creditCardNumber='$savedCardNumber'");
@@ -262,20 +267,54 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$ccToken = $result->ccToken;
 				}
 			}
-			$response = $api->createPaymentRequest($terminal, $order_id, $amount, $currency, $payment_type, $customerInfo, $cookie, $language, $config, $transactionInfo, $orderLines, false, $ccToken, null, null, null, null, null,$customerCreatedDate);
-			$responseError = $response->getErrorMessage();
 
-			if ( $responseError ) {
-				return new WP_Error( 'ResponseError', $responseError );
+			$auth    = $this->getAuth();
+			$request = new PaymentRequest( $auth );
+			$request->setTerminal( $terminal )
+					->setShopOrderId( $order_id )
+					->setAmount( round( $amount, 2 ) )
+					->setCurrency( $currency )
+					->setCustomerInfo( $customerInfo )
+					->setConfig( $config )
+					->setTransactionInfo( $transactionInfo )
+					->setSalesTax( round( $order->get_total_tax(), 2 ) )
+					->setCookie( $cookie )
+					->setCcToken( $ccToken )
+					->setFraudService( null )
+					->setLanguage( $language )
+					->setType( $payment_type )
+					->setOrderLines( $orderLines );
+			if ( $request ) {
+				try {
+					$response                 = $request->call();
+					$requestParams['result']  = 'success';
+					$requestParams['formurl'] = $response->Url;
+				} catch ( ClientException $e ) {
+					$requestParams['result']  = 'error';
+					$requestParams['message'] = $e->getResponse()->getBody();
+				} catch ( ResponseHeaderException $e ) {
+					$requestParams['result']  = 'error';
+					$requestParams['message'] = $e->getHeader()->ErrorMessage;
+				} catch ( ResponseMessageException $e ) {
+					$requestParams['result']  = 'error';
+					$requestParams['message'] = $e->getMessage();
+				} catch ( \Exception $e ) {
+					$requestParams['result']  = 'error';
+					$requestParams['message'] = $e->getMessage();
+				}
+				if ( isset( $requestParams['message'] ) && $requestParams['result'] === 'error' ) {
+					return new WP_Error( 'ResponseError', $requestParams['message'] );
+				}
+
+				echo '<p>' . __( 'You are now going to be redirected to AltaPay Payment Gateway', 'altapay' ) . '</p>';
+
+				return $requestParams;
 			}
-
-			echo '<p>'.__('You are now going to be redirected to AltaPay Payment Gateway','altapay').'</p>';
-
-			return $response->getRedirectURL();
 		} catch ( Exception $e ) {
-				error_log('Could not create the payment request: ' . $e->getMessage());
-				$order->add_order_note( __('Could not create the payment request: ' . $e->getMessage(), 'altapay') );
-				return new WP_Error( 'error', 'Could not create the payment request' );
+			error_log( 'Could not create the payment request: ' . $e->getMessage() );
+			$order->add_order_note( __( 'Could not create the payment request: ' . $e->getMessage(), 'altapay' ) );
+
+			return new WP_Error( 'error', 'Could not create the payment request' );
 		}
 	}
 
@@ -285,9 +324,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function checkAltapayResponse() {
-		// Check if callback is altapay and the allowed IP
-		if ( isset($_GET['wc-api']) && $_GET['wc-api'] === 'WC_Gateway_'.$this->id ) {
-			global $woocommerce;
+		// Check if callback is altapay and the allowed API
+		if ( isset( $_GET['wc-api'] ) && $_GET['wc-api'] === 'WC_Gateway_' . $this->id ) {
 
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
@@ -334,17 +372,17 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				exit;
 			}
 
-			if ($status === 'open') {
-				$order->update_status('on-hold', 'The payment is pending an update from the payment provider.');
-				$redirect = $this->get_return_url($order);
-				wp_redirect($redirect);
+			if ( $status === 'open' ) {
+				$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
+				$redirect = $this->get_return_url( $order );
+				wp_redirect( $redirect );
 				exit;
 			}
 
-			if ($payment_status === 'released') {
-				$order->add_order_note( __('Payment failed: payment released', 'altapay') );
-				wc_add_notice( __('Payment error:', 'altapay') . ' Payment released', 'error' );
-				wp_redirect(wc_get_cart_url());
+			if ( $payment_status === 'released' ) {
+				$order->add_order_note( __( 'Payment failed: payment released', 'altapay' ) );
+				wc_add_notice( __( 'Payment error:', 'altapay' ) . ' Payment released', 'error' );
+				wp_redirect( wc_get_cart_url() );
 				exit;
 			}
 
@@ -376,12 +414,102 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			// Redirect to Order Confirmation Page
 			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' ) {
-				$api = $this->apiLogin();
-				$api->captureReservation( $txnId, $amount, array(), null );
+				$login = $this->altapayApiLogin();
+				if ( ! $login || is_wp_error( $login ) ) {
+					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+					return;
+				}
+				$api = new CaptureReservation( $this->getAuth() );
+				$api->setAmount( round( $amount, 2 ) );
+				$api->setTransaction( $txnId );
+
+				/** @var CaptureReservationResponse $response */
+				try {
+					$response = $api->call();
+				} catch ( ResponseHeaderException $e ) {
+					error_log( 'Response header exception ' . $e->getMessage() );
+				} catch ( \Exception $e ) {
+					error_log( 'Response header exception ' . $e->getMessage() );
+				}
 			}
-			$redirect = $this->get_return_url($order);
-			wp_redirect($redirect);
+			$redirect = $this->get_return_url( $order );
+			wp_redirect( $redirect );
 			exit;
 		}
+	}
+
+	/**
+	 * @param array   $addressInfo
+	 * @param Address $address
+	 *
+	 * @return void
+	 */
+	private function populateAddressObject( $addressInfo, $address ) {
+		$address->Firstname  = $addressInfo['firstname'];
+		$address->Lastname   = $addressInfo['lastname'];
+		$address->Address    = $addressInfo['address'];
+		$address->City       = $addressInfo['city'];
+		$address->PostalCode = $addressInfo['postcode'];
+		$address->Region     = $addressInfo['region'] ?: '0';
+		$address->Country    = $addressInfo['country'];
+	}
+
+	/**
+	 * @param WC_Order $order
+	 *
+	 * @return Customer
+	 * @throws Exception
+	 */
+	public function setCustomer( $order ) {
+		$address        = new Address();
+		$altapayHelpers = new Helpers\AltapayHelpers();
+		$billingInfo    = array(
+			'firstname' => $order->get_billing_first_name(),
+			'lastname'  => $order->get_billing_last_name(),
+			'address'   => $order->get_billing_address_1(),
+			'postcode'  => $order->get_billing_postcode(),
+			'city'      => $order->get_billing_city(),
+			'region'    => $order->get_billing_state(),
+			'country'   => $order->get_billing_country(),
+		);
+		$shippingInfo   = array(
+			'firstname' => $order->get_shipping_first_name(),
+			'lastname'  => $order->get_shipping_last_name(),
+			'address'   => $order->get_shipping_address_1(),
+			'postcode'  => $order->get_shipping_postcode(),
+			'city'      => $order->get_shipping_city(),
+			'region'    => $order->get_shipping_state(),
+			'country'   => $order->get_shipping_country(),
+		);
+		if ( $order->get_billing_address_1() ) {
+			$this->populateAddressObject( $billingInfo, $address );
+		}
+		$customer = new Customer( $address );
+		if ( $order->get_shipping_address_1() ) {
+			$shippingAddress         = new Address();
+			$this->populateAddressObject( $shippingInfo, $shippingAddress );
+			$customer->setShipping( $shippingAddress );
+		} else {
+			$customer->setShipping( $address );
+		}
+		$customer->setEmail( $order->get_billing_email() );
+		$customer->setPhone( str_replace( ' ', '', $order->get_billing_phone() ) );
+		$customer->setClientIP( $_SERVER['REMOTE_ADDR'] );
+		$customer->setClientAcceptLanguage( substr( $_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2 ) );
+		$customer->setHttpUserAgent( $_SERVER['HTTP_USER_AGENT'] );
+		$customer->setClientSessionID( crypt( session_id(), '$5$rounds=5000$customersessionid$' ) );
+
+		// Get user registration date
+		if ( is_user_logged_in() ) {
+			$users         = get_users();
+			$currentUserId = get_current_user_id();
+			foreach ( $users as $user ) {
+				$userData            = get_userdata( $currentUserId );
+				$customerCreatedDate = $altapayHelpers->convertDateTimeFormat( $userData->user_registered );
+				$customer->setCreatedDate( new \DateTime( $customerCreatedDate ) );
+			}
+		}
+
+		return $customer;
 	}
 }

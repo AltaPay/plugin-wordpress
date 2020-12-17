@@ -9,14 +9,13 @@
 
 namespace Altapay\Classes\Core;
 
-use AltapayConnectionFailedException;
-use AltapayInvalidResponseException;
-use AltapayMerchantAPI;
-use AltapayMerchantAPIException;
-use AltapayRequestTimeoutException;
-use AltapayUnauthorizedAccessException;
-use AltapayUnknownMerchantAPIException;
 use WP_Error;
+use Altapay\Classes\Core;
+use Altapay\Api\Others\Payments;
+use Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Payments\ReleaseReservation;
+use Altapay\Exceptions\ResponseHeaderException;
+use Exception;
 
 class AltapayOrderStatus {
 
@@ -38,12 +37,6 @@ class AltapayOrderStatus {
 	 * @param WC_Order $order
 	 *
 	 * @return WP_Error
-	 * @throws AltapayConnectionFailedException
-	 * @throws AltapayInvalidResponseException
-	 * @throws AltapayMerchantAPIException
-	 * @throws AltapayRequestTimeoutException
-	 * @throws AltapayUnauthorizedAccessException
-	 * @throws AltapayUnknownMerchantAPIException
 	 */
 	public function orderStatusChanged( $orderID, $currentStatus, $nextStatus, $order ) {
 		$txnID    = $order->get_transaction_id();
@@ -52,80 +45,77 @@ class AltapayOrderStatus {
 		$refunded = 0;
 		$status   = '';
 
-		$api = new AltapayMerchantAPI(
-			esc_attr( get_option( 'altapay_gateway_url' ) ),
-			esc_attr( get_option( 'altapay_username' ) ),
-			esc_attr( get_option( 'altapay_password' ) ),
-			null
-		);
-		try {
-			$api->login();
-		} catch ( Exception $e ) {
-			$_SESSION['altapay_login_error'] = $e->getMessage();
+		$settings = new Core\AltapaySettings();
+		$login    = $settings->altapayApiLogin();
 
-			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+		if ( ! $login || is_wp_error( $login ) ) {
+			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+			return;
 		}
 
-		$payment  = $api->getPayment( $txnID );
-		$payments = $payment->getPayments();
-		foreach ( $payments as $pay ) {
-			$reserved = $pay->getReservedAmount();
-			$captured = $pay->getCapturedAmount();
-			$refunded = $pay->getRefundedAmount();
-			$status   = $pay->getCurrentStatus();
+		$auth = $settings->getAuth();
+		$api  = new Payments( $auth );
+		$api->setTransaction( $txnID );
+		$payments = $api->call();
 
+		if ( $payments ) {
+			foreach ( $payments as $pay ) {
+				$reserved += $pay->ReservedAmount;
+				$captured += $pay->CapturedAmount;
+				$refunded += $pay->RefundedAmount;
+				$status   += $pay->TransactionStatus;
+			}
 		}
 
 		if ( $currentStatus === 'cancelled' ) {
 			try {
 				if ( $status === 'released' ) {
 					return;
-				} elseif ( $captured == 0 && $refunded == 0 ) {
-					$releaseResult = $api->releaseReservation( $txnID );
-					if ( $releaseResult->wasSuccessful() ) {
+				} elseif ( $captured === 0 && $refunded === 0 ) {
+					$orderStatus = 'cancelled';
+				} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
+					$orderStatus = 'refunded';
+				} else {
+					$orderStatus = 'processing';
+				}
+
+				$api = new ReleaseReservation( $auth );
+				$api->setTransaction( $txnID );
+				$response = $api->call();
+
+				if ( $response->Result === 'Success' ) {
+					$order->update_status( $orderStatus );
+					if ( $orderStatus === 'cancelled' ) {
 						update_post_meta( $orderID, '_released', true );
 						$order->add_order_note( __( 'Order released: "The order has been released"', 'altapay' ) );
 					}
-				} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
-					$order->update_status( 'refunded' );
-					$releaseResult = $api->releaseReservation( $txnID );
-					if ( ! $releaseResult->wasSuccessful() ) {
-						$order->add_order_note(
-							__(
-								'Release failed: ' . $releaseResult->getMerchantErrorMessage(),
-								'altapay'
-							)
-						);
-						echo wp_json_encode(
-							array(
-								'status'  => 'error',
-								'message' => $releaseResult->getMerchantErrorMessage(),
-							)
-						);
-					}
 				} else {
-					$order->update_status( 'processing' );
-					$releaseResult = $api->releaseReservation( $txnID );
-					if ( ! $releaseResult->wasSuccessful() ) {
-						$order->add_order_note( __( 'Release failed: Order cannot be released', 'altapay' ) );
-					}
+					$order->add_order_note( __( 'Release failed: ' . $response->MerchantErrorMessage, 'altapay' ) );
+					echo wp_json_encode(
+						array(
+							'status'  => 'error',
+							'message' => $response->MerchantErrorMessage,
+						)
+					);
 				}
-			} catch ( Exception $e ) {
-				return WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+			} catch ( ResponseHeaderException $e ) {
+				error_log( 'Exception: ' . $e->getMessage() );
 			}
 		} elseif ( $currentStatus === 'completed' ) {
 			try {
 				if ( $status === 'captured' ) {
 					return;
 				} elseif ( $captured == 0 ) {
-					$captureResult = $api->captureReservation( $txnID );
-					if ( $captureResult->wasSuccessful() ) {
+					$api = new CaptureReservation( $auth );
+					$api->setTransaction( $txnID );
+					$response = $api->call();
+					if ( isset( $response->Result ) && $response->Result === 'Success' ) {
 						update_post_meta( $orderID, '_captured', true );
 						$order->add_order_note( __( 'Order captured: "The order has been fully captured"', 'altapay' ) );
 					}
 				}
 			} catch ( Exception $e ) {
-				return WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+				return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 			}
 		}
 	}
