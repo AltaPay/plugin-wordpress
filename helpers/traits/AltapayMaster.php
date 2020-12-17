@@ -16,6 +16,7 @@ use Altapay\Authentication;
 use Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
 use WC_Subscriptions_Renewal_Order;
+use Altapay\Api\Subscription\ChargeSubscription;
 
 trait AltapayMaster {
 
@@ -60,19 +61,23 @@ trait AltapayMaster {
 				return;
 			}
 
-			$api = $this->altapayApiLogin();
-			if ( ! $api || is_wp_error( $api ) ) {
+			$login = $this->altapayApiLogin();
+			if ( ! $login || is_wp_error( $login ) ) {
 				echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 				return;
 			}
-			$result = $api->chargeSubscription( $transaction_id, $amount );
 
-			if ( $result->wasSuccessful() ) {
+			$api = new ChargeSubscription( $this->getAuth() );
+			$api->setTransaction( $transaction_id );
+			$api->setAmount( round( $amount, 2 ) );
+			$response = $api->call();
+
+			if ( $response->Result === 'Success' ) {
 				$renewal_order->payment_complete();
 			} else {
 				$renewal_order->update_status(
 					'failed',
-					sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $result->getErrorMessage() )
+					sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
 				);
 			}
 		} catch ( Exception $e ) {

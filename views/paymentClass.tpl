@@ -154,8 +154,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$utilMethods = new Util\UtilMethods;
 		$altapayHelpers = new Helpers\AltapayHelpers;
 		// Create form request etc.
-		$api = $this->altapayApiLogin();
-		if ( ! $api || is_wp_error( $api ) ) {
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
 			return new WP_Error( 'error', 'Could not connect to AltaPay!' );
 		}
 		// Create payment request
@@ -259,7 +259,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		try {
 			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
-			if ( is_null( $savedCardNumber ) ) {
+			if ( !$savedCardNumber ) {
 				$ccToken = null;
 			} else {
 				$results = $wpdb->get_results("SELECT ccToken FROM {$wpdb->prefix}altapayCreditCardDetails WHERE creditCardNumber='$savedCardNumber'");
@@ -414,8 +414,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			// Redirect to Order Confirmation Page
 			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' ) {
-				$api = $this->altapayApiLogin();
-				if ( ! $api || is_wp_error( $api ) ) {
+				$login = $this->altapayApiLogin();
+				if ( ! $login || is_wp_error( $login ) ) {
 					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 					return;
 				}
@@ -442,7 +442,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param array   $addressInfo
 	 * @param Address $address
 	 *
-	 * @return Address
+	 * @return void
 	 */
 	private function populateAddressObject( $addressInfo, $address ) {
 		$address->Firstname  = $addressInfo['firstname'];
@@ -452,8 +452,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$address->PostalCode = $addressInfo['postcode'];
 		$address->Region     = $addressInfo['region'] ?: '0';
 		$address->Country    = $addressInfo['country'];
-
-		return $address;
 	}
 
 	/**
@@ -488,8 +486,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		}
 		$customer = new Customer( $address );
 		if ( $order->get_shipping_address_1() ) {
-			$address         = new Address();
-			$shippingAddress = $this->populateAddressObject( $shippingInfo, $address );
+			$shippingAddress         = new Address();
+			$this->populateAddressObject( $shippingInfo, $shippingAddress );
 			$customer->setShipping( $shippingAddress );
 		} else {
 			$customer->setShipping( $address );

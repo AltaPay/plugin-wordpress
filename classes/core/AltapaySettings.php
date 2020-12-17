@@ -55,8 +55,8 @@ class AltapaySettings {
 			return;
 		}
 
-		$api = $this->altapayApiLogin();
-		if ( ! $api || is_wp_error( $api ) ) {
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 
 			return;
@@ -365,10 +365,10 @@ class AltapaySettings {
 	 * @return void
 	 */
 	function refreshTerminals() {
-		$api = $this->altapayApiLogin();
-		if ( ! $api || is_wp_error( $api ) ) {
-			if ( is_wp_error( $api ) ) {
-				echo '<div class="error"><p>' . wp_kses_post( $api->get_error_message() ) . '</p></div>';
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
+			if ( is_wp_error( $login ) ) {
+				echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
 			} else {
 				echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
 			}
