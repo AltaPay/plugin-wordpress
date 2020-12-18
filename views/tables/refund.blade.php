@@ -78,9 +78,9 @@
         @endif
 
         @php
-            $discountPercent = (float)number_format(((($itemData->get_subtotal() + $itemData->get_subtotal_tax()) - ($itemData->get_total() + $itemData->get_total_tax())) / ($itemData->get_subtotal() + $itemData->get_subtotal_tax())) * 100, 2, '.', '');
-            $productUnitPriceWithoutTax = (float)number_format(($itemData->get_total() / $qty), 2, '.', '');
-            $productUnitPriceWithTax = (float)number_format(($itemData->get_total() / $qty), 2, '.', '') + ($itemData->get_total_tax() / $qty);
+            $discountPercent = round(((($itemData->get_subtotal() + $itemData->get_subtotal_tax()) - ($itemData->get_total() + $itemData->get_total_tax())) / ($itemData->get_subtotal() + $itemData->get_subtotal_tax())) * 100, 2);
+            $productUnitPriceWithoutTax = round(($itemData->get_total() / $qty), 2);
+            $productUnitPriceWithTax = round(($itemData->get_total() / $qty) + ($itemData->get_total_tax() / $qty), 2);
             $totalIncTax = round($itemData->get_total() + $itemData->get_total_tax(), 2);
         @endphp
 

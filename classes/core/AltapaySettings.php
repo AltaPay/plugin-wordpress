@@ -11,9 +11,11 @@ namespace Altapay\Classes\Core;
 
 use Altapay\Helpers;
 use Altapay\Helpers\Traits\AltapayMaster;
+use Altapay\Api\Others\Terminals;
+use Altapay\Api\Others\Payments;
+use Altapay\Api\Payments\CaptureReservation;
+use Exception;
 use WC_Order;
-
-require_once dirname( __DIR__, 2 ) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'altapay' . DIRECTORY_SEPARATOR . 'altapay-php-sdk' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'AltapayMerchantAPI.class.php';
 
 class AltapaySettings {
 
@@ -42,7 +44,6 @@ class AltapaySettings {
 	/**
 	 * @param int $orderID
 	 * @return void
-	 * @throws AltapayMerchantAPIException
 	 */
 	public function altapayOrderStatusCompleted( $orderID ) {
 		$this->startSession();
@@ -54,39 +55,40 @@ class AltapaySettings {
 			return;
 		}
 
-		$api = $this->apiLogin();
-		if ( $api instanceof WP_Error ) {
-			$_SESSION['altapay_login_error'] = $api->get_error_message();
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 
 			return;
 		}
 
-		$payment = $api->getPayment( $txnID );
-		if ( ! $payment ) {
+		$auth = $this->getAuth();
+		$api  = new Payments( $auth );
+		$api->setTransaction( $txnID );
+		$payments = $api->call();
+
+		if ( ! $payments ) {
 			return;
 		}
 
-		$payments = $payment->getPayments();
-		$pay      = $payments[0];
-
-		if ( $pay->getCapturedAmount() > 0 ) {
+		$pay = $payments[0];
+		if ( $pay->CapturedAmount > 0 ) {
 			$this->saveCaptureWarning( 'This order was already fully or partially captured: ' . $orderID );
 		} else { // Order wasn't captured and must be captured now.
-			$amount        = $pay->getReservedAmount(); // Amount to capture.
-			$salesTax      = $order->get_total_tax();
-			$orderLines    = array( array() );
-			$captureResult = $api->captureReservation( $txnID, $amount, $orderLines, $salesTax );
-
-			if ( ! $captureResult->wasSuccessful() ) {
+			$amount = $pay->ReservedAmount; // Amount to capture.
+			$api    = new CaptureReservation( $this->getAuth() );
+			$api->setAmount( round( $amount, 2 ) );
+			$api->setTransaction( $txnID );
+			$response = $api->call();
+			if ( $response->Result !== 'Success' ) {
 				$order->add_order_note(
 					__(
-						'Capture failed: ' . $captureResult->getMerchantErrorMessage(),
+						'Capture failed: ' . $response->MerchantErrorMessage,
 						'Altapay'
 					)
 				); // log to history.
 				$this->saveCaptureFailedMessage(
-					'Capture failed for order ' . $orderID . ': ' . $captureResult->getMerchantErrorMessage()
+					'Capture failed for order ' . $orderID . ': ' . $response->MerchantErrorMessage
 				);
 
 				return;
@@ -96,7 +98,6 @@ class AltapaySettings {
 			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
 		}
 	}
-
 
 	/**
 	 * Starts the session
@@ -127,10 +128,9 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function saveCaptureWarning( $newMessage ) {
+		$message = '';
 		if ( isset( $_SESSION['altapay_capture_warning'] ) ) {
 			$message = $_SESSION['altapay_capture_warning'] . '<br/>';
-		} else {
-			$message = '';
 		}
 
 		$_SESSION['altapay_capture_warning'] = $message . $newMessage;
@@ -200,7 +200,7 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function altapayLocalizationInit() {
-		 load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	/**
@@ -255,7 +255,7 @@ class AltapaySettings {
 	 * AltaPay settings page with actions and controls
 	 *
 	 * @return void
-	 * @throws AltapayMerchantAPIException
+	 * @throws Exception
 	 */
 	public function altapaySettings() {
 		$terminals         = false;
@@ -363,13 +363,15 @@ class AltapaySettings {
 	 * Method for refreshing terminals on AltaPay settings page
 	 *
 	 * @return void
-	 * @throws AltapayMerchantAPIException
 	 */
 	function refreshTerminals() {
-		$api = $this->apiLogin();
-		if ( $api instanceof WP_Error ) {
-			$_SESSION['altapay_login_error'] = $api->get_error_message();
-			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+		$login = $this->altapayApiLogin();
+		if ( ! $login || is_wp_error( $login ) ) {
+			if ( is_wp_error( $login ) ) {
+				echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
+			} else {
+				echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
+			}
 			// Delete terminals and enabled terminals from database
 			update_option( 'altapay_terminals', '' );
 			update_option( 'altapay_terminals_enabled', '' );
@@ -380,17 +382,18 @@ class AltapaySettings {
 			<?php
 			return;
 		}
-		echo '<p><b>' . __( 'Connection OK !', 'altapay' ) . '</b></p>';
-		// Get list of terminals information
-		$terminalInfo = $api->getTerminals();
-		$terminals    = array();
-		$terms        = $terminalInfo->getTerminals();
 
-		foreach ( $terms as $terminal ) {
+		echo '<p><b>' . __( 'Connection OK !', 'altapay' ) . '</b></p>';
+		$terminals = array();
+		$auth      = $this->getAuth();
+		$api       = new Terminals( $auth );
+		$response  = $api->call();
+
+		foreach ( $response->Terminals as $terminal ) {
 			$terminals[] = array(
-				'key'    => str_replace( array( ' ', '-' ), '_', $terminal->getTitle() ),
-				'name'   => $terminal->getTitle(),
-				'nature' => $terminal->getNature(),
+				'key'    => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+				'name'   => $terminal->Title,
+				'nature' => $terminal->Natures,
 			);
 		}
 

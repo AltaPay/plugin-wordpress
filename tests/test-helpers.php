@@ -1,9 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-require_once dirname( __DIR__ ) . '/helpers/AltapayHelpers.php';
-
+use Altapay\Helpers;
 
 class AltapayHelpersTest extends TestCase {
 
@@ -13,7 +11,7 @@ class AltapayHelpersTest extends TestCase {
 	 * @return void
 	 */
 	public function testSetShippingMethodWithShippingCountry() {
-		$classImport  = new AltapayHelpers();
+		$classImport  = new Helpers\AltapayHelpers();
 		$customerInfo = array(
 			'shipping_country' => 'America',
 			'shipping_city'    => 'London',
@@ -48,7 +46,7 @@ class AltapayHelpersTest extends TestCase {
 	 * @return void
 	 */
 	public function testSetShippingMethodWithMissingShippingCountry() {
-		 $classImport = new AltapayHelpers();
+		 $classImport = new Helpers\AltapayHelpers();
 		$customerInfo = array(
 			'shipping_country' => '',
 			'shipping_city'    => 'London',
@@ -84,7 +82,7 @@ class AltapayHelpersTest extends TestCase {
 	 * @return void
 	 */
 	public function testSetShippingMethodWithMissingBillingCountry() {
-		$classImport  = new AltapayHelpers();
+		$classImport  = new Helpers\AltapayHelpers();
 		$customerInfo = array(
 			'shipping_country' => '',
 			'shipping_city'    => 'London',
