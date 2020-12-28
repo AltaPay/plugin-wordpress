@@ -28,8 +28,9 @@
         "szepeviktor/phpstan-wordpress": "^0.7.1"
     },
     "autoload": {
-        "psr-4": {
-            "Altapay\\": ""
-        }
+        "classmap": ["classes","helpers","assets/blade/lib"]
+    },
+    "autoload-dev": {
+        "classmap": ["tests"]
     }
 }
