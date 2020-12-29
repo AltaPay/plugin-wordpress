@@ -37,7 +37,12 @@ jobs:
        run: |
          git clone https://github.com/wp-premium/woocommerce-subscriptions.git
        working-directory: wordpress/wp-content/plugins
-     
+       
+     - name: Install wordpress-develop-tests plugin
+       run: |
+         git clone https://github.com/bobbingwide/wordpress-develop-tests.git
+       working-directory: wordpress/wp-content/plugins
+       
      - run: mkdir wordpress/wp-content/plugins/plugin-wordpress
      - uses: actions/checkout@v2 
        with: 
