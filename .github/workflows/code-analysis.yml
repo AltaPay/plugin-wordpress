@@ -10,27 +10,35 @@ jobs:
   php-stan:
     runs-on: ubuntu-latest
     steps:
+    strategy:
+      matrix:
+        php-versions: ['7.4']
+    steps:
+     - name: Install PHP 7.4
+       uses: shivammathur/setup-php@v2
+       with:
+         php-version: ${{ matrix.php-versions }}
+         extensions: intl #optional
+         ini-values: "post_max_size=256M" #optional
      
      - name: Install wordpress
        run: |
          curl -O https://wordpress.org/latest.tar.gz
          tar xzvf latest.tar.gz 
          rm latest.tar.gz
-         pwd
-         ls -al
+     
      - name: Install woocommerce
        run: |
          curl -O https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip
          unzip woocommerce.latest-stable.zip 
          rm woocommerce.latest-stable.zip
-         pwd
-         ls -al
        working-directory: wordpress/wp-content/plugins
      
      - run: mkdir wordpress/wp-content/plugins/plugin-wordpress
      - uses: actions/checkout@v2 
        with: 
          path: wordpress/wp-content/plugins/plugin-wordpress
+      
      - name: Install composer and run PhpStan
        run: |
          composer install
