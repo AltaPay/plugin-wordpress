@@ -27,11 +27,16 @@ jobs:
          tar xzvf latest.tar.gz 
          rm latest.tar.gz
      
-     - name: Install woocommerce
+     - name: Install woocommerce plugin
        run: |
          curl -O https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip
          unzip woocommerce.latest-stable.zip 
          rm woocommerce.latest-stable.zip
+       working-directory: wordpress/wp-content/plugins
+
+     - name: Install woocommerce-subscriptions plugin
+       run: |
+         git clone https://github.com/wp-premium/woocommerce-subscriptions.git
        working-directory: wordpress/wp-content/plugins
      
      - run: mkdir wordpress/wp-content/plugins/plugin-wordpress
