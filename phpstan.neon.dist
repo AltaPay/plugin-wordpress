@@ -4,11 +4,12 @@ parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/vendor/
         - %currentWorkingDirectory%/assets/
-        - %currentWorkingDirectory%/tests/
+#        - %currentWorkingDirectory%/tests/
     scanDirectories:
         - ../woocommerce/
         - ../../../wp-includes/
         - ../../../wp-admin/
         - ../woocommerce-subscriptions
+        - ../wordpress-develop-tests
     level: 0
-    checkMissingIterableValueType: false
+#    checkMissingIterableValueType: false
