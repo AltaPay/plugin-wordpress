@@ -1,4 +1,8 @@
 *** Changelog ***
+= 3.2.0 =
+* Fixed the overlapping notification bar issue
+* Code improvement
+
 = 3.1.1 =
 * Added fix for payment page CSS
 
