@@ -26,12 +26,17 @@ The whole installation and configuration process is described in our [integratio
 1. Plugin configuration for gateway access
 2. Payment terminal configuration
 
+== Code Analysis==
+
+PHPStan is being used for running static code analysis. It's configuration file 'phpstan.neno.dist' is available is this repository. The directories mentioned under scnDirectories option, in phpstan.neon.dist file, are required for running the analysis. These directories belong to wordpress and woocommerce. If you don't have these packages, you'll need to download and extract them first and then make sure their paths are correctly reflected in phpstan.neon.dist file. Once done, we can run the analysis: 
+1. First install composer packages using 'composer install'
+2. Then run 'vendor/bin/phpstan analyze' to run the analysis. It'll print out any errors detected by PHPStan.
+
 == Support ==
 
 Feel free to contact our support team (support@altapay.com) if you need any assistance during the installation process or have questions regarding specific payment methods and functionalities.
 
 == About Altapay ==
-
 
 AltaPay supports major acquiring banks, global payment methods and over 50 preferred local schemes like Dankort in Denmark, Vipps and Bank Axept in Norway, Swish in Sweden etc., across multiple sales channels (in-store and terminals & eCommerce), geographies and currencies. This includes credit and debit card acquiring, bank transfer networks, direct debit, wallets, mobile payment types, online invoicing, prepaid and gift card networks. With offices in Denmark, Altapay serves Pan European and Global customers including JD Sports, Sports Direct, Paul Smith, Laura Ashley, DFDS Seaways, ZARA, ECCO and Stokke.
 Altapay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for Altapay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.

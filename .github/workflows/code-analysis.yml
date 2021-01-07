@@ -1,0 +1,56 @@
+name: PHP Code Analysis For Altapay Wordpress Plugin
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  php-stan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['7.4']
+    steps:
+     - name: Install PHP 7.4
+       uses: shivammathur/setup-php@v2
+       with:
+         php-version: ${{ matrix.php-versions }}
+         extensions: intl #optional
+         ini-values: "post_max_size=256M" #optional
+     
+     - name: Install wordpress
+       run: |
+         curl -O https://wordpress.org/latest.tar.gz
+         tar xzvf latest.tar.gz 
+         rm latest.tar.gz
+     
+     - name: Install woocommerce plugin
+       run: |
+         curl -O https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip
+         unzip woocommerce.latest-stable.zip 
+         rm woocommerce.latest-stable.zip
+       working-directory: wordpress/wp-content/plugins
+
+     - name: Install woocommerce-subscriptions plugin
+       run: |
+         git clone https://github.com/wp-premium/woocommerce-subscriptions.git
+       working-directory: wordpress/wp-content/plugins
+       
+     - name: Install wordpress-develop-tests plugin
+       run: |
+         git clone https://github.com/bobbingwide/wordpress-develop-tests.git
+       working-directory: wordpress/wp-content/plugins
+       
+     - run: mkdir wordpress/wp-content/plugins/plugin-wordpress
+     - uses: actions/checkout@v2 
+       with: 
+         path: wordpress/wp-content/plugins/plugin-wordpress
+      
+     - name: Install composer and run PhpStan
+       run: |
+         composer install
+         vendor/bin/phpstan analyze
+       working-directory: wordpress/wp-content/plugins/plugin-wordpress
+      

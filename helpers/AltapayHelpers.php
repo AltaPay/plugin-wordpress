@@ -9,8 +9,6 @@
 
 namespace Altapay\Helpers;
 
-require_once dirname( __DIR__, 1 ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'blade' . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'BladeOne.php';
-
 use DateTime;
 use eftec\bladeone;
 use WP_Error;
