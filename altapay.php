@@ -612,12 +612,12 @@ function altapayReleasePayment() {
 	try {
 		$payments = $api->call();
 		foreach ( $payments as $pay ) {
-			$reserved += $pay->ReservedAmount;
-			$captured += $pay->CapturedAmount;
-			$refunded += $pay->RefundedAmount;
+			$reserved += (float) $pay->ReservedAmount;
+			$captured += (float) $pay->CapturedAmount;
+			$refunded += (float) $pay->RefundedAmount;
 		}
 
-		if ( (int) $captured === 0 && (int) $refunded === 0 ) {
+		if ( !$captured && !$refunded ) {
 			$orderStatus = 'cancelled';
 		} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
 			$orderStatus = 'refunded';
