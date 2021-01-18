@@ -10,4 +10,4 @@ parameters:
         - ../../../wp-admin/
         - ../woocommerce-subscriptions
         - ../wordpress-develop-tests
-    level: max
+    level: 1
