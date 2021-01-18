@@ -617,7 +617,7 @@ function altapayReleasePayment() {
 			$refunded += $pay->RefundedAmount;
 		}
 
-		if ( $captured === 0 && $refunded === 0 ) {
+		if ( !$captured && !$refunded ) {
 			$orderStatus = 'cancelled';
 		} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
 			$orderStatus = 'refunded';
