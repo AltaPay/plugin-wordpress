@@ -612,9 +612,9 @@ function altapayReleasePayment() {
 	try {
 		$payments = $api->call();
 		foreach ( $payments as $pay ) {
-			$reserved += (float) $pay->ReservedAmount;
-			$captured += (float) $pay->CapturedAmount;
-			$refunded += (float) $pay->RefundedAmount;
+			$reserved += $pay->ReservedAmount;
+			$captured += $pay->CapturedAmount;
+			$refunded += $pay->RefundedAmount;
 		}
 
 		if ( !$captured && !$refunded ) {
