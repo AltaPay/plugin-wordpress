@@ -259,9 +259,8 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 
 		try {
 			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
-			if ( is_null( $savedCardNumber ) ) {
-				$ccToken = null;
-			} else {
+			$ccToken = null;
+			if ( ! is_null( $savedCardNumber ) ) {
 				$results = $wpdb->get_results( "SELECT ccToken FROM {$wpdb->prefix}altapayCreditCardDetails WHERE creditCardNumber='$savedCardNumber'" );
 				foreach ( $results as $result ) {
 					$ccToken = $result->ccToken;

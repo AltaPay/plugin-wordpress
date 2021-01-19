@@ -188,6 +188,9 @@ class UtilMethods {
 			$discountPercentage = round( ( $productDiscountAmount / $productRegularPrice ) * 100, 2 );
 		}
 
+		$taxAmount = 0;
+		$productPrice = 0;
+
 		// conditional switch for calculations based on discount and tax configuration settings
 		switch ( array( $singleProduct->is_on_sale(), $taxConfiguration, $couponDiscountPercentage ) ) {
 			// calculate product price if discount is applied either catalogue or cart with tax included configurations
@@ -281,6 +284,7 @@ class UtilMethods {
 		$shippingID           = 'NaN';
 		$shippingDetails      = array();
 
+		$orderShippingKey = 0;
 		foreach ( $orderShippingMethods as $orderShippingKey => $orderShippingMethods ) {
 			$shippingID = $orderShippingMethods['method_id'];
 		}
