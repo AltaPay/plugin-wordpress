@@ -44,7 +44,7 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 == Changelog ==
 
 = 3.2.1 =
-* Minor adjustments
+* Fix some notification errors
 
 = 3.2.0 =
 * Fixed the overlapping notification bar issue
