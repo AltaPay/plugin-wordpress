@@ -2865,7 +2865,10 @@
             "time": "2020-07-08T17:02:28+00:00"
         }
     ],
+<<<<<<< HEAD
     "packages-dev": [],
+=======
+>>>>>>> d6c838ba4596b6975f2d67c445967e2f6411e256
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": [],
