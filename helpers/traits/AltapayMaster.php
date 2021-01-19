@@ -48,6 +48,7 @@ trait AltapayMaster {
 				return;
 			}
 
+			$parent_order_id = 0;
 			if ( wcs_order_contains_renewal( $renewal_order->id ) ) {
 				$parent_order_id = WC_Subscriptions_Renewal_Order::get_parent_order_id( $renewal_order->id );
 			}

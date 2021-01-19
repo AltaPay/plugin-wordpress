@@ -33,6 +33,8 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
 /**
  * Init AltaPay settings and gateway
+ *
+ * @return void
  */
 function init_altapay_settings() {
 	// Make sure WooCommerce and WooCommerce gateway is enabled and loaded
@@ -56,9 +58,9 @@ function init_altapay_settings() {
 /**
  * Add the Gateway to WooCommerce.
  *
- * @param array $methods
+ * @param array<int, string> $methods
  *
- * @return array
+ * @return array<int, string>
  */
 function altapay_add_gateway( $methods ) {
 	$pluginDir = plugin_dir_path( __FILE__ );
@@ -138,6 +140,7 @@ function altapay_page_template( $template ) {
 
 /**
  * Register meta box for order details page
+ * @return bool
  */
 function altapayAddMetaBoxes() {
 	global $post;
@@ -246,7 +249,7 @@ function altapayActionJavascript() {
 			wp_register_script(
 				'jQuery',
 				'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js',
-				null,
+				array(),
 				'2.1.3',
 				true
 			);
@@ -340,6 +343,7 @@ function altapayCaptureCallback() {
 
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 
+		$orderLines = array();
 		if ( $postOrderLines ) {
 			$selectedProducts = array(
 				'skuList' => array(),
@@ -355,12 +359,15 @@ function altapayCaptureCallback() {
 			$orderLines = $utilMethods->createOrderLines( $order, $selectedProducts );
 		}
 
+		$response = null;
+		$rawResponse = null;
 		try {
 			$api = new CaptureReservation( $settings->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
 			$response = $api->call();
+			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
 			error_log( 'Response header exception ' . $e->getMessage() );
 		} catch ( ResponseHeaderException $e ) {
@@ -369,11 +376,10 @@ function altapayCaptureCallback() {
 			error_log( 'Response header exception ' . $e->getMessage() );
 		}
 
-		if ( $response->Result !== 'Success' ) {
+		if ( $response && $response->Result !== 'Success' ) {
 			wp_send_json_error( array( 'error' => __( 'Could not capture reservation' ) ) );
 		}
 
-		$rawResponse = $api->getRawResponse();
 		$charge      = 0;
 		$reserved    = 0;
 		$captured    = 0;
