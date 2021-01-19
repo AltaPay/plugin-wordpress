@@ -1,4 +1,7 @@
 *** Changelog ***
+= 3.2.1 =
+* Fix some notification errors
+
 = 3.2.0 =
 * Fixed the overlapping notification bar issue
 * Code improvement

@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://www.altapay.com/knowledge-base/omni-channel/
- * Version: 3.2.0
+ * Version: 3.2.1
  * Name: SDM_Altapay
- * WC requires at least: 3.0.0
- * WC tested up to: 4.8.0
+ * WC requires at least: 3.8.0
+ * WC tested up to: 4.9.0
  *
  * @package Altapay
  */
