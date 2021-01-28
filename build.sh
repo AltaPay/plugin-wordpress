@@ -3,20 +3,23 @@
 set -e
 
 if ! command -v zip
-then
+then	
   echo "Zip package is not currently installed"
+  echo "Or use docker/build-package.sh"
   exit
 fi
 
 if ! command -v php5.6
 then
   echo "PHP 5.6 package is not currently installed"
+  echo "Or use docker/build-package.sh"
   exit
 fi
 
 if ! command -v composer
 then
   echo "Composer package is not currently installed"
+  echo "Or use docker/build-package.sh"
   exit
 fi
 
