@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: Altapay for WooCommerce - Payments less complicated
- * Plugin URI: https://www.altapay.com/knowledge-base/omni-channel/integration-manuals/
+ * Plugin URI: https://documentation.altapay.com/Content/Plugins/Plugins.htm
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
- * Author URI: https://www.altapay.com/knowledge-base/omni-channel/
- * Version: 3.2.1
+ * Author URI: https://altapay.com
+ * Version: 3.2.2
  * Name: SDM_Altapay
  * WC requires at least: 3.8.0
- * WC tested up to: 4.9.0
+ * WC tested up to: 5.0.0
  *
  * @package Altapay
  */
