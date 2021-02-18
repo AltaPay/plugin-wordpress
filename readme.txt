@@ -4,13 +4,13 @@ Tags: Altapay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 5.6
 Requires at least: 4.9.0
 Tested up to: 5.6
-Stable tag: 3.2.1
+Stable tag: 3.2.2
 License: MIT
 WC requires at least: 3.8.0
-WC tested up to: 4.9.0
+WC tested up to: 5.0.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A plugin that integrates your WooCommerce web shop to the Valitor payments gateway.
+A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 == Description ==
 
@@ -19,18 +19,12 @@ Altapay is fully integrated with WooCommerce via a plug-in. All you have to do i
 
 == Installation ==
 
-The whole installation and configuration process is described in our [integration manual](https://www.valitor.com/wp-content/uploads/2019/01/WooCommerce-Integration-Manual.pdf).
+The whole installation and configuration process is described in our [integration manual](https://documentation.altapay.com/Content/Plugins/WooCommerce/1%20WooCommerce%20Plugin.htm).
 
 == Screenshots ==
 
 1. Plugin configuration for gateway access
 2. Payment terminal configuration
-
-== Code Analysis==
-
-PHPStan is being used for running static code analysis. It's configuration file 'phpstan.neno.dist' is available is this repository. The directories mentioned under scnDirectories option, in phpstan.neon.dist file, are required for running the analysis. These directories belong to wordpress and woocommerce. If you don't have these packages, you'll need to download and extract them first and then make sure their paths are correctly reflected in phpstan.neon.dist file. Once done, we can run the analysis: 
-1. First install composer packages using 'composer install'
-2. Then run 'vendor/bin/phpstan analyze' to run the analysis. It'll print out any errors detected by PHPStan.
 
 == Support ==
 
@@ -42,6 +36,9 @@ AltaPay supports major acquiring banks, global payment methods and over 50 prefe
 Altapay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for Altapay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
 
 == Changelog ==
+
+= 3.2.2 =
+* Support provided for Woocommerce version 5.0.0
 
 = 3.2.1 =
 * Fix some notification errors
