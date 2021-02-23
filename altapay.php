@@ -484,7 +484,7 @@ function altapayRefundCallback() {
 		if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
 
 			$api = new RefundCapturedReservation( $auth );
-			$api->setAmount( round( $amount ) );
+			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
 
