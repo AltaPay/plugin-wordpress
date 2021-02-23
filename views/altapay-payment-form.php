@@ -22,6 +22,9 @@ get_header();
 		.pensio_payment_form_cvc_cell img {
 			max-width: 60px;
 		}
+	        .theme-storefront .wp-altapay-payment-form-cnt {
+	            max-width: 55%;
+	        }
 	</style>
 </head>
 	<div id="primary" class="content-area">
@@ -147,7 +150,7 @@ get_header();
 					<?php do_action( 'woocommerce_order_details_after_order_table', $order ); ?>
 				</section>
 			</div>
-			<div>
+			<div class="wp-altapay-payment-form-cnt">
 				<form id="PensioPaymentForm"></form>
 			</div>
 
