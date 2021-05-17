@@ -16,18 +16,19 @@ $url     = "{{gatewayURL}}";
 try {
     $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
     $response = $api->call();
+    if (!$response) {
+        echo "API credentials are incorrect";
+        exit();
+    }
 } catch (ClientException $e) {
     echo "Error:" . $e->getMessage();
+    exit();
 } catch (Exception $e) {
     echo "Error:" . $e->getMessage();
-}
-
-if (!$response) {
-    echo "API credentials are incorrect";
     exit();
 }
 
-$currency  = "DKK";
+$currency  = get_option('woocommerce_currency') ?: "DKK";
 $terminals = array();
 
 try {
