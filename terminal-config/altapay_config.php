@@ -9,9 +9,9 @@ define('WP_USE_THEMES', false);
 require('./wp-load.php');
 
 // Settings
-$apiUser = "gateway_username";
-$apiPass = "gateway_pass";
-$url     = "gateway_url";
+$apiUser = "~gatewayusername~";
+$apiPass = "~gatewaypass~";
+$url     = "~gatewayurl~";
 
 try {
     $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
