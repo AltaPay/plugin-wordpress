@@ -191,7 +191,7 @@ PHPStan is being used for running static code analysis. Its configuration file '
 ## Sync terminals with gateway
 Follow these steps to sync the terminals with the gateway.
 * Move the file from `terminal-config/altapay_config.php` to the root directory of the WordPress installation
-* Edit the file and replace ~gatewayusername~,~gatewaypass~, and ~gatewayurl~ with the actual credentials.
+* Edit the file and replace `~gatewayusername~`,`~gatewaypass~`, and `~gatewayurl~` with the actual credentials.
 * Run the file with the below command
 
     $ php altapay_config.php
