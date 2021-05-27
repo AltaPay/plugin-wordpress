@@ -8,7 +8,7 @@ class Order
     visit()
     {
         cy.fixture('config').then((url)=>{
-        cy.visit(url.url) 
+        cy.visit(url.shopURL) 
    
             })    
     }
@@ -102,9 +102,9 @@ class Order
     {
             cy.clearCookies()
             cy.fixture('config').then((admin)=>{
-            cy.visit(admin.admin_url)
-            cy.get('#user_login').clear().type(admin.wp_admin_user)
-            cy.get('#user_pass').type(admin.wp_admin_pass)
+            cy.visit(admin.adminURL)
+            cy.get('#user_login').clear().type(admin.adminUsername)
+            cy.get('#user_pass').type(admin.adminPass)
             cy.get('#wp-submit').wait(1000).click()
             cy.get('.welcome-panel-content > h2').should('have.text', 'Welcome to WordPress!')
             })
