@@ -1,9 +1,7 @@
 {
-  "url":"http://yourdomain.com",
-  "usrname":"shop_login@mail",
-  "pass":"shop_password",
-  "url_admin_url":"yourdomain.com/wp-admin",
-  "wp_admin_user":"admin_user",
-  "wp_admin_pass":"admin_password"
+  "shopURL":"http://yoursite.com",
+  "adminURL":"http://yoursite.com/wp-admin",
+  "adminUsername":"admin_username",
+  "adminPass":"admin_password"
   
 }
