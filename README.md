@@ -119,7 +119,7 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 1.3.4
 > * Fix - connection to the payment gateway.
 
-1.3.3 =
+1.3.3
 > * Fix - Valitor terminals are not visible if connection to the API is not established.
 
 1.3.2
