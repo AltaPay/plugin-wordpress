@@ -109,7 +109,7 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 > * Fix - Capture and Release buttons.
 > * Perform tests with latest WordPress version.
 
-1.5.0 =
+1.5.0
 > * Include Valitor PHP SDK through Composer.
 > * Upgrade the build package script.
 
