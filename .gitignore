@@ -3,3 +3,4 @@
 vendor/
 dist/
 
+tests/integration-test/node_modules
