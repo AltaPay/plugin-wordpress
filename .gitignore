@@ -2,5 +2,4 @@
 .idea
 vendor/
 dist/
-
-tests/integration-test/node_modules
+node_modules/
