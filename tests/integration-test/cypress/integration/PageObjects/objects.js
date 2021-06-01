@@ -15,7 +15,8 @@ class Order
 
     
     addproduct(){
-        cy.get('.wp-block-product-new > .wc-block-grid__products > :nth-child(5) > .wc-block-grid__product-link > .wc-block-grid__product-image > .attachment-woocommerce_thumbnail').click()
+        cy.get('.nav-menu > .page-item-6 > a').click()
+        cy.get('.post-28 > .woocommerce-LoopProduct-link > .attachment-woocommerce_thumbnail').click()
         cy.xpath('/html/body/div[1]/div[2]/div/div[2]/main/div[2]/div[2]/form/div/input').click().clear().type('3')
         cy.get('.single_add_to_cart_button').click()
         cy.get('.woocommerce-message > .button').click()
