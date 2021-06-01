@@ -16,7 +16,7 @@ class Order
     
     addproduct(){
         cy.get('.nav-menu > .page-item-6 > a').click()
-        cy.get('.post-28 > .woocommerce-LoopProduct-link > .attachment-woocommerce_thumbnail').click()
+        cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.xpath('/html/body/div[1]/div[2]/div/div[2]/main/div[2]/div[2]/form/div/input').click().clear().type('3')
         cy.get('.single_add_to_cart_button').click()
         cy.get('.woocommerce-message > .button').click()
