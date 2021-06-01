@@ -3,3 +3,5 @@
 vendor/
 dist/
 tests/integration-test/node_modules/
+tests/integration-test/cypress/screenshots/
+tests/integration-test/cypress/videos/
