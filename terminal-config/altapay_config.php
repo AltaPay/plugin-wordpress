@@ -76,6 +76,7 @@ update_option('altapay_gateway_url', $url);
 // Terminals Enabled
 update_option('altapay_terminals_enabled', json_encode($terminals));
 
+// Enable terminals in WooCommerce
 foreach ($terminals as $terminal) {
     $terminalSettings = array(
         "enabled"        => "yes",
