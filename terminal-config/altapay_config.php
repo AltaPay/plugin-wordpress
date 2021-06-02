@@ -32,11 +32,20 @@ $currency  = get_option('woocommerce_currency') ?: "DKK";
 $terminals = array();
 
 try {
-    $api      = new Terminals(new Authentication($apiUser, $apiPass, $url));
-    $response = $api->call();
-    foreach ($response->Terminals as $terminal) {
-        $terminals[] = $terminal->Title;
+    $api              = new Terminals(new Authentication($apiUser, $apiPass, $url));
+    $response         = $api->call();
+    $altapayTerminals = array();
+
+    foreach ($response->Terminals as $key => $terminal) {
+        $terminals[$key]    = str_replace(array(' ', '-'), '_', $terminal->Title);
+        $altapayTerminals[] = array(
+            'key'    => $terminals[$key],
+            'name'   => $terminal->Title,
+            'nature' => $terminal->Natures,
+        );
     }
+    update_option('altapay_terminals', wp_json_encode($altapayTerminals));
+
 } catch (ClientException $e) {
     echo "Error:" . $e->getMessage();
 } catch (Exception $e) {
@@ -76,11 +85,10 @@ update_option('altapay_gateway_url', $url);
 // Terminals Enabled
 update_option('altapay_terminals_enabled', json_encode($terminals));
 
-// Enable terminals in WooCommerce
 foreach ($terminals as $terminal) {
     $terminalSettings = array(
         "enabled"        => "yes",
-        "title"          => $terminal,
+        "title"          => str_replace('_', ' ', $terminal),
         "description"    => "",
         "payment_action" => "authorize",
         "payment_icon"   => "default",
