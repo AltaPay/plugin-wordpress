@@ -28,7 +28,10 @@ try {
     exit();
 }
 
-$currency  = get_option('woocommerce_currency') ?: "DKK";
+$currency = "DKK";
+update_option('woocommerce_currency', $currency);
+update_option('woocommerce_default_country', 'DK');
+$terminals = array();
 $terminals = array();
 
 try {
