@@ -35,7 +35,7 @@ try {
     $api      = new Terminals(new Authentication($apiUser, $apiPass, $url));
     $response = $api->call();
     foreach ($response->Terminals as $terminal) {
-        $terminals[] = str_replace(array(' ', '-'), '_', $terminal->Title);
+        $terminals[] = $terminal->Title;
     }
 } catch (ClientException $e) {
     echo "Error:" . $e->getMessage();
@@ -79,7 +79,7 @@ update_option('altapay_terminals_enabled', json_encode($terminals));
 foreach ($terminals as $terminal) {
     $terminalSettings = array(
         "enabled"        => "yes",
-        "title"          => str_replace('_', ' ', $terminal),
+        "title"          => $terminal,
         "description"    => "",
         "payment_action" => "authorize",
         "payment_icon"   => "default",
