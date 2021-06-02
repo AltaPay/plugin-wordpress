@@ -79,7 +79,7 @@ jobs:
     # Setting branch name for running cypress tests
     - name: Set env TEST_BRANCH_NAME
       run: |
-          if [[ $GITHUB_EVENT_NAME == 'pull' ]]; then
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
               echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
           else
               echo "TEST_BRANCH_NAME=main" >> "$GITHUB_ENV"
