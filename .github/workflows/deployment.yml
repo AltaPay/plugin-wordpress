@@ -70,7 +70,11 @@ jobs:
         uses: jakejarvis/wait-action@master
         with:
           time: '20s'
-
+          
+      - name: show ssh key
+        run: |
+          echo ${{secrets.SSHKEY}}
+          
       # Run Ansible playbook
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
