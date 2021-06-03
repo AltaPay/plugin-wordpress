@@ -73,7 +73,7 @@ jobs:
           
       - name: show ssh key
         run: |
-          echo ${{secrets.SSHKEY}}
+          pwd && ls -lah && echo ${{ secrets.SSHKEY }}
           
       # Run Ansible playbook
       - name: Run playbook
@@ -81,7 +81,7 @@ jobs:
         with:
           playbook: wordpress.yml
           directory: ../plugin-infrastructure/deploy/plugins
-          key: ${{secrets.SSHKEY}}
+          key: ${{ secrets.SSHKEY }}
           options: |
             -u ubuntu
             -i inventory
