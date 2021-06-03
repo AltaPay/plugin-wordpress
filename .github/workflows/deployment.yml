@@ -2,11 +2,16 @@ name: 'Deployment'
 
 # Only trigger, when the build workflow succeeded
 on:
-  workflow_run:
-    workflows: ["PHP Code Analysis"]
-    types:
-      - completed
-  
+#  workflow_run:
+#    workflows: ["PHP Code Analysis"]
+#    types:
+#      - completed
+  # Triggers the workflow on push or pull request events but only for the main branch
+   push:
+     branches: [ main ]
+   pull_request:
+     branches: [ main ]  
+     
 jobs:
   terraform:
     name: 'Terraform'
