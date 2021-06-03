@@ -60,7 +60,7 @@ class Order
         cy.get('#billing_first_name').type('Testperson-dk')
         cy.get('#billing_last_name').type('Testperson-dk')
         cy.get('#billing_address_1').type('Sæffleberggate 56,1 mf')
-        cy.get('#billing_postcode').type('6800')
+        cy.get('#billing_postcode').type('22313')
         cy.get('#billing_city').type('Varde')
         cy.get('#billing_phone').type('20123456')
         cy.get('#billing_email').type('demo@example.com')
