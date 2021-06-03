@@ -71,6 +71,20 @@ jobs:
         with:
           time: '20s'
 
+      # Run Ansible playbook
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: wordpress.yml
+          directory: ../plugin-infrastructure/deploy/plugins
+          key: ${{secrets.SSHKEY}}
+          options: |
+            -u ubuntu
+            -i inventory
+            --extra-vars "branch_name=altapay-config gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+
+
+
       # Export IP for use in cypress tests config
       - name: Export IP
         run: |
@@ -124,16 +138,3 @@ jobs:
         with:
           name: cypress-screenshots
           path: ./tests/integration-tests/cypress/screenshots
-
-
-      # Run Ansible playbook
-      - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
-        with:
-          playbook: wordpress.yml
-          directory: ../plugin-infrastructure/deploy/plugins
-          key: ${{secrets.SSHKEY}}
-          options: |
-            -u ubuntu
-            -i inventory
-            --extra-vars "branch_name=altapay-config gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
