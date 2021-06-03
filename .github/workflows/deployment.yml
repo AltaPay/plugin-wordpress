@@ -74,6 +74,7 @@ jobs:
       - name: show ssh key
         run: |
           pwd && ls -lah && echo ${{secrets.SSHKEY}} && echo "${{secrets.SSHKEY}}" > key && cat key
+        working-directory: ../plugin-infrastructure/provision/plugins
         
           
       # Run Ansible playbook
