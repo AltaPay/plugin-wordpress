@@ -73,7 +73,7 @@ jobs:
           
       - name: show ssh key
         run: |
-          pwd  && echo ${{secrets.SSHKEY}} && echo "${{secrets.SSHKEY}}" > key && cat key && ls -lah
+          pwd  && echo "${{secrets.SSHKEY}}" > key && cat key && ls -lah
         working-directory: ../plugin-infrastructure/deploy/plugins
         
           
