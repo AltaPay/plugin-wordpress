@@ -34,42 +34,42 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: 'origin/woocom-configuration'
 
-      # Install version 0.14.4 of Terraform CLI
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 0.14.4
+#       # Install version 0.14.4 of Terraform CLI
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v1
+#         with:
+#           terraform_version: 0.14.4
 
-      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-      - name: Terraform Init
-        run: terraform init 
-        working-directory: ../plugin-infrastructure/provision/plugins
-
-
-      # Select a terraform workspace
-      - name: Terraform workspace
-        run: terraform workspace select wordpress
-        working-directory: ../plugin-infrastructure/provision/plugins
+#       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+#       - name: Terraform Init
+#         run: terraform init 
+#         working-directory: ../plugin-infrastructure/provision/plugins
 
 
-      # Generates an execution plan for Terraform
-      - name: Terraform Plan
-        run: terraform plan
-        working-directory: ../plugin-infrastructure/provision/plugins
+#       # Select a terraform workspace
+#       - name: Terraform workspace
+#         run: terraform workspace select wordpress
+#         working-directory: ../plugin-infrastructure/provision/plugins
 
-      # Run Terraform Apply      
-      # On push to main, build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-      - name: Terraform Apply
-        #if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -var ec2_type=t2.micro -auto-approve
-        working-directory: ../plugin-infrastructure/provision/plugins
 
-      # Add a sleep of 20 seconds, in case instance needs to warm up  
-      - name: Sleep for 20 seconds
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '20s'
+#       # Generates an execution plan for Terraform
+#       - name: Terraform Plan
+#         run: terraform plan
+#         working-directory: ../plugin-infrastructure/provision/plugins
+
+#       # Run Terraform Apply      
+#       # On push to main, build or change infrastructure according to Terraform configuration files
+#       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+#       - name: Terraform Apply
+#         #if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#         run: terraform apply -var ec2_type=t2.micro -auto-approve
+#         working-directory: ../plugin-infrastructure/provision/plugins
+
+#       # Add a sleep of 20 seconds, in case instance needs to warm up  
+#       - name: Sleep for 20 seconds
+#         uses: jakejarvis/wait-action@master
+#         with:
+#           time: '20s'
           
           
       # Run Ansible playbook
@@ -86,14 +86,14 @@ jobs:
 
 
 
-      # Export IP for use in cypress tests config
-      - name: Export IP
-        run: |
-          testvar=$(sed '4!d' inventory)
-          echo $testvar
-          echo "IP=$testvar">> $GITHUB_ENV
-          echo $IP
-        working-directory: ../plugin-infrastructure/deploy/plugins
+#       # Export IP for use in cypress tests config
+#       - name: Export IP
+#         run: |
+#           testvar=$(sed '4!d' inventory)
+#           echo $testvar
+#           echo "IP=$testvar">> $GITHUB_ENV
+#           echo $IP
+#         working-directory: ../plugin-infrastructure/deploy/plugins
 
 
       # Setting branch name for running cypress tests
@@ -117,7 +117,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://${{env.IP}}/wordpress","adminURL": "http://${{env.IP}}/wordpress/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
+          json: '{"shopURL": "http://34.245.17.187/wordpress","adminURL": "http://${{env.IP}}/wordpress/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
           dir: tests/integration-test/cypress/fixtures/
 
       - name: Install Cypress Dependencies 
