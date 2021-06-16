@@ -71,7 +71,16 @@ jobs:
         with:
           time: '20s'
           
-          
+      # Setting branch name for running cypress tests
+      - name: Set env TEST_BRANCH_NAME
+        run: |
+            if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
+                echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
+            else
+                echo "TEST_BRANCH_NAME=main" >> "$GITHUB_ENV"
+            fi  	  
+        
+        
       #Run Ansible playbook
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -96,20 +105,12 @@ jobs:
         working-directory: ../plugin-infrastructure/deploy/plugins
 
 
-      # Setting branch name for running cypress tests
-      - name: Set env TEST_BRANCH_NAME
-        run: |
-            if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
-                echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
-            else
-                echo "TEST_BRANCH_NAME=main" >> "$GITHUB_ENV"
-            fi  	
 
       # Run Cypress tests   
       - uses: actions/checkout@v1
         with:
           repository: AltaPay/plugin-wordpress
-          ref: 'origin/cypress-test'
+          ref: 'origin/main'
           path: plugin-wordpress
 
       - name: Create Cypress fixture config json
