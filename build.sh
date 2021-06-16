@@ -26,5 +26,5 @@ fi
 mkdir -p dist
 rm -rf vendor
 php5.6 $(command -v composer) install --no-dev -o
-zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" build.sh guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock @
+zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" build.sh guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock @
 composer install
