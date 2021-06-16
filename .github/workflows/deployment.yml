@@ -91,7 +91,7 @@ jobs:
           options: |
             -u ubuntu
             -i inventory
-            --extra-vars "branch_name=altapay-config gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+            --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
 
 
 
@@ -118,7 +118,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://34.245.17.187/wordpress","adminURL": "http://34.245.17.187/wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}"}'
+          json: '{"shopURL": "http://${{env.IP}}//wordpress","adminURL": "http://${{env.IP}}//wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}"}'
           dir: tests/integration-test/cypress/fixtures/
 
       - name: Install Cypress Dependencies 
