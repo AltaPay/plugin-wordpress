@@ -123,7 +123,7 @@ jobs:
 
       - name: Install Cypress Dependencies 
         run: npm i
-        working-directory: "Test/Integration test/"
+        working-directory: "tests/integration-test"
 
       - name: Run Cypress tests 
         run: ./node_modules/.bin/cypress run --config video=false
