@@ -119,15 +119,15 @@ jobs:
         with:
           name: "config.json"
           json: '{"shopURL": "http://${{env.IP}}//wordpress","adminURL": "http://${{env.IP}}//wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}"}'
-          dir: tests/integration-test/cypress/fixtures/
+          dir: "Test/Integration test/cypress/fixtures/"
 
       - name: Install Cypress Dependencies 
         run: npm i
-        working-directory: tests/integration-test
+        working-directory: "Test/Integration test/"
 
       - name: Run Cypress tests 
         run: ./node_modules/.bin/cypress run --config video=false
-        working-directory: tests/integration-test
+        working-directory: "Test/Integration test/"
 
         # after the test run completes
         # store screenshots
@@ -139,6 +139,6 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: ./tests/integration-test/cypress/screenshots
+          path: "./Test/Integration test/cypress/screenshots"
           
           
