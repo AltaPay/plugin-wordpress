@@ -140,5 +140,4 @@ jobs:
         with:
           name: cypress-screenshots
           path: "./tests/integration-test/cypress/screenshots"
-          
-          
+                    
