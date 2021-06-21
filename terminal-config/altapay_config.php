@@ -31,6 +31,11 @@ try {
 $currency = "DKK";
 update_option('woocommerce_currency', $currency);
 update_option('woocommerce_default_country', 'DK');
+
+$wcSetupWizard = get_option( 'woocommerce_onboarding_profile', array() );
+$wcSetupWizard['skipped'] = true;
+update_option('woocommerce_onboarding_profile', $wcSetupWizard);
+
 $terminals = array();
 $terminals = array();
 
