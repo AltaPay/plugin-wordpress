@@ -126,7 +126,7 @@ jobs:
         working-directory: "tests/integration-test"
 
       - name: Run Cypress tests 
-        run: ./node_modules/.bin/cypress run 
+        run: ./node_modules/.bin/cypress run --config video=false
         working-directory: "tests/integration-test"
 
         # after the test run completes
