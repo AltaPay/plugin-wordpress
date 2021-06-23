@@ -174,8 +174,8 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 ### Prerequisites: 
 
-1) WordPress default theme and WooCommerce should be installed and running on a public URL
-2) Cypress should be installed
+* WordPress default theme and WooCommerce should be installed and running on a public URL
+* Cypress should be installed
 
 ### Steps 
 
