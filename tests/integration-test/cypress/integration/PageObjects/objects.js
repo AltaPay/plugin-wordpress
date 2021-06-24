@@ -116,34 +116,34 @@ class Order
 
         cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click()
         //Skip WooCommercec Wizard
-        cy.get('body').then(($a) => { 
+        // cy.get('body').then(($a) => { 
         
-            if ($a.find('.woocommerce-profile-wizard__footer-link').length) {
-                cy.get('.woocommerce-profile-wizard__footer-link').click().wait(2000)
+        //     if ($a.find('.woocommerce-profile-wizard__footer-link').length) {
+        //         cy.get('.woocommerce-profile-wizard__footer-link').click().wait(2000)
                     
 
-            }
+        //     }
 
-        })
-            cy.get('body').then(($a) => { 
+        // })
+        //     cy.get('body').then(($a) => { 
         
-                if ($a.find('.is-secondary').length==1) {
-                    cy.get('.is-secondary').click().wait(2000)
+        //         if ($a.find('.is-secondary').length==1) {
+        //             cy.get('.is-secondary').click().wait(2000)
                     
-                }
+        //         }
                 
-            })
-            cy.get('body').then(($a) => { 
+        //     })
+        //     cy.get('body').then(($a) => { 
     
-                if ($a.find('.components-modal__header > .components-button > svg > path').length) {
-                    cy.get('.components-modal__header > .components-button > svg > path').click().wait(2000)
+        //         if ($a.find('.components-modal__header > .components-button > svg > path').length) {
+        //             cy.get('.components-modal__header > .components-button > svg > path').click().wait(2000)
                 
                         
     
-                }    
+        //         }    
 
             
-        })
+        // })
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         //cy.get('.woocommerce-profile-wizard__footer-link').click()
