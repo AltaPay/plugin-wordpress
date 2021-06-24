@@ -126,41 +126,9 @@ class Order
             })
 
 
-        //Skip WooCommercec Wizard
-        // cy.get('body').then(($a) => { 
         
-        //     if ($a.find('.woocommerce-profile-wizard__footer-link').length) {
-        //         cy.get('.woocommerce-profile-wizard__footer-link').click().wait(2000)
-                    
-
-        //     }
-
-        // })
-        //     cy.get('body').then(($a) => { 
-        
-        //         if ($a.find('.is-secondary').length==1) {
-        //             cy.get('.is-secondary').click().wait(2000)
-                    
-        //         }
-                
-        //     })
-        //     cy.get('body').then(($a) => { 
-    
-        //         if ($a.find('.components-modal__header > .components-button > svg > path').length) {
-        //             cy.get('.components-modal__header > .components-button > svg > path').click().wait(2000)
-                
-                        
-    
-        //         }    
-
-            
-        // })
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
-        //cy.get('.woocommerce-profile-wizard__footer-link').click()
-
-        //else
-        //cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).should('contain', 'Processing').click()
         cy.get('#altapay_capture').click()
         cy.get('#altapay_capture').should('not.exist')
