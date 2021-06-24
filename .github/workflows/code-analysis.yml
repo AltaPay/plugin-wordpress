@@ -1,4 +1,4 @@
-name: PHP Code Analysis For Altapay Wordpress Plugin
+name: PHP Code Analysis
 
 on:
   pull_request:
