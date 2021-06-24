@@ -174,8 +174,8 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 ### Prerequisites: 
 
-1) WordPress default theme and WooCommerce should be installed and running on a public URL
-2) Cypress should be installed
+* WordPress default theme and WooCommerce should be installed and running on a public URL
+* Cypress should be installed
 
 ### Steps 
 
@@ -188,8 +188,8 @@ PHPStan is being used for running static code analysis. Its configuration file '
 * Install composer packages using `composer install`
 * Run `vendor/bin/phpstan analyze` to run the analysis. It'll print out any errors detected by PHPStan.
 
-## Sync terminals with gateway
-Follow these steps to sync the terminals with the gateway.
+## Loading and saving gateway configurations
+Follow these steps to load and save the terminal configurations from the gateway.
 * Move the file from `terminal-config/altapay_config.php` to the root directory of the WordPress installation
 * Edit the file and replace `~gatewayusername~`,`~gatewaypass~`, and `~gatewayurl~` with the actual credentials.
 * Run the file with the below command
