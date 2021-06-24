@@ -114,7 +114,18 @@ class Order
 
     capture(){
 
-        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click()
+        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click().wait(3000)
+        cy.get('body').then(($a) => { 
+        
+                if ($a.find('.components-modal__header > .components-button').length) {
+                    cy.get('.components-modal__header > .components-button').click().wait(2000)
+                        
+    
+                }
+    
+            })
+
+
         //Skip WooCommercec Wizard
         // cy.get('body').then(($a) => { 
         
