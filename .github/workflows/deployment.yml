@@ -110,7 +110,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           repository: AltaPay/plugin-wordpress
-          ref: 'origin/main'
+          ref: 'origin/${{env.TEST_BRANCH_NAME}}'
           path: plugin-wordpress
 
       - name: Create Cypress fixture config json
