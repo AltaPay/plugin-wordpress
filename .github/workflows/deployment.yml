@@ -94,7 +94,6 @@ jobs:
             --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
 
 
-
       # Export IP for use in cypress tests config
       - name: Export IP
         run: |
@@ -140,4 +139,3 @@ jobs:
         with:
           name: cypress-screenshots
           path: "./tests/integration-test/cypress/screenshots"                    
-
