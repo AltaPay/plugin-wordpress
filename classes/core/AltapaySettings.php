@@ -366,24 +366,25 @@ class AltapaySettings {
 	 */
 	function refreshTerminals() {
 		$login = $this->altapayApiLogin();
-		if ( ! $login || is_wp_error( $login ) ) {
-			if ( is_wp_error( $login ) ) {
-				echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
-			} else {
-				echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
-			}
-			// Delete terminals and enabled terminals from database
-			update_option( 'altapay_terminals', '' );
-			update_option( 'altapay_terminals_enabled', '' );
-			?>
-			<script>
-				setTimeout("location.reload()", 1500);
-			</script>
-			<?php
-			return;
-		}
+        if ( ! $login || is_wp_error( $login ) ) {
+            if ( is_wp_error( $login ) ) {
+                echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
+            } else {
+                echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
+            }
+            // Delete terminals and enabled terminals from database
+            update_option( 'altapay_terminals', '' );
+            update_option( 'altapay_terminals_enabled', '' );
+            ?>
+            <script>
+                setTimeout("location.reload()", 1500);
+            </script>
+            <?php
+            return;
+        }
 
-		echo '<p><b>' . __( 'Connection OK !', 'altapay' ) . '</b></p>';
+        echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Payment methods synchronized successfully.', 'altapay' ) . "</p> </div>";
+		
 		$terminals = array();
 		$auth      = $this->getAuth();
 		$api       = new Terminals( $auth );
