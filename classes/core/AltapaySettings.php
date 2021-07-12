@@ -406,7 +406,7 @@ class AltapaySettings {
 	}
 
 	/**
-	 * Form with refresh connection button on AltaPay page
+	 * Form with synchronize payment methods button on AltaPay page
 	 *
 	 * @return void
 	 */
@@ -414,13 +414,13 @@ class AltapaySettings {
 		$terminals = get_option( 'altapay_terminals' );
 		if ( ! $terminals ) {
 			?>
-			<p><?php esc_html_e( 'Terminals missing, please click - Refresh connection', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Terminals missing, please click - Synchronize payment methods', 'altapay' ); ?></p>
 		<?php } else { ?>
-			<p><?php esc_html_e( 'Click below to re-create terminal data', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
 		<?php } ?>
 		<form method="post" action="#refresh_connection">
 			<input type="hidden" value="true" name="refresh_connection">
-			<input type="submit" value="<?php esc_html_e( 'Refresh connection', 'altapay' ); ?>" name="refresh-connection"
+			<input type="submit" value="<?php esc_html_e( 'Synchronize payment methods', 'altapay' ); ?>" name="refresh-connection"
 				   class="button" style="color: #006064; border-color: #006064;">
 		</form>
 		<?php
