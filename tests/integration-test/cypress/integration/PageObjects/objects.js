@@ -182,8 +182,8 @@ class Order
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).should('contain', 'Processing').click()
-        cy.get('[for="tab2"]').click()     
-        cy.xpath('/html/body/div[1]/div[2]/div[3]/div[1]/div[5]/form[1]/div[2]/div/div[3]/div/div[5]/div[2]/div/div/section[2]/div/div[4]/div/table/tbody[2]/tr[1]/td[7]/input').click().clear().type('0').click()
+        cy.get('[for="tab2"]').click() 
+        cy.get('#refund > [style="overflow-x:auto;"] > .responsive-table > .w-100 > :nth-child(3) > :nth-child(1) > :nth-child(7) > .form-control').click({force: true}).clear({force: true}).type('0' , {force: true}).click({force: true})
         cy.get('#altapay_refund').click().wait(2000)
         
 
