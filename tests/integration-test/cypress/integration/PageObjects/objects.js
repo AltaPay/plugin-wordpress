@@ -17,15 +17,23 @@ class Order
     addproduct(){
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
-        cy.xpath('/html/body/div[1]/div[2]/div/div[2]/main/div[2]/div[2]/form/div/input').click().clear().type('3')
         cy.get('.single_add_to_cart_button').click()
         cy.get('.woocommerce-message > .button').click()
         cy.get('.checkout-button').click()
         
     }
+    
+    addpartial_product(){
+        cy.get('.nav-menu > li').contains('Shop').click()
+        cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[1]/a[1]/img').click()
+        cy.get('.single_add_to_cart_button').click()
+        
 
-    cc_payment(){
-        cy.get('.wc_payment_method.payment_method_altapay_embraceit_test_terminal > label').click({force: true})
+    }
+
+    cc_payment(CC_TERMINAL_NAME){
+        
+        cy.contains(CC_TERMINAL_NAME).click({force: true})
         //billing details
         cy.get('#billing_first_name').type('Testperson-dk')
         cy.get('#billing_last_name').type('Testperson-dk')
@@ -54,9 +62,11 @@ class Order
         cy.log(txt)
     })
     }
-    klarna_payment(){
 
-        cy.get('.payment_method_altapay_embraceit_klarna_dkk_test_terminal > label').click({force: true}).wait(1000)
+    klarna_payment(KLARNA_DKK_TERMINAL_NAME){
+
+        cy.contains(KLARNA_DKK_TERMINAL_NAME).click({force: true})
+
         cy.get('#billing_first_name').type('Testperson-dk')
         cy.get('#billing_last_name').type('Testperson-dk')
         cy.get('#billing_address_1').type('Sæffleberggate 56,1 mf')
@@ -70,7 +80,6 @@ class Order
         cy.get('[id=klarna-pay-later-fullscreen]').then(($a) => { 
             if ($a.find('[id=klarna-pay-later-fullscreen]').length) {
                 cy.get('[id=klarna-pay-later-fullscreen]').wait(3000)
-                    
 
             } 
 
@@ -80,9 +89,7 @@ class Order
     
             }
         })
-
-        
-        
+          
         cy.get('[id=klarna-pay-later-fullscreen]').wait(3000).then(function($iFrame){
             const mobileNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-phone-number]')
             cy.wrap(mobileNum).type('(452) 012-3456')
@@ -125,16 +132,31 @@ class Order
     
             })
 
-
-        
-
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).should('contain', 'Processing').click()
         cy.get('#altapay_capture').click()
         cy.get('#altapay_capture').should('not.exist')
-        
+                
+    }
 
+    partial_capture(){
+
+        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click().wait(3000)
+        cy.get('body').then(($a) => { 
         
+                if ($a.find('.components-modal__header > .components-button').length) {
+                    cy.get('.components-modal__header > .components-button').click().wait(2000)                     
+    
+                }
+    
+            })  
+
+        cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
+        cy.get('tr').eq(1).should('contain', 'Processing').click()
+        cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
+        cy.get('#altapay_capture').click()
+
+            
     }
 
     refund(){
@@ -143,6 +165,45 @@ class Order
         cy.get('#altapay_refund').click()
         cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
 
+    }
+
+    partial_refund(){
+
+        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click().wait(3000)
+        cy.get('body').then(($a) => { 
+        
+                if ($a.find('.components-modal__header > .components-button').length) {
+                    cy.get('.components-modal__header > .components-button').click().wait(2000)
+                        
+    
+                }
+    
+            })
+
+        cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
+        cy.get('tr').eq(1).should('contain', 'Processing').click()
+        cy.get('[for="tab2"]').click() 
+        cy.get('#refund > [style="overflow-x:auto;"] > .responsive-table > .w-100 > :nth-child(3) > :nth-child(1) > :nth-child(7) > .form-control').click({force: true}).clear({force: true}).type('0' , {force: true}).click({force: true})
+        cy.get('#altapay_refund').click().wait(2000)
+        
+
+    }
+
+    release_payment(){
+        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click().wait(3000)
+        cy.get('body').then(($a) => { 
+        
+                if ($a.find('.components-modal__header > .components-button').length) {
+                    cy.get('.components-modal__header > .components-button').click().wait(2000)
+                        
+    
+                }
+    
+            })
+
+        cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
+        cy.get('tr').eq(1).should('contain', 'Processing').click()
+        cy.get('#altapay_release_payment').click()
     }
   
 

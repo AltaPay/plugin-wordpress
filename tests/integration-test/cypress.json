@@ -1,9 +1,14 @@
 { "chromeWebSecurity": false,
+    
   "retries": {
   
       "runMode": 2,
       "openMode": 2
-  } 
-  
-  }
-  
+
+  },
+
+  "viewportWidth": 1366,
+  "viewportHeight": 786,
+  "video": false,
+  "videoUploadOnPasses": false
+}
