@@ -4,6 +4,10 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 ## Changelog
 
+3.2.3
+> * Update supported version details
+> * Minor label adjustments
+
 3.2.2
 > * Support provided for Woocommerce version 5.0.0
 
