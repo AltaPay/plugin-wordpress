@@ -38,8 +38,8 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 == Changelog ==
 
 = 3.2.3 =
-* Update supported version
-* Minor label adjustments
+* Update supported version for WooCommerce to 5.4.1 and WordPress version to 5.7.2
+* Update synch button label to 'Synchronize payment methods'
 
 = 3.2.2 =
 * Support provided for Woocommerce version 5.0.0
