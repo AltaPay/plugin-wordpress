@@ -4,7 +4,7 @@ Tags: Altapay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 5.6
 Requires at least: 4.9.0
 Tested up to: 5.7.2
-Stable tag: 3.2.3
+Stable tag: 3.2.4
 License: MIT
 WC requires at least: 3.8.0
 WC tested up to: 5.4.1
@@ -37,7 +37,7 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 == Changelog ==
 
-= 3.2.3 =
+= 3.2.4 =
 * Update supported version for WooCommerce to 5.4.1 and WordPress version to 5.7.2
 * Update synch button label to 'Synchronize payment methods'
 
