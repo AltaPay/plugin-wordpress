@@ -63,7 +63,7 @@ jobs:
      
      - name: Create erronous PHP file for testing php linter
        run: |
-         echo Test >> test_linter.php
+         echo '<?php Test' >> test_linter.php
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
 
      - name: Run php5.6 linter
