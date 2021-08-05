@@ -19,7 +19,7 @@
         ]
     },
     "require": {
-        "php": "^7.0 || ^8.0",
+        "php": "^5.6 || ^7.0",
         "altapay/api-php":"^3.0"
     },
     "require-dev": {
