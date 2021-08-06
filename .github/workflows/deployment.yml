@@ -117,7 +117,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://${{env.IP}}/wordpress","adminURL": "http://${{env.IP}}/wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}"}'
+          json: '{"shopURL": "http://${{env.IP}}/wordpress","adminURL": "http://${{env.IP}}/wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}"}'
           dir: "tests/integration-test/cypress/fixtures/"
 
       - name: Install Cypress Dependencies 
