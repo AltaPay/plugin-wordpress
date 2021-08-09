@@ -39,8 +39,9 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.2.5 =
 * Update minimum PHP supported version to 7.0
-* Fix: capture and refund amount calculation issue on quantity change in order grid
-* Fix: capture and refund issue with PHP8
+* Fix: Capture and refund amount calculation issue on quantity change in order grid
+* Fix: Error appeared during capture and refund functionality
+
 = 3.2.4 =
 * Update supported version for WooCommerce to 5.4.1 and WordPress version to 5.7.2
 * Update synch button label to 'Synchronize payment methods'
