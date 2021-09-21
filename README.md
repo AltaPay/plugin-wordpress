@@ -4,6 +4,9 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 ## Changelog
 
+3.2.6
+> * Fix: Issue when switching the payment method on the same order
+
 3.2.5
 > * Update minimum PHP supported version to 7.0
 > * Fix: Capture and refund amount calculation issue on quantity change in order grid
