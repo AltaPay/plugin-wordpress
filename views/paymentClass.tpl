@@ -18,6 +18,7 @@ use Altapay\Exceptions\ClientException;
 use Altapay\Exceptions\ResponseHeaderException;
 use Altapay\Exceptions\ResponseMessageException;
 use Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Payments\ReleaseReservation;
 
 class WC_Gateway_{key} extends WC_Payment_Gateway {
 
@@ -347,6 +348,20 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'];
 
 			$order = new WC_Order( $order_id );
+
+			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
+
+			// Exit if payment already completed against the same order
+			if (! empty( $transaction_id ) ) {
+				// Release duplicate transaction from the gateway side
+				if ( $status === 'succeeded' ) {
+					$api = new ReleaseReservation( $this->getAuth() );
+					$api->setTransaction( $txnId );
+					$api->call();
+				}
+
+				exit;
+			}
 
 			// If order already on-hold
 			if ( $order->has_status( 'on-hold' ) ) {
