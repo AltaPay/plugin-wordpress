@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.6]
+- Fix: Issue when switching the payment method on the same order id
+
+## [3.2.5]
+- Update minimum PHP supported version to 7.0
+- Fix: Capture and refund amount calculation issue on quantity change in order grid
+- Fix: Error appeared during capture and refund functionality
+
+## [3.2.4]
+- Update supported version for WooCommerce to 5.4.1 and WordPress version to 5.7.2
+- Update synch button label to 'Synchronize payment methods'
+
+## [3.2.2]
+- Support provided for Woocommerce version 5.0.0
+
 ## [3.2.1]
 - Fix some notification errors
 
