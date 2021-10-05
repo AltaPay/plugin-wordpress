@@ -2,9 +2,25 @@
 
 Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
+If you are not a developer, please use [Altapay for WooCommerce](https://wordpress.org/plugins/altapay-for-woocommerce/) on WordPress.org.
+
+## How to Build
+
+If you wish to build your own copy, follow below steps:
+
+- Navigate to the `plugins` directory and run below commands.
+
+        git clone https://github.com/AltaPay/plugin-wordpress.git
+        cd plugin-wordpress
+        
+- Install all the necessary dependencies.
+        
+        composer install --no-dev
+- Finally, Activate the plugin from the plugins page.
+
 ## How to run cypress tests
 
-### Prerequisites: 
+### Prerequisites
 
 * WordPress and the WooCommerce plugin should be installed with the default storefront theme
 * WooCommerce sample data for products imported to the store
