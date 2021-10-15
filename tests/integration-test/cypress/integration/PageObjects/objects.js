@@ -61,7 +61,7 @@ class Order {
         cy.get('#billing_city').type('Varde')
         cy.get('#billing_phone').type('20123456')
         cy.get('#billing_email').type('demo@example.com')
-        cy.get('#place_order').wait(3000).click()
+        cy.get('#place_order').click()
         cy.get('#submitbutton').click().wait(8000)
 
         cy.get('[id=klarna-pay-later-fullscreen]').then(($a) => {
@@ -134,7 +134,6 @@ class Order {
         })
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
-        //cy.get('tr').eq(1).should('contain', 'Processing').click()
         cy.get('tr').eq(1).click()
         cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
         cy.get('#altapay_capture').click()
@@ -144,7 +143,14 @@ class Order {
 
         cy.get('[for="tab2"]').click()
         cy.get('#altapay_refund').click().wait(5000)
-        cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+        cy.get('body').then(($a) => {
+        if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
+            cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+        }
+        else{
+            cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+        }
+    })
     }
 
     partial_refund() {
@@ -225,8 +231,15 @@ class Order {
         cy.get('tr').eq(1).click()
         cy.get('[for="tab2"]').click()
         cy.get('#altapay_refund').click().wait(5000)
-        cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
-
+        cy.get('[for="tab2"]').click()
+        cy.get('body').then(($a) => {
+        if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
+            cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+        }
+        else{
+            cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+        }
+    })
     }
 
     change_currency_to_DKK() {
@@ -236,6 +249,57 @@ class Order {
         cy.get('.select2-dropdown > .select2-search > .select2-search__field').type('Danish Krone{enter}')
         cy.get('.submit > .button-primary').click()
     }
+
+    create_fixed_discount() {
+        cy.get('#toplevel_page_woocommerce-marketing > .wp-has-submenu > .wp-menu-name').click()
+        cy.get('#toplevel_page_woocommerce-marketing > ul > li:nth-child(3) > a').click()
+        cy.get('.page-title-action').click()
+        cy.get('#title').type('fixed')
+        cy.get('#discount_type').select('Fixed cart discount')
+        cy.get('#coupon_amount').clear().type('10.5')
+        cy.get('#publish').click()
+    }
+
+    create_percentage_discount() {
+        cy.get('#toplevel_page_woocommerce-marketing > .wp-has-submenu > .wp-menu-name').click()
+        cy.get('#toplevel_page_woocommerce-marketing > ul > li:nth-child(3) > a').click()
+        cy.get('.page-title-action').click()
+        cy.get('#title').type('percentage')
+        cy.get('#discount_type').select('Percentage discount')
+        cy.get('#coupon_amount').clear().type('10.5')
+        cy.get('#publish').click()
+    }
+
+     apply_fixed_discount(){
+        cy.get('.nav-menu > li').contains('Shop').click()
+        cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
+        cy.get('.single_add_to_cart_button').click()
+        cy.get('.woocommerce-message > .button').click()
+        cy.get('#coupon_code').type('fixed')
+        cy.get('.coupon > .button').click()
+        cy.get('.checkout-button').click()
+    }
+
+    apply_percentage_discount(){
+        cy.get('.nav-menu > li').contains('Shop').click()
+        cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
+        cy.get('.single_add_to_cart_button').click()
+        cy.get('.woocommerce-message > .button').click()
+        cy.get('#coupon_code').type('percentage')
+        cy.get('.coupon > .button').click()
+        cy.get('.checkout-button').click()
+    }
+
+    apply_fixed_discount(){
+        cy.get('.nav-menu > li').contains('Shop').click()
+        cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
+        cy.get('.single_add_to_cart_button').click()
+        cy.get('.woocommerce-message > .button').click()
+        cy.get('#coupon_code').type('fixed')
+        cy.get('.coupon > .button').click()
+        cy.get('.checkout-button').click()
+    }
+
 }
 
 export default Order
