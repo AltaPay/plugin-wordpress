@@ -128,7 +128,7 @@ jQuery( document ).ready(
 			}
 		);
 		// Recalculate the full amount when quantity is changing
-		$( '.ap-order-capture-modify' ).click(
+		$( '.ap-order-capture-modify' ).change(
 			function (e) {
 				e.preventDefault();
 				var element = this;

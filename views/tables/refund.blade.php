@@ -25,6 +25,9 @@
     </tr>
     </tbody>
 
+    @php
+        $productsWithCoupon = array();
+    @endphp
     @foreach($order->get_items() as $itemData)
 
         @php

@@ -366,24 +366,25 @@ class AltapaySettings {
 	 */
 	function refreshTerminals() {
 		$login = $this->altapayApiLogin();
-		if ( ! $login || is_wp_error( $login ) ) {
-			if ( is_wp_error( $login ) ) {
-				echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
-			} else {
-				echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
-			}
-			// Delete terminals and enabled terminals from database
-			update_option( 'altapay_terminals', '' );
-			update_option( 'altapay_terminals_enabled', '' );
-			?>
-			<script>
-				setTimeout("location.reload()", 1500);
-			</script>
-			<?php
-			return;
-		}
+        if ( ! $login || is_wp_error( $login ) ) {
+            if ( is_wp_error( $login ) ) {
+                echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
+            } else {
+                echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
+            }
+            // Delete terminals and enabled terminals from database
+            update_option( 'altapay_terminals', '' );
+            update_option( 'altapay_terminals_enabled', '' );
+            ?>
+            <script>
+                setTimeout("location.reload()", 1500);
+            </script>
+            <?php
+            return;
+        }
 
-		echo '<p><b>' . __( 'Connection OK !', 'altapay' ) . '</b></p>';
+        echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Payment methods synchronized successfully.', 'altapay' ) . "</p> </div>";
+		
 		$terminals = array();
 		$auth      = $this->getAuth();
 		$api       = new Terminals( $auth );
@@ -406,7 +407,7 @@ class AltapaySettings {
 	}
 
 	/**
-	 * Form with refresh connection button on AltaPay page
+	 * Form with synchronize payment methods button on AltaPay page
 	 *
 	 * @return void
 	 */
@@ -414,13 +415,13 @@ class AltapaySettings {
 		$terminals = get_option( 'altapay_terminals' );
 		if ( ! $terminals ) {
 			?>
-			<p><?php esc_html_e( 'Terminals missing, please click - Refresh connection', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Terminals missing, please click - Synchronize payment methods', 'altapay' ); ?></p>
 		<?php } else { ?>
-			<p><?php esc_html_e( 'Click below to re-create terminal data', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
 		<?php } ?>
 		<form method="post" action="#refresh_connection">
 			<input type="hidden" value="true" name="refresh_connection">
-			<input type="submit" value="<?php esc_html_e( 'Refresh connection', 'altapay' ); ?>" name="refresh-connection"
+			<input type="submit" value="<?php esc_html_e( 'Synchronize payment methods', 'altapay' ); ?>" name="refresh-connection"
 				   class="button" style="color: #006064; border-color: #006064;">
 		</form>
 		<?php

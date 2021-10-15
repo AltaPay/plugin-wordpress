@@ -126,7 +126,7 @@ jQuery( document ).ready(
 				}
 			}
 		);
-		$( '.ap-order-refund-modify' ).click(
+		$( '.ap-order-refund-modify' ).change(
 			function (e) {
 				e.preventDefault();
 				var element = this;
