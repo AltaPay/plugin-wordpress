@@ -157,10 +157,36 @@ describe('WooCommerce', function () {
         })
         ord.apply_fixed_discount()
         cy.fixture('config').then((admin) => {
-            if (admin.iDEAl_EUR_TERMINAL != "") {
+            if (admin.iDEAL_EUR_TERMINAL != "") {
                 cy.get('body').then(($a) => {
-                    if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
-                        ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
+                    if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+                        ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
+                        ord.admin()
+                        ord.ideal_refund()
+                    } else {
+                        cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
+                        this.skip()
+                    }
+
+                })
+
+            }
+            else {
+                cy.log('iDEAL_EUR_TERMINAL skipped')
+                this.skip()
+            }
+        })
+    })
+
+    it('Apply percentage discount with iDEAL', function () {
+        const ord = new Order()
+        ord.visit()
+        ord.apply_percentage_discount()
+        cy.fixture('config').then((admin) => {
+            if (admin.iDEAL_EUR_TERMINAL != "") {
+                cy.get('body').then(($a) => {
+                    if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+                        ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
                         ord.admin()
                         ord.ideal_refund()
                     } else {
@@ -172,33 +198,7 @@ describe('WooCommerce', function () {
 
             }
             else {
-                cy.log('iDEAl_EUR_TERMINAL skipped')
-                this.skip()
-            }
-        })
-    })
-
-    it('Apply percentage discount with iDEAL', function () {
-        const ord = new Order()
-        ord.visit()
-        ord.apply_percentage_discount()
-        cy.fixture('config').then((admin) => {
-            if (admin.iDEAl_EUR_TERMINAL != "") {
-                cy.get('body').then(($a) => {
-                    if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
-                        ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
-                        ord.admin()
-                        ord.ideal_refund()
-                    } else {
-                        cy.log(admin.iDEAl_EUR_TERMINA + ' not found in page')
-                        this.skip()
-                    }
-
-                })
-
-            }
-            else {
-                cy.log('iDEAl_EUR_TERMINAL skipped')
+                cy.log('iDEAL_EUR_TERMINAL skipped')
                 this.skip()
             }
         })

@@ -300,14 +300,14 @@ describe('WooCommerce', function () {
             if ($body.text().includes('€')) {
                 ord.addproduct()
                 cy.fixture('config').then((admin) => {
-                    if (admin.iDEAl_EUR_TERMINAL != "") {
+                    if (admin.iDEAL_EUR_TERMINAL != "") {
                         cy.get('body').then(($a) => {
-                            if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
-                                ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
+                            if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+                                ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
                                 ord.admin()
                                 ord.ideal_refund()
                             } else {
-                                cy.log(admin.iDEAl_EUR_TERMINAL + ' not found in page')
+                                cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
                                 this.skip()
                             }
 
@@ -328,14 +328,14 @@ describe('WooCommerce', function () {
                 cy.wait(2000)
                 ord.addproduct()
                 cy.fixture('config').then((admin) => {
-                    if (admin.iDEAl_EUR_TERMINAL != "") {
+                    if (admin.iDEAL_EUR_TERMINAL != "") {
                         cy.get('body').then(($a) => {
-                            if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
-                                ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
+                            if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+                                ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
                                 ord.admin()
                                 ord.ideal_refund()
                             } else {
-                                cy.log(admin.iDEAl_EUR_TERMINAL + ' not found in page')
+                                cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
                                 this.skip()
                             }
 
