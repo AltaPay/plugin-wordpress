@@ -196,8 +196,8 @@ class Order {
         cy.get('.submit > .button-primary').click()
     }
 
-    ideal_payment(iDEAl_EUR_TERMINAL) {
-        cy.contains(iDEAl_EUR_TERMINAL).click({ force: true })
+    ideal_payment(iDEAL_EUR_TERMINAL) {
+        cy.contains(iDEAL_EUR_TERMINAL).click({ force: true })
         cy.get('#billing_first_name').clear().type('Testperson-dk')
         cy.get('#billing_last_name').clear().type('Approved')
         cy.get('#billing_address_1').clear().type('Sæffleberggate 56,1 mf')

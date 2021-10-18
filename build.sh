@@ -9,9 +9,9 @@ then
   exit
 fi
 
-if ! command -v php5.6
+if ! command -v php7.0
 then
-  echo "PHP 5.6 package is not currently installed"
+  echo "PHP 7.0 package is not currently installed"
   echo "Or use docker/build-package.sh"
   exit
 fi
@@ -25,6 +25,6 @@ fi
 
 mkdir -p dist
 rm -rf vendor
-php5.6 $(command -v composer) install --no-dev -o
-zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" build.sh guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock @
+php7.0 $(command -v composer) install --no-dev -o
+zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" build.sh README.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock @
 composer install
