@@ -95,8 +95,8 @@ class Order {
         cy.clearCookies()
         cy.fixture('config').then((admin) => {
             cy.visit(admin.adminURL)
-            cy.get('#user_login').clear().type(admin.adminUsername)
-            cy.get('#user_pass').type(admin.adminPass)
+            cy.get('#user_login').clear().wait(1000).type(admin.adminUsername)
+            cy.get('#user_pass').clear().wait(1000).type(admin.adminPass)
             cy.get('#wp-submit').wait(1000).click()
             cy.get('.welcome-panel-content > h2').should('have.text', 'Welcome to WordPress!')
         })
