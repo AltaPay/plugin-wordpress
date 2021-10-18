@@ -128,6 +128,14 @@ jobs:
         run: ./node_modules/.bin/cypress run --config video=false
         working-directory: "tests/integration-test"
 
+      - name: Check if screenshots directory exists
+        run: |
+          screenshots_dir_res = $([ -d "screenshots" ] && echo "exists")
+          echo $screenshots_dir_res
+          echo "screenshots_dir=$screenshots_dir_res">> $GITHUB_ENV
+          echo $screenshots_dir
+        working-directory: "tests/integration-test/cypress"
+
         # after the test run completes
         # store screenshots
         # NOTE: screenshots will be generated only if E2E test failed
@@ -135,7 +143,7 @@ jobs:
         # Alternative: create and commit an empty cypress/screenshots folder
         # to always have something to upload
       - uses: actions/upload-artifact@v1
-        if: failure()
+        if: failure() || (screenshots_dir == "exists")
         with:
           name: cypress-screenshots
           path: "./tests/integration-test/cypress/screenshots"                    
