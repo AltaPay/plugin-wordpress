@@ -130,7 +130,7 @@ jobs:
 
       - name: Check if screenshots directory exists
         run: |
-          screenshots_dir_res = $([ -d "screenshots" ] && echo "exists")
+          screenshots_dir_res=$([ -d "screenshots" ] && echo "exists")
           echo $screenshots_dir_res
           echo "screenshots_dir=$screenshots_dir_res">> $GITHUB_ENV
           echo $screenshots_dir
