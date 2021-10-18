@@ -143,7 +143,7 @@ jobs:
         # Alternative: create and commit an empty cypress/screenshots folder
         # to always have something to upload
       - uses: actions/upload-artifact@v1
-        if: failure() || (screenshots_dir == "exists")
+        if: failure() || (env.screenshots_dir == "exists")
         with:
           name: cypress-screenshots
           path: "./tests/integration-test/cypress/screenshots"                    
