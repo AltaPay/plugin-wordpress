@@ -119,8 +119,11 @@ jobs:
           name: "config.json"
           json: '{"shopURL": "http://${{env.IP}}/wordpress","adminURL": "http://${{env.IP}}/wordpress/wp-admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}"}'
           dir: "tests/integration-test/cypress/fixtures/"
-
-      - name: Install Cypress Dependencies 
+   
+      - name: Install Cypress dependencies
+        run: sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+      
+      - name: Install Cypress 
         run: npm i
         working-directory: "tests/integration-test"
 
