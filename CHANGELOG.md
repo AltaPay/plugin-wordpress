@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.7]
+- Fix: Issue in AltaPay login when password had special character slash '/'
+
 ## [3.2.6]
 - Fix: Issue when switching the payment method on the same order id
 
