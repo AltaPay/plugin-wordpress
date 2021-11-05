@@ -95,7 +95,7 @@ trait AltapayMaster {
 	public function getAuth() {
 
 		$apiUser = esc_attr( get_option( 'altapay_username' ) );
-		$apiPass = esc_attr( get_option( 'altapay_password' ) );
+		$apiPass = get_option( 'altapay_password' );
 		$url     = esc_attr( get_option( 'altapay_gateway_url' ) );
 
 		return new Authentication( $apiUser, $apiPass, $url );
