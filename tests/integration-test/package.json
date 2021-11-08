@@ -8,7 +8,7 @@
     "cypress_open": "./node_modules/.bin/cypress open",
     "cypress_run": "./node_modules/.bin/cypress run"
   },
-  "author": "Idrees",
+  "author": "AltaPay",
   "license": "ISC",
   "dependencies": {
     "cypress": "7.4.0",
