@@ -351,8 +351,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
 
-			// Exit if payment already completed against the same order
-			if (! empty( $transaction_id ) ) {
+			/*
+			Exit if payment already completed against the same order and 
+			the new transaction ID is different
+			*/
+			if (! empty( $transaction_id ) && $transaction_id != $txnId ) {
 				// Release duplicate transaction from the gateway side
 				if ( $status === 'succeeded' ) {
 					$api = new ReleaseReservation( $this->getAuth() );
