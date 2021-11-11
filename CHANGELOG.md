@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.8]
+- Fix: Auto release payments issue with MobilePay payment method
+
 ## [3.2.7]
 - Fix: Issue in AltaPay login when password had special character slash '/'
 
