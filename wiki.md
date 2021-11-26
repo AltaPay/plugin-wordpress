@@ -103,9 +103,9 @@ For the AltaPay payment method to appear in the checkout page:
 - Navigate to: Plugins > Installed Plugins
 - If there is a new version of the plug-in, you should see a warning message, as is shown in the image below.
 
-![configuring_woocommerce](docs/configuring_woocommerce.png)
+![configuring_woocommerce](docs/update_plugin.png)
 
-- Click on the "Update now" link.
+- Click on the "Save Changes" link.
 
 > Warning:
 >
