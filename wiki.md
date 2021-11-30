@@ -1,4 +1,4 @@
-[# AltaPay WooCommerce Plugin
+# AltaPay WooCommerce Plugin
 
 AltaPay, headquartered in Denmark, is an internationally focused fintech company within payments with the mission to make payments less complicated. We help our merchants grow and expand their business across payment channels by offering a fully integrated seamless omni-channel experience for online, mobile and instore payments, creating transparency and reducing the need for manual tasks with one centralized payment platform.
 
