@@ -1,4 +1,4 @@
-# AltaPay WooCommerce Plugin
+[# AltaPay WooCommerce Plugin
 
 AltaPay, headquartered in Denmark, is an internationally focused fintech company within payments with the mission to make payments less complicated. We help our merchants grow and expand their business across payment channels by offering a fully integrated seamless omni-channel experience for online, mobile and instore payments, creating transparency and reducing the need for manual tasks with one centralized payment platform.
 
@@ -42,7 +42,7 @@ We highly recommend gathering all the below information before starting the inst
 
 # Installation
 
-There are two ways of installing the plug-in: by uploading the build package or by search for the plug-in on the WC Marketplace.
+There are two ways of installing the plug-in: by uploading the build package or by search for the plug-in [Altapay for WooCommerce](https://wordpress.org/plugins/altapay-for-woocommerce/) on WordPress.org.
 
 AltaPay WooCommerce plug-in needs to be installed on the merchant WooCommerce/WordPress website
 
@@ -54,9 +54,9 @@ There are two ways to install the plugin:
 - Select the build package (zip file) that contains the plugin
 - Click on Install Now.
 
-## By searching for the plug-in in the WC Marketplace:
-- navigate to Plugins > Add new.
-- in the search text box (Search plugins…) type in the keyword "altapay"
+## By searching for the plug-in on WordPress.org:
+- Navigate to Plugins > Add new.
+- In the search text box (Search plugins…) type in the keyword "altapay"
 - Wait for the plug-in to be found
 - Once the plug-in has been set to be installed, you should see a message saying "Plugin installed successfully".
 - Click on the Activate Plugin button.
@@ -73,29 +73,40 @@ The standard configuration connects the plugin with the test gateway. Take the f
 
 To connect to the payment gateway:
 
-- Navigate to: Plugins > Installed Plugins
-- Click on Settings button in the "AltaPay for WooCommerce" section
+- Navigate to: **WooCommerce > AltaPay Settings**
+
+![altapay_settings_initial](docs/altapay_settings_initial.png)
+
 - Complete the Gateway URL, Username and Password fields with the information provided by AltaPay
-- Click on **Create Page button _(very important)_**
-- Click on Save Changes button (from the bottom of the page).
+- Click on **Create Page** button **_(mandatory)_**
+- Click on **Save changes** button (in the bottom of the page).
 
 To select the Terminals:
 
-- Click on Refresh Connection, where a list with one or more payment terminals will be shown.
+![altapay_settings_terminal_selection](docs/altapay_settings_terminal_selection.png)
+
+- Click on **Synchronize payment methods** button, where a list with one or more payment terminals will be shown.
 - Select the payment terminals which should be shown on the checkout page by checking the checkbox related to each one.
-- Click on the Save Changes button.
+- Click on the **Save changes** button.
 
 ## Configure the terminals for the checkout page
 
 For the AltaPay payment method to appear in the checkout page:
 
-- Navigate to WooCommerce >  Settings > Checkout
-- For each AltaPay payment terminal, there must be a link at the top of the page. Refresh the page if you do not see any links, or if the links do not seem updated.
+- Navigate to WooCommerce > Settings
+- Click on the **Payments** tab.
+
+![altapay_woocommerce_payment_methods](docs/altapay_woocommerce_payment_methods.png)
+
+- For each AltaPay payment terminal, there must be a payment method. Refresh the page if you do not see any.
 - Click on the desired payment terminal.
+
+![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.png)
+
 - Enable the payment terminal.
 - Complete the text field "Title"; this field will appear in the checkout page as the title of the payment terminal.
 - Complete the field "Message"; this field must contain the message that will appear for the customer in the checkout page and describes the payment terminal.
-- Check if the selected currency matches WooCommerce currency. (WooCommerce currency can be viewed in WooCommerce > Settings > General)
+- Check if the selected currency matches WooCommerce currency. (WooCommerce currency can be viewed in WooCommerce > Settings > General tab)
 - Save the changes.
 
 ## Update the plug-in
@@ -105,7 +116,7 @@ For the AltaPay payment method to appear in the checkout page:
 
 ![configuring_woocommerce](docs/update_plugin.png)
 
-- Click on the "Save Changes" link.
+- Click on the "update now" link.
 
 > Warning:
 >
@@ -115,7 +126,7 @@ For the AltaPay payment method to appear in the checkout page:
 
 The checkout page is implemented by the following file:
 
-`<wordpress>/wp-content/plugins/altapay/templates/altapay-payment-form.php`
+`<wordpress>/wp-content/plugins/altapay-for-woocommerce/views/altapay-payment-form.php`
 
 To customize this page, copy the file to the folder of the theme that WordPress is currently using. The file inside the theme folder will override the file inside the plugin folder.
 
@@ -145,3 +156,21 @@ The setting is located is in: WooCommerce > Settings > Shipping > Shipping Optio
 ![troubleshooting_woocommerce](docs/troubleshooting_woocommerce.png)
 
 **For any other error messages shown in the "Order notes" section, please contact support (support@altapay.com) for assistance.**
+
+# Providing error logs to support team
+
+You are always welcome to contact AltaPay support (support@altapay.com) if you are experiencing difficulties.
+
+It is recommended to provide as much information as possible to support team.
+
+**You can find the CMS logs by following the below steps:**
+
+From Admin Dashboard navigate to **"WooCommerce > Status > Logs"** tab
+
+**Web server error logs**
+
+**For Apache server** You can find it on **/var/log/apache2/error.log**
+
+**For Nginx** it would be **/var/log/nginx/error.log**
+
+**_Note: Your path may vary from the mentioned above._**
