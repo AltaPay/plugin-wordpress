@@ -25,16 +25,6 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 # Prerequisites
 
-Minimum system requirements are:
-- WordPress min. 5.0 – max. 5.8.2
-- WooCommerce min. 3.9.0 - max. 5.9.0
-- PHP 7.0+
-- PHP-bcmath library installed.
-- PHP-curl MUST be enabled.
-
-The latest tested version is:
-- WordPress 5.8.2, WooCommerce 5.9.0 and PHP 7.4
-
 We highly recommend gathering all the below information before starting the installation:
 
 - AltaPay credentials for the payment gateway, terminals and custom gateway (i.e. yourShopName.altapaysecure.com). These will be provided by AltaPay.
@@ -138,6 +128,19 @@ When the status of an order is manually changed to 'Completed', the plug-in will
 
 If the order was already fully or partially captured, no capture will be made.
 
+
+
+# Supported versions
+
+Minimum system requirements are:
+- WordPress min. 5.0 – max. 5.8.2
+- WooCommerce min. 3.9.0 – max. 5.9.0
+- PHP 7.0+
+- PHP-bcmath library installed.
+- PHP-curl MUST be enabled.
+
+The latest tested version is:
+- WordPress 5.8.2, WooCommerce 5.9.0 and PHP 7.4
 
 
 # Troubleshooting
