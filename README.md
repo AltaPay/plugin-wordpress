@@ -55,7 +55,7 @@ Distributed under the GNU General Public License. See [LICENSE](LICENSE) for mor
 
 ## Documentation
 
-For more details please see [AltaPay docs](https://documentation.altapay.com/)
+For more details please see [AltaPay docs](https://github.com/AltaPay/plugin-wordpress/wiki)
 
 ## Contact
 Feel free to contact our support team (support@altapay.com) if you need any assistance.
