@@ -19,6 +19,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Configuration](#configuration)
 
+[Supported versions](#supported-versions)
+
 [Troubleshooting](#troubleshooting)
 
 
