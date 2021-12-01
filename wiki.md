@@ -162,7 +162,7 @@ The setting is located is in: WooCommerce > Settings > Shipping > Shipping Optio
 
 **For any other error messages shown in the "Order notes" section, please contact support (support@altapay.com) for assistance.**
 
-# Providing error logs to support team
+## Providing error logs to support team
 
 You are always welcome to contact AltaPay support (support@altapay.com) if you are experiencing difficulties.
 
