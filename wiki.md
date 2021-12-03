@@ -164,10 +164,6 @@ The setting is located is in: WooCommerce > Settings > Shipping > Shipping Optio
 
 ## Providing error logs to support team
 
-You are always welcome to contact AltaPay support (support@altapay.com) if you are experiencing difficulties.
-
-It is recommended to provide as much information as possible to support team.
-
 **You can find the CMS logs by following the below steps:**
 
 From Admin Dashboard navigate to **"WooCommerce > Status > Logs"** tab
