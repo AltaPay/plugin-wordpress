@@ -160,7 +160,6 @@ The setting is located is in: WooCommerce > Settings > Shipping > Shipping Optio
 
 ![troubleshooting_woocommerce](docs/troubleshooting_woocommerce.png)
 
-**For any other error messages shown in the "Order notes" section, please contact support (support@altapay.com) for assistance.**
 
 ## Providing error logs to support team
 
