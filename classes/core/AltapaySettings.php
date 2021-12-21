@@ -440,20 +440,32 @@ class AltapaySettings {
 	 * @return void
 	 */
 	function syncTerminals() {
+
+		// return if terminals are configured already
+		if ( get_option( 'altapay_terminals_enabled' ) ) {
+			echo '<div id="message" class="notice notice-error"><p>Terminals are already configured, please select the checkboxes manually.</p></div>';
+			return;
+		}
+
+		// return if terminals does not exist
+		if ( !get_option( 'altapay_terminals' ) ) {
+			echo '<div id="message" class="notice notice-error"><p>Terminals are missing. Click "Refresh connection" button to re-create terminal data.</p></div>';
+			return;
+		}
+
 		$terminals	= array();
-		$auth		= $this->getAuth();
-		$api		= new Terminals($auth);
+		$api	= new Terminals( $this->getAuth() );
 		$response	= $api->call();
 		$wcCountry	= get_option('woocommerce_default_country');
 
-		foreach ($response->Terminals as $terminal) {
+		foreach ( $response->Terminals as $key => $terminal ) {
 
-			if($terminal->Country  !== $wcCountry){
+			if( $terminal->Country  !== $wcCountry ){
 				continue;
 			}
 
-			$terminalTitle = str_replace(array(' ', '-'), '_', $terminal->Title);
-			$terminals[]    = $terminalTitle;
+			$terminalTitle	= str_replace(array(' ', '-'), '_', $terminal->Title);
+			$terminals[]	= $terminalTitle;
 
 			$terminalSettings = array(
 				"enabled"        => "yes",
@@ -471,7 +483,7 @@ class AltapaySettings {
 			);
 		}
 
-		update_option('altapay_terminals_enabled', $terminals);
+		add_option('altapay_terminals_enabled', $terminals);
 
 		wp_redirect( admin_url( 'admin.php?page=altapay-settings' ) );
 		exit;
