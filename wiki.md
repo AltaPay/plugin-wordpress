@@ -19,6 +19,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Configuration](#configuration)
 
+[Synchronize payment methods](#synchronize-payment-methods)
+
 [Supported versions](#supported-versions)
 
 [Troubleshooting](#troubleshooting)
@@ -73,11 +75,17 @@ To connect to the payment gateway:
 - Click on **Create Page** button **_(mandatory)_**
 - Click on **Save changes** button (in the bottom of the page).
 
-To select the Terminals:
+This will populate all the available terminals for the currenct API user.
+If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
+
+## Synchronize payment methods
+
+To synchronize the terminals with the gateway, click on the **Synchronize payment methods** button. This will fetch the latest terminals from the gateway and will automatically configure based on the store country.
 
 ![altapay_settings_terminal_selection](docs/altapay_settings_terminal_selection.png)
 
-- Click on **Synchronize payment methods** button, where a list with one or more payment terminals will be shown.
+To select the Terminals:
+
 - Select the payment terminals which should be shown on the checkout page by checking the checkbox related to each one.
 - Click on the **Save changes** button.
 
@@ -136,13 +144,13 @@ If the order was already fully or partially captured, no capture will be made.
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 5.8.2
-- WooCommerce min. 3.9.0 – max. 5.9.0
+- WooCommerce min. 3.9.0 – max. 6.0.0
 - PHP 7.0+
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 5.8.2, WooCommerce 5.9.0 and PHP 7.4
+- WordPress 5.8.2, WooCommerce 6.0.0 and PHP 7.4
 
 
 # Troubleshooting
