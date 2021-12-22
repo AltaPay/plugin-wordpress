@@ -488,6 +488,7 @@ class AltapaySettings {
 			add_option( 'altapay_terminals_enabled', $terminals );
 		}
 
+		$_SESSION['altapay_sync_terminals'] = 'Payment methods synchronized successfully!';
 		wp_redirect( admin_url( 'admin.php?page=altapay-settings' ) );
 		exit;
 	}
@@ -498,6 +499,7 @@ class AltapaySettings {
 	 * @return void
 	 */
 	private function altapaySynchronizeTerminalsForm() {
+		$this->showUserMessage( 'altapay_sync_terminals', 'notice-success');
 		?>
 		<form method="post" action="">
 			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
