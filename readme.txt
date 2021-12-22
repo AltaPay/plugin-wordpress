@@ -19,7 +19,7 @@ Altapay is fully integrated with WooCommerce via a plug-in. All you have to do i
 
 == Installation ==
 
-The whole installation and configuration process is described in our [integration manual](https://documentation.altapay.com/Content/Plugins/WooCommerce/1%20WooCommerce%20Plugin.htm).
+The whole installation and configuration process is described in our [integration manual](https://github.com/AltaPay/plugin-wordpress/wiki).
 
 == Screenshots ==
 
