@@ -454,7 +454,7 @@ class AltapaySettings {
 		}
 
 		$terminals	= array();
-		$api	= new Terminals( $this->getAuth() );
+		$api		= new Terminals( $this->getAuth() );
 		$response	= $api->call();
 		$wcCountry	= get_option('woocommerce_default_country');
 
@@ -483,7 +483,10 @@ class AltapaySettings {
 			);
 		}
 
-		add_option('altapay_terminals_enabled', $terminals);
+		if($terminals){
+			delete_option( 'altapay_terminals_enabled' );
+			add_option( 'altapay_terminals_enabled', $terminals );
+		}
 
 		wp_redirect( admin_url( 'admin.php?page=altapay-settings' ) );
 		exit;
