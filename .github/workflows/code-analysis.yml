@@ -48,9 +48,9 @@ jobs:
        with: 
          path: wordpress/wp-content/plugins/plugin-wordpress
       
-     - name: Install composer and run PhpStan
+     - name: Install and run PhpStan
        run: |
-         composer install
+         composer install --no-interaction
          vendor/bin/phpstan analyze
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
      
