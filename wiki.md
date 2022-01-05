@@ -80,9 +80,20 @@ If you face any issue click on **Refresh connection** button, this will fetch th
 
 ## Synchronize payment methods
 
-To synchronize the terminals with the gateway, click on the **Synchronize payment methods** button. This will fetch the latest terminals from the gateway and will automatically configure based on the store country.
+1. **Using "Synchronize payment methods" button**
 
-![altapay_settings_terminal_selection](docs/altapay_settings_terminal_selection.png)
+    To synchronize the terminals with the gateway, click on the **Synchronize payment methods** button. This will fetch the latest terminals from the gateway and will automatically configure based on the store country.
+
+    ![altapay_settings_terminal_selection](docs/altapay_settings_terminal_selection.png)
+
+2. **Using script file** 
+
+    Follow these steps to load and save the terminal configurations from the gateway.
+    * Move the file from [terminal-config/altapay_config.php](https://github.com/AltaPay/plugin-wordpress/blob/main/terminal-config/altapay_config.php) to the root directory of the WordPress installation
+    * Edit the file and replace `~gatewayusername~`,`~gatewaypass~`, and `~gatewayurl~` with the actual credentials.
+    * Run the file with the below command
+
+        $ php altapay_config.php
 
 To select the Terminals:
 
