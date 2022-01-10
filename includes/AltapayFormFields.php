@@ -65,7 +65,7 @@ $formSettings = array(
 		'type'        => 'select',
 		'description' => __( 'Select the currency does this terminal work with' ),
 		'options'     => get_woocommerce_currencies(),
-		'default'     => $this->default_currency,
+		'default'     => get_option('woocommerce_currency'),
 	),
 );
 

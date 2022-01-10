@@ -352,6 +352,7 @@ class AltapaySettings {
 				<?php
 				if ( $gatewayURL && $username ) {
 					$this->altapayRefreshConnectionForm();
+					$this->altapaySynchronizeTerminalsForm();
 				}
 			}
 			?>
@@ -383,7 +384,7 @@ class AltapaySettings {
             return;
         }
 
-        echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Payment methods synchronized successfully.', 'altapay' ) . "</p> </div>";
+        echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Connection OK !', 'altapay' ) . "</p> </div>";
 		
 		$terminals = array();
 		$auth      = $this->getAuth();
@@ -407,7 +408,7 @@ class AltapaySettings {
 	}
 
 	/**
-	 * Form with synchronize payment methods button on AltaPay page
+	 * Form with refresh connection button on AltaPay Settings page
 	 *
 	 * @return void
 	 */
@@ -415,20 +416,100 @@ class AltapaySettings {
 		$terminals = get_option( 'altapay_terminals' );
 		if ( ! $terminals ) {
 			?>
-			<p><?php esc_html_e( 'Terminals missing, please click - Synchronize payment methods', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Terminals missing, please click - Refresh connection', 'altapay' ); ?></p>
 		<?php } else { ?>
-			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
+			<p><?php esc_html_e( 'Click below to re-create terminal data', 'altapay' ); ?></p>
 		<?php } ?>
 		<form method="post" action="#refresh_connection">
 			<input type="hidden" value="true" name="refresh_connection">
-			<input type="submit" value="<?php esc_html_e( 'Synchronize payment methods', 'altapay' ); ?>" name="refresh-connection"
-				   class="button" style="color: #006064; border-color: #006064;">
+			<input type="submit" value="<?php esc_html_e( 'Refresh connection', 'altapay' ); ?>" name="refresh-connection"
+				   class="button" style="color: #006064; border-color: #006064; margin: bottom 15px;">
 		</form>
 		<?php
 		// TODO Make use of WordPress notice and error handling
 		// Test connection
 		if ( isset( $_POST['refresh_connection'] ) ) {
 			$this->refreshTerminals();
+		}
+	}
+
+
+	/**
+	 * Form with synchronize payment methods button on AltaPay Settings page
+	 *
+	 * @return void
+	 */
+	function syncTerminals() {
+
+		// return if terminals are configured already
+		if ( get_option( 'altapay_terminals_enabled' ) ) {
+			echo '<div id="message" class="notice notice-error"><p>Terminals are already configured, please select the checkboxes manually.</p></div>';
+			return;
+		}
+
+		// return if terminals does not exist
+		if ( !get_option( 'altapay_terminals' ) ) {
+			echo '<div id="message" class="notice notice-error"><p>Terminals are missing. Click "Refresh connection" button to re-create terminal data.</p></div>';
+			return;
+		}
+
+		$terminals	= array();
+		$api		= new Terminals( $this->getAuth() );
+		$response	= $api->call();
+		$wcCountry	= get_option('woocommerce_default_country');
+
+		foreach ( $response->Terminals as $key => $terminal ) {
+
+			if( $terminal->Country  !== $wcCountry ){
+				continue;
+			}
+
+			$terminalTitle	= str_replace(array(' ', '-'), '_', $terminal->Title);
+			$terminals[]	= $terminalTitle;
+
+			$terminalSettings = array(
+				"enabled"        => "yes",
+				"title"          => str_replace('-', ' ', $terminal->Title),
+				"description"    => "",
+				"payment_action" => "authorize",
+				"payment_icon"   => "default",
+				"currency"       => get_option('woocommerce_currency'),
+			);
+
+			update_option(
+				'woocommerce_altapay_' . strtolower($terminalTitle) . '_settings',
+				$terminalSettings,
+				'yes'
+			);
+		}
+
+		if($terminals){
+			delete_option( 'altapay_terminals_enabled' );
+			add_option( 'altapay_terminals_enabled', $terminals );
+		}
+
+		$_SESSION['altapay_sync_terminals'] = 'Payment methods synchronized successfully!';
+		wp_redirect( admin_url( 'admin.php?page=altapay-settings' ) );
+		exit;
+	}
+
+	/**
+	 * Form with synchronize payment methods button on AltaPay Settings page
+	 * 
+	 * @return void
+	 */
+	private function altapaySynchronizeTerminalsForm() {
+		$this->showUserMessage( 'altapay_sync_terminals', 'notice-success');
+		?>
+		<form method="post" action="">
+			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
+			<input type="hidden" value="true" name="sync_terminals">
+			<input type="submit" value="<?php esc_html_e( 'Synchronize payment methods', 'altapay' ); ?>"  name="sync-connection" class="button" style="color: #006064; border-color: #006064;">
+		</form>
+		<?php
+
+		if ( isset( $_POST['sync_terminals'] ) ) {
+			$this->syncTerminals();
 		}
 	}
 

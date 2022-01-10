@@ -4,10 +4,10 @@ Tags: Altapay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.0
 Requires at least: 5.0
 Tested up to: 5.8.2
-Stable tag: 3.2.8
+Stable tag: 3.2.9
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 5.9.0
+WC tested up to: 6.0.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
@@ -19,7 +19,7 @@ Altapay is fully integrated with WooCommerce via a plug-in. All you have to do i
 
 == Installation ==
 
-The whole installation and configuration process is described in our [integration manual](https://documentation.altapay.com/Content/Plugins/WooCommerce/1%20WooCommerce%20Plugin.htm).
+The whole installation and configuration process is described in our [integration manual](https://github.com/AltaPay/plugin-wordpress/wiki).
 
 == Screenshots ==
 
@@ -36,6 +36,9 @@ AltaPay supports major acquiring banks, global payment methods and over 50 prefe
 Altapay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for Altapay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
 
 == Changelog ==
+
+= 3.2.9 =
+* Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
 
 = 3.2.8 =
 * Fix: Auto release payments issue with MobilePay payment method

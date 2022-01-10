@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.9]
+- Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
+
 ## [3.2.8]
 - Fix: Auto release payments issue with MobilePay payment method
 
