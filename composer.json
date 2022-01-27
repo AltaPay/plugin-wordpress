@@ -29,7 +29,7 @@
         "szepeviktor/phpstan-wordpress": "^0.7.1"
     },
     "autoload": {
-        "classmap": ["classes","helpers","assets/blade/lib"]
+        "classmap": ["classes","helpers"]
     },
     "autoload-dev": {
         "classmap": ["tests"]
