@@ -22,9 +22,12 @@ get_header();
 		.pensio_payment_form_cvc_cell img {
 			max-width: 60px;
 		}
-	        .theme-storefront .wp-altapay-payment-form-cnt {
-	            max-width: 55%;
-	        }
+		.theme-storefront .wp-altapay-payment-form-cnt {
+			max-width: 55%;
+		}
+		.theme-storefront .pensio_payment_form_row.cardholdername_row {
+			margin-bottom: 15px;
+		}
 	</style>
 </head>
 	<div id="primary" class="content-area">
