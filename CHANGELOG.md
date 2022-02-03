@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.2.9]
 - Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
-- Add support for WordPress 5.9, WooCommerce 6.1.1
+- Add support for WordPress 5.9 and WooCommerce 6.1.1
 
 ## [3.2.8]
 - Fix: Auto release payments issue with MobilePay payment method
