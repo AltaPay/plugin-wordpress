@@ -39,6 +39,7 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.2.9 =
 * Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
+* Add support for WordPress 5.9, WooCommerce 6.1.1
 
 = 3.2.8 =
 * Fix: Auto release payments issue with MobilePay payment method
