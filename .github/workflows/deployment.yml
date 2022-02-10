@@ -46,7 +46,7 @@ jobs:
         working-directory: ../plugin-infrastructure/provision/plugins
 
 
-      # Select a terraform workspace
+      # Select a Terraform workspace
       - name: Terraform workspace
         run: terraform workspace select wordpress
         working-directory: ../plugin-infrastructure/provision/plugins
