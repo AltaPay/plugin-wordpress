@@ -155,13 +155,13 @@ If the order was already fully or partially captured, no capture will be made.
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 5.9
-- WooCommerce min. 3.9.0 – max. 6.1.1
+- WooCommerce min. 3.9.0 – max. 6.2.0
 - PHP 7.0+
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 5.9, WooCommerce 6.1.1 and PHP 7.4
+- WordPress 5.9, WooCommerce 6.2.0 and PHP 7.4
 
 
 # Troubleshooting
