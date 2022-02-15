@@ -33,6 +33,7 @@ class AltapayTokenControl {
 			2
 		);
 		add_action( 'woocommerce_checkout_process', array( $this, 'setCreditCardSessionVariable' ) );
+		add_action ('wp_loaded', array( $this, 'altapay_saved_credit_card_actions' ) );
 	}
 
 	/**
@@ -44,7 +45,7 @@ class AltapayTokenControl {
 	 */
 	public function savedCreditCardMenuLink( $menuLinks ) {
 		$menuLinks = array_slice( $menuLinks, 0, 5, true )
-					 + array( 'saved-credit-cards' => 'Saved credit card' )
+					 + array( 'saved-credit-cards' => 'Saved credit card(s)' )
 					 + array_slice( $menuLinks, 5, null, true );
 
 		return $menuLinks;
@@ -74,12 +75,17 @@ class AltapayTokenControl {
 		$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
 		$blade   = new Helpers\AltapayHelpers();
 		echo _( '<h3>Saved credit card(s)</h3>' );
-		echo $blade->loadBladeLibrary()->run(
-			'tables.creditCard',
-			array(
-				'results' => $results,
-			)
-		);
+
+		if($results){
+			echo $blade->loadBladeLibrary()->run(
+				'tables.creditCard',
+				array(
+					'results' => $results,
+				)
+			);
+		}else{
+			echo _( 'No saved credit cards.' );
+		}
 	}
 
 	/**
@@ -162,7 +168,7 @@ class AltapayTokenControl {
 									  . get_current_user_id() . "' and ccToken='$ccToken'"
 		);
 
-		if ( array_key_exists( 'test', $_POST ) ) {
+		if ( array_key_exists( 'save_credit_card', $_POST ) ) {
 			$this->saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate );
 		}
 
@@ -171,7 +177,7 @@ class AltapayTokenControl {
 				&& $paymentMethods[ $orderPaymentMethod ]->settings['token_control'] === 'yes'
 			) {
 				return '<form method="post" action="">
-		<input type="submit" name="test" id="test" value="' . $buttonText . '" /><br/>
+		<input type="submit" name="save_credit_card" id="save_credit_card" value="' . $buttonText . '" /><br/>
 		</form>';
 			}
 		}
@@ -201,7 +207,9 @@ class AltapayTokenControl {
 				'ccToken'          => $ccToken,
 			)
 		);
-		header( 'Location: ' . wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		// Redirect user to Saved credit card(s) section of my account page
+		wp_redirect( wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) ) );
+		exit;
 	}
 
 	/**
@@ -215,4 +223,20 @@ class AltapayTokenControl {
 		}
 	}
 
+	/**
+	 * 
+	 * Method to handle the delete action against the saved credit card.
+	 * 
+	 * @return void
+	 */
+
+	function altapay_saved_credit_card_actions() {
+		global $wpdb;
+	
+		if (isset($_GET['delete_card'])) {
+			$wpdb->delete($wpdb->prefix . 'altapayCreditCardDetails', array('creditCardNumber' => $_GET['delete_card'], 'userID' => get_current_user_id()));
+			wp_redirect( wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) ) );
+			exit;
+		}
+	}
 }
