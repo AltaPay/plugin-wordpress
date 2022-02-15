@@ -63,14 +63,13 @@ class UtilMethods {
 			}
 		}
 		// get the shipping Details
-		$shippingDetails = reset(
-			$this->getShippingDetails(
-				$order,
-				$products,
-				$returnRefundOrderLines
-			)
+		$shippingDetails = $this->getShippingDetails(
+			$order,
+			$products,
+			$returnRefundOrderLines
 		);
 
+		$shippingDetails = reset( $shippingDetails );
 		if ( $shippingDetails ) {
 			$orderlineDetails [] = $shippingDetails;
 		}
