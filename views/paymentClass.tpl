@@ -345,7 +345,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
 			$jsonToArray          = json_decode( $xmlToJson, true );
 			$creditCardCardBrand  = $jsonToArray['PaymentSchemeName'];
-			$creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'];
+			$creditCardExpiryDate = isset( $jsonToArray['CreditCardExpiry'] ) ? ( $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'] ) : '';
 
 			$order = new WC_Order( $order_id );
 
