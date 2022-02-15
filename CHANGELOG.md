@@ -3,7 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [3.2.9]
 - Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
-- Add support for WordPress 5.9 and WooCommerce 6.1.1
+- Add support for WordPress 5.9, WooCommerce 6.2.0
+- Fix: Token Control field not showing for payment method configuration page
+- Fix: Redirection issue in the saved credit card section on my account page
 
 ## [3.2.8]
 - Fix: Auto release payments issue with MobilePay payment method

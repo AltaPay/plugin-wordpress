@@ -7,7 +7,7 @@ Tested up to: 5.9
 Stable tag: 3.2.9
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 6.1.1
+WC tested up to: 6.2.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
@@ -39,7 +39,9 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.2.9 =
 * Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
-* Add support for WordPress 5.9 and WooCommerce 6.1.1
+* Add support for WordPress 5.9, WooCommerce 6.2.0
+* Fix: Token Control field not showing for payment method configuration page
+* Fix: Redirection issue in the saved credit card section on my account page
 
 = 3.2.8 =
 * Fix: Auto release payments issue with MobilePay payment method
