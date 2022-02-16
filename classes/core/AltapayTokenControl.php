@@ -117,8 +117,7 @@ class AltapayTokenControl {
 
 						$creditCard[] = _( 'Select a saved credit card' );
 						foreach ( $results as $result ) {
-							$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber . ' ('
-																	 . $result->cardExpiryDate . ')';
+							$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
 						}
 
 						woocommerce_form_field(
@@ -156,7 +155,7 @@ class AltapayTokenControl {
 		$paymentMethods = WC()->payment_gateways->get_available_payment_gateways();
 
 		$orderMeta          = get_metadata( 'post', $order->get_id() );
-		$cardNo             = $orderMeta['_cardno'][0];
+		$maskedCCNo			= $orderMeta['_cardno'][0]; // masked credit card number
 		$ccToken            = $orderMeta['_credit_card_token'][0];
 		$ccBrand            = $orderMeta['_credit_card_brand'][0];
 		$ccExpiryDate       = $orderMeta['_credit_card_expiry_date'][0];
@@ -169,7 +168,7 @@ class AltapayTokenControl {
 		);
 
 		if ( array_key_exists( 'save_credit_card', $_POST ) ) {
-			$this->saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate );
+			$this->saveCreditCardDetails( $maskedCCNo, $ccToken, $ccBrand, $ccExpiryDate );
 		}
 
 		if ( ! empty( $orderMeta['_cardno'][0] ) && ! $results && is_user_logged_in() ) {
@@ -186,14 +185,14 @@ class AltapayTokenControl {
 	/**
 	 * Save the credit card details in the database - Triggered when save credit card details button
 	 *
-	 * @param string $cardNo
+	 * @param string $maskedCCNo
 	 * @param string $ccToken
 	 * @param string $ccBrand
 	 * @param string $ccExpiryDate
 	 *
 	 * @return void
 	 */
-	public function saveCreditCardDetails( $cardNo, $ccToken, $ccBrand, $ccExpiryDate ) {
+	public function saveCreditCardDetails( $maskedCCNo, $ccToken, $ccBrand, $ccExpiryDate ) {
 		global $wpdb;
 
 		$wpdb->insert(
@@ -202,7 +201,7 @@ class AltapayTokenControl {
 				'time'             => date( 'Y-m-d H:i:s' ),
 				'userID'           => get_current_user_id(),
 				'cardBrand'        => $ccBrand,
-				'creditCardNumber' => $cardNo,
+				'creditCardNumber' => $maskedCCNo,
 				'cardExpiryDate'   => $ccExpiryDate,
 				'ccToken'          => $ccToken,
 			)
