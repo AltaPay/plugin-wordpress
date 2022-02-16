@@ -77,3 +77,12 @@ jobs:
             -u ubuntu
             -i inventory
             --extra-vars "variable_host=wordpress-support branch_name=main gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} wp_user=${{secrets.CMS_ADMIN_USER}} wp_pass=${{secrets.CMS_ADMIN_PASS}} wp_email=${{secrets.CMS_ADMIN_EMAIL}}"   
+
+      # Export URL
+      - name: Export URL
+        run: |
+          testvar=$(sed '4!d' inventory)
+          echo $testvar
+          echo "IP=$testvar">> $GITHUB_ENV
+          echo "http://$IP/wordpress"
+        working-directory: ../plugin-infrastructure/deploy/plugins
