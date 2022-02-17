@@ -8,7 +8,7 @@
  * Version: 3.2.9
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 6.0.0
+ * WC tested up to: 6.2.0
  *
  * @package Altapay
  */
@@ -70,22 +70,24 @@ function altapay_add_gateway( $methods ) {
 	$tmpDir = sys_get_temp_dir();
 	// Get enabled terminals
 	$terminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
-
+	// Load Terminal information
+	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
 			$tokenStatus = '';
-			// Load Terminal information
-			$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 			$terminalName = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
 					$terminalName   = $term->name;
-					$terminalNature = $term->nature;
-					if ( in_array( 'CreditCard', $terminalNature, true ) ) {
-						$tokenStatus = 'CreditCard';
+					foreach ( $term->nature as $nature ){
+						if( $nature->Nature === "CreditCard"){
+							$tokenStatus = 'CreditCard';
+							break;
+						}
 					}
 				}
 			}
+
 			// Check if file exists
 			$path    = $terminalDir . $terminal . '.class.php';
 			$tmpPath = $tmpDir . '/' . $terminal . '.class.php';

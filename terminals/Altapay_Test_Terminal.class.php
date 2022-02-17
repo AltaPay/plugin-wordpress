@@ -328,7 +328,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
-			$cardNo         = isset( $_POST['masked_credit_card'] ) ? sanitize_text_field( wp_unslash( $_POST['masked_credit_card'] ) ) : '';
+			$maskedCCNo     = isset( $_POST['masked_credit_card'] ) ? sanitize_text_field( wp_unslash( $_POST['masked_credit_card'] ) ) : '';
 			$amount         = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
 			$credToken      = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
 			$merchantError  = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
@@ -343,7 +343,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 			$xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
 			$jsonToArray          = json_decode( $xmlToJson, true );
 			$creditCardCardBrand  = $jsonToArray['PaymentSchemeName'];
-			$creditCardExpiryDate = $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'];
+			$creditCardExpiryDate = isset( $jsonToArray['CreditCardExpiry'] ) ? ( $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'] ) : '';
 
 			$order = new WC_Order( $order_id );
 
@@ -356,7 +356,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 					$order->payment_complete();
 
 					update_post_meta( $order_id, '_transaction_id', $txnId );
-					update_post_meta( $order_id, '_cardno', $cardNo );
+					update_post_meta( $order_id, '_cardno', $maskedCCNo );
 					update_post_meta( $order_id, '_credit_card_token', $credToken );
 					update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
 					update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );
@@ -405,7 +405,7 @@ class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
 				$order->payment_complete();
 				update_post_meta( $order_id, '_transaction_id', $txnId );
-				update_post_meta( $order_id, '_cardno', $cardNo );
+				update_post_meta( $order_id, '_cardno', $maskedCCNo );
 				update_post_meta( $order_id, '_credit_card_token', $credToken );
 				update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
 				update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );

@@ -54,13 +54,13 @@ class Order {
 
         cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
 
-        cy.get('#billing_first_name').type('Testperson-dk')
-        cy.get('#billing_last_name').type('Testperson-dk')
-        cy.get('#billing_address_1').type('Sæffleberggate 56,1 mf')
-        cy.get('#billing_postcode').type('6800')
-        cy.get('#billing_city').type('Varde')
-        cy.get('#billing_phone').type('20123456')
-        cy.get('#billing_email').type('demo@example.com')
+        cy.get('#billing_first_name').clear().type('Testperson-dk')
+        cy.get('#billing_last_name').clear().type('Testperson-dk')
+        cy.get('#billing_address_1').clear().type('Sæffleberggate 56,1 mf')
+        cy.get('#billing_postcode').clear().type('6800')
+        cy.get('#billing_city').clear().type('Varde')
+        cy.get('#billing_phone').clear().type('20123456')
+        cy.get('#billing_email').clear().type('demo@example.com')
         cy.get('#place_order').click()
         cy.get('#submitbutton').click().wait(8000)
 
@@ -98,7 +98,14 @@ class Order {
             cy.get('#user_login').clear().wait(1000).type(admin.adminUsername)
             cy.get('#user_pass').clear().wait(1000).type(admin.adminPass)
             cy.get('#wp-submit').wait(1000).click()
-            cy.get('.welcome-panel-content > h2').should('have.text', 'Welcome to WordPress!')
+            cy.get('body').then(($a) => {
+
+                if ($a.find('.welcome-panel-content > h2').length) {
+                    cy.get('.welcome-panel-content > h2').should('have.text', 'Welcome to WordPress!')
+                }
+
+            })
+
         })
 
     }
@@ -144,13 +151,13 @@ class Order {
         cy.get('[for="tab2"]').click()
         cy.get('#altapay_refund').click().wait(5000)
         cy.get('body').then(($a) => {
-        if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
-            cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
-        }
-        else{
-            cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
-        }
-    })
+            if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
+                cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+            }
+            else {
+                cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+            }
+        })
     }
 
     partial_refund() {
@@ -233,13 +240,13 @@ class Order {
         cy.get('#altapay_refund').click().wait(5000)
         cy.get('[for="tab2"]').click()
         cy.get('body').then(($a) => {
-        if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
-            cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
-        }
-        else{
-            cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
-        }
-    })
+            if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
+                cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+            }
+            else {
+                cy.get(':nth-child(5) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
+            }
+        })
     }
 
     change_currency_to_DKK() {
@@ -270,7 +277,7 @@ class Order {
         cy.get('#publish').click()
     }
 
-     apply_fixed_discount(){
+    apply_fixed_discount() {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click()
@@ -280,7 +287,7 @@ class Order {
         cy.get('.checkout-button').click()
     }
 
-    apply_percentage_discount(){
+    apply_percentage_discount() {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click()
@@ -290,7 +297,7 @@ class Order {
         cy.get('.checkout-button').click()
     }
 
-    apply_fixed_discount(){
+    apply_fixed_discount() {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click()
