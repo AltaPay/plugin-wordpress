@@ -32,11 +32,11 @@ then
   exit
 fi
 
-if [ "$1" != "7.0" ]
+if [ "$1" == "7.0" ]
 then
-  composer_command="update"
-else
   composer_command="install"
+else
+  composer_command="update"
 fi
 
 mkdir -p dist
