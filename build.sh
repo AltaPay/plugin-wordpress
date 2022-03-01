@@ -32,8 +32,15 @@ then
   exit
 fi
 
+if [ "$1" != "7.0" ]
+then
+  composer_command="update"
+else
+  composer_command="install"
+fi
+
 mkdir -p dist
 rm -rf vendor
-php$1 $(command -v composer) install --no-dev -o --no-interaction
+php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
 zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" wiki.md build.sh README.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock @
-composer install --no-interaction
+composer $composer_command --no-interaction
