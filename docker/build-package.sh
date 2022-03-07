@@ -1,6 +1,6 @@
 #!/bin/bash
 
-supported_versions_msg="Only PHP versions 7.0 & 8.1 are supported"
+supported_versions_msg="This script supports only PHP versions 7.0 & 8.1 with docker"
 
 if [ -z "$1" ]
   then
