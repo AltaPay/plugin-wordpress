@@ -41,6 +41,13 @@ else
   cp composer.lock{,.backup}
 fi
 
+if [ ! -d dist ];
+then
+  mkdir -p dist
+else
+  rm -rf dist/altapay-for-woocommerce.zip
+fi
+
 mkdir -p dist
 rm -rf vendor
 php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
