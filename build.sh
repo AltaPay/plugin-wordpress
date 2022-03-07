@@ -33,7 +33,7 @@ then
   exit
 fi
 
-if [ "$1" == "7.0" ]
+if [ "$1" = "7.0" ]
 then
   composer_command="install"
 else
