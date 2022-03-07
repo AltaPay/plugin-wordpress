@@ -38,7 +38,7 @@ then
   composer_command="install"
 else
   composer_command="update"
-  cp composer.lock{,.backup} .
+  cp composer.lock composer.lock.backup
 fi
 
 if [ ! -d dist ];
