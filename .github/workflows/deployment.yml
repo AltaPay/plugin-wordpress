@@ -32,7 +32,7 @@ jobs:
         with:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
-          ref: 'origin/main'
+          ref: 'origin/php8_wordpress'
 
       # Install version 1.0.8 of Terraform CLI
       - name: Setup Terraform
