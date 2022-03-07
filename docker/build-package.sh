@@ -9,6 +9,7 @@ if [ -z "$1" ]
     echo "Usage: ./build-package.sh <php_version>"
     echo "./build-package.sh 7.0"
     echo "./build-package.sh 8.1"
+    echo "composer.lock will be updated for php 8.1"
     exit 1
 fi
 
