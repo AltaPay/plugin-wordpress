@@ -1,0 +1,8 @@
+FROM php:8.1.2-cli
+RUN apt-get update && apt-get install -y libmemcached-dev zlib1g-dev \
+	&& ln -s /usr/local/bin/php /usr/local/bin/php8.1 \
+	&& apt-get install -yq zip \
+	&& php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+	&& php composer-setup.php \
+	&& php -r "unlink('composer-setup.php');" \
+	&& mv composer.phar /usr/bin/composer
