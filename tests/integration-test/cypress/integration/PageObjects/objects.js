@@ -31,13 +31,13 @@ class Order {
 
         cy.contains(CC_TERMINAL_NAME).click({ force: true })
         //billing details
-        cy.get('#billing_first_name').clear().type('Testperson-dk')
-        cy.get('#billing_last_name').clear().type('Approved')
-        cy.get('#billing_address_1').clear().type('Sæffleberggate 56,1 mf')
-        cy.get('#billing_postcode').clear().type('6800')
-        cy.get('#billing_city').clear().type('Varde')
-        cy.get('#billing_phone').clear().type('20123456')
-        cy.get('#billing_email').clear().type('demo@example.com')
+        cy.get('#billing_first_name').clear().type('Test')
+        cy.get('#billing_last_name').clear().type('Person-dk')
+        cy.get('#billing_address_1').clear().type('65 Nygårdsvej')
+        cy.get('#billing_postcode').clear().type('2100')
+        cy.get('#billing_city').clear().type('København Ø')
+        cy.get('#billing_phone').clear().type('33 13 71 12')
+        cy.get('#billing_email').clear().type('customer@email.dk')
         cy.get('#place_order').click()
         cy.get('[id=creditCardNumberInput]').type('4111111111111111')
         cy.get('#emonth').type('01')
@@ -50,45 +50,32 @@ class Order {
 
     }
 
-    klarna_payment(KLARNA_DKK_TERMINAL_NAME) {
-
-        cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
-
-        cy.get('#billing_first_name').clear().type('Testperson-dk')
-        cy.get('#billing_last_name').clear().type('Testperson-dk')
-        cy.get('#billing_address_1').clear().type('Sæffleberggate 56,1 mf')
-        cy.get('#billing_postcode').clear().type('6800')
-        cy.get('#billing_city').clear().type('Varde')
-        cy.get('#billing_phone').clear().type('20123456')
-        cy.get('#billing_email').clear().type('demo@example.com')
+    klarna_payment(KLARNA_DKK_TERMINAL_NAME){
+        cy.contains(KLARNA_DKK_TERMINAL_NAME).click({force: true}).wait(4000)
+        cy.get('#billing_first_name').clear().type('Test')
+        cy.get('#billing_last_name').clear().type('Person-dk')
+        cy.get('#billing_address_1').clear().type('65 Nygårdsvej')
+        cy.get('#billing_postcode').clear().type('2100')
+        cy.get('#billing_city').clear().type('København Ø')
+        cy.get('#billing_phone').clear().type('33 13 71 12')
+        cy.get('#billing_email').clear().type('customer@email.dk')
         cy.get('#place_order').click()
         cy.get('#submitbutton').click().wait(8000)
-
-        cy.get('[id=klarna-pay-later-fullscreen]').then(($a) => {
-            if ($a.find('[id=klarna-pay-later-fullscreen]').length) {
-                cy.get('[id=klarna-pay-later-fullscreen]').wait(3000)
-
-            }
-
-            else {
-
-                cy.get('#submitbutton').click().wait(8000)
-
-            }
+        cy.get('[id=submitbutton]').click().wait(3000)
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
+            const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
+            cy.wrap(mobileNum).type('20222222')
+            const continueBtn = $iFrame.contents().find('[id=onContinue]')
+            cy.wrap(continueBtn).click().wait(2000)
         })
-
-        cy.get('[id=klarna-pay-later-fullscreen]').wait(3000).then(function ($iFrame) {
-            const mobileNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-phone-number]')
-            cy.wrap(mobileNum).type('(452) 012-3456')
-            const personalNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-national-identification-number]')
-            cy.wrap(personalNum).type('1012201234')
-            const submit = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-continue-button]')
-            cy.wrap(submit).click()
-
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
+            const otp = $iFrame.contents().find('[id=otp_field]')
+            cy.wrap(otp).type('123456').wait(2000)
+        })  
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function($iFrame){
+            const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
+            cy.wrap(contbtn).click().wait(2000)
         })
-
-        cy.wait(3000)
-        cy.get('.entry-title').should('have.text', 'Order received')
     }
 
     admin() {
