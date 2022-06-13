@@ -464,13 +464,13 @@ function altapayRefundCallback() {
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 		if ( $postOrderLines ) {
 			$selectedProducts = array(
-				'skuList' => array(),
-				'skuQty'  => array(),
+				'itemList' => array(),
+				'itemQty'  => array(),
 			);
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['skuList'][]                          = $productData[0]['value'];
-					$selectedProducts['skuQty'][ $productData[0]['value'] ] = $productData[1]['value'];
+					$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
+					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
 			$orderLines         = $utilMethods->createOrderLines( $order, $selectedProducts );
