@@ -20,10 +20,10 @@ class UtilMethods {
 	 *
 	 * @param WC_Order|WC_Order_Refund $order
 	 * @param array                    $products
-	 * @param bool                     $returnRefundOrderLines
+	 * @param bool                     $wcRefund
 	 * @return array  list of order lines
 	 */
-	public function createOrderLines( $order, $products = array(), $returnRefundOrderLines = false ) {
+	public function createOrderLines( $order, $products = array(), $wcRefund = false ) {
 		$orderlineDetails         = array();
 		$itemsToCapture           = array();
 		$couponDiscountPercentage = 0; // set initial coupon discount to 0
@@ -33,7 +33,7 @@ class UtilMethods {
 		// If capture request is triggered
 		if ( $products ) {
 			foreach ( $cartItems as $key => $value ) {
-				if ( in_array( $key, $products['skuList'] ) ) {
+				if ( in_array( intval( $key ), $products['itemList'], true ) ) {
 					$itemsToCapture[ $key ] = $value;
 				}
 			}
@@ -56,9 +56,19 @@ class UtilMethods {
 			if ( $product && 'bundle' === $product->get_type() && $productDetails['product']['unitPrice'] == 0 ) {
 				continue;
 			}
-			$orderlineDetails [] = $productDetails['product'];
+
+			if ( $wcRefund ) {
+				$orderlineDetails[ $orderlineKey ] = array(
+					'qty'          => $products['itemQty'][ $orderlineKey ],
+					'refund_total' => ( $orderline['line_total'] / $orderline->get_quantity() ) * $products['itemQty'][ $orderlineKey ],
+					'refund_tax'   => ( $orderline->get_total_tax() / $orderline->get_quantity() ) * $products['itemQty'][ $orderlineKey ],
+				);
+			} else {
+				$orderlineDetails[] = $productDetails['product'];
+			}
+
 			// check if compensation exists to bind it in orderline details
-			if ( $productDetails['compensation']->unitPrice != 0 ) {
+			if ( !$wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 		}
@@ -66,7 +76,7 @@ class UtilMethods {
 		$shippingDetails = $this->getShippingDetails(
 			$order,
 			$products,
-			$returnRefundOrderLines
+			$wcRefund
 		);
 
 		$shippingDetails = reset( $shippingDetails );
@@ -187,7 +197,7 @@ class UtilMethods {
 			$discountPercentage = round( ( $productDiscountAmount / $productRegularPrice ) * 100, 2 );
 		}
 
-		$taxAmount = 0;
+		$taxAmount    = 0;
 		$productPrice = 0;
 
 		// conditional switch for calculations based on discount and tax configuration settings
@@ -274,10 +284,10 @@ class UtilMethods {
 	 *
 	 * @param WC_Order $order
 	 * @param array    $products
-	 * @param bool     $returnRefundOrderLines
+	 * @param bool     $wcRefund
 	 * @return array|bool
 	 */
-	private function getShippingDetails( $order, $products, $returnRefundOrderLines ) {
+	private function getShippingDetails( $order, $products, $wcRefund ) {
 		// Get the shipping method
 		$orderShippingMethods = $order->get_shipping_methods();
 		$shippingID           = 'NaN';
@@ -290,7 +300,7 @@ class UtilMethods {
 		// In a refund it's possible to have order_shipping == 0 and order_shipping_tax != 0 at the same time
 		if ( $order->get_shipping_total() != 0 || $order->get_shipping_tax() != 0 ) {
 			if ( $products ) {
-				if ( ! in_array( $shippingID, $products['skuList'] ) ) {
+				if ( ! in_array( $shippingID, $products['itemList'] ) ) {
 					return false;
 				}
 			}
@@ -299,7 +309,7 @@ class UtilMethods {
 			$totalShippingTax = $order->get_shipping_tax();
 
 			// This will trigger in case a refund action is performed
-			if ( $returnRefundOrderLines ) {
+			if ( $wcRefund ) {
 				$shippingDetails[ $orderShippingKey ] = array(
 					'qty'          => 1,
 					'refund_total' => wc_format_decimal( $totalShipping ),
