@@ -348,27 +348,27 @@ function altapayCaptureCallback() {
 		$orderLines = array();
 		if ( $postOrderLines ) {
 			$selectedProducts = array(
-				'skuList' => array(),
-				'skuQty'  => array(),
+				'itemList' => array(),
+				'itemQty'  => array(),
 			);
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['skuList'][]                          = $productData[0]['value'];
-					$selectedProducts['skuQty'][ $productData[0]['value'] ] = $productData[1]['value'];
+					$selectedProducts['itemList'][]                          = $productData[0]['value'];
+					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
 
 			$orderLines = $utilMethods->createOrderLines( $order, $selectedProducts );
 		}
 
-		$response = null;
+		$response    = null;
 		$rawResponse = null;
 		try {
 			$api = new CaptureReservation( $settings->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
-			$response = $api->call();
+			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
 			error_log( 'Response header exception ' . $e->getMessage() );
