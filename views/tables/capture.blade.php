@@ -38,12 +38,6 @@
             $discountPercentageWholeCart = 0;
         @endphp
 
-        @if(!empty($product->get_sku()))
-            @php($sku = $productID . '-' . $product->get_sku())
-        @else
-            @php($sku = $productID)
-        @endif
-
         @if($orderedItems)
             @foreach($orderedItems as $itemID => $item)
                 @php
@@ -88,7 +82,7 @@
         @endphp
 
         <tr class="ap-orderlines-capture">
-            <td style="display:none"><input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$sku}}"/></td>
+            <td style="display:none"><input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/></td>
             <td class="pv3 pr3 bb b--black-20"> {{$itemData->get_product()->get_name()}} </td>
             <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
             <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
