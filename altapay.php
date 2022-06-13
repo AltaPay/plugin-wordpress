@@ -74,13 +74,13 @@ function altapay_add_gateway( $methods ) {
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
-			$tokenStatus = '';
+			$tokenStatus  = '';
 			$terminalName = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
-					$terminalName   = $term->name;
-					foreach ( $term->nature as $nature ){
-						if( $nature->Nature === "CreditCard"){
+					$terminalName = $term->name;
+					foreach ( $term->nature as $nature ) {
+						if ( $nature->Nature === 'CreditCard' ) {
 							$tokenStatus = 'CreditCard';
 							break;
 						}
@@ -142,6 +142,7 @@ function altapay_page_template( $template ) {
 
 /**
  * Register meta box for order details page
+ *
  * @return bool
  */
 function altapayAddMetaBoxes() {
@@ -382,10 +383,10 @@ function altapayCaptureCallback() {
 			wp_send_json_error( array( 'error' => __( 'Could not capture reservation' ) ) );
 		}
 
-		$charge      = 0;
-		$reserved    = 0;
-		$captured    = 0;
-		$refunded    = 0;
+		$charge   = 0;
+		$reserved = 0;
+		$captured = 0;
+		$refunded = 0;
 
 		if ( $rawResponse ) {
 			$body = $rawResponse->getBody();
