@@ -146,7 +146,7 @@ class AltapayTokenControl {
 	 * @param string   $text
 	 * @param WC_Order $order
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	public function filterSaveCreditCardDetailsButton( $text, $order ) {
 		global $wpdb;
