@@ -34,20 +34,6 @@
             $productID = $itemData->get_id();
             $product = wc_get_product($itemData['product_id']);
             $qty = $itemData->get_quantity();
-
-            $refunded = abs($order->get_qty_refunded_for_item( $productID ));
-            $refundableQty = $qty - $refunded;
-
-            echo 'refundableQty = '.$refundableQty;
-            echo '<br/>';
-            echo 'qty = '.$qty;
-            echo '<br/>';
-            echo 'productID = '.$productID;
-            echo '<br/>';
-            echo 'refunded = '.$refunded;
-            echo '<br/>';
-           // exit;
-
             $orderedItems = $order->get_items('coupon');
             $discountPercentageWholeCart = 0;
         @endphp
