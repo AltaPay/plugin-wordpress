@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.0]
+- Update minimum PHP supported version to 7.2
+- Fix: inventory not updating when doing refund from AltaPay actions grid
+
 ## [3.2.9]
 - Enable possibility to synchronize terminals based on store country with a Button in WooCommerce.
 - Add support for WordPress 5.9, WooCommerce 6.2.0
