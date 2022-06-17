@@ -63,7 +63,7 @@ class AltapayOrderStatus {
 				$reserved += $pay->ReservedAmount;
 				$captured += $pay->CapturedAmount;
 				$refunded += $pay->RefundedAmount;
-				$status   += $pay->TransactionStatus;
+				$status    = $pay->TransactionStatus;
 			}
 		}
 
