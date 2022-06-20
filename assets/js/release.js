@@ -29,7 +29,7 @@ jQuery( document ).ready(
 							alert( 'Payment released' );
 							location.reload();
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Release failed: ' + result.error + '</b>' );
+							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="red">Release failed: ' + result.error + '</strong>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}
