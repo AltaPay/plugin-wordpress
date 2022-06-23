@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.2.9
+ * Version: 3.3.0
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 6.2.0
+ * WC tested up to: 6.6.0
  *
  * @package Altapay
  */
@@ -74,13 +74,13 @@ function altapay_add_gateway( $methods ) {
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
-			$tokenStatus = '';
+			$tokenStatus  = '';
 			$terminalName = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
-					$terminalName   = $term->name;
-					foreach ( $term->nature as $nature ){
-						if( $nature->Nature === "CreditCard"){
+					$terminalName = $term->name;
+					foreach ( $term->nature as $nature ) {
+						if ( $nature->Nature === 'CreditCard' ) {
 							$tokenStatus = 'CreditCard';
 							break;
 						}
@@ -142,6 +142,7 @@ function altapay_page_template( $template ) {
 
 /**
  * Register meta box for order details page
+ *
  * @return bool
  */
 function altapayAddMetaBoxes() {
@@ -348,27 +349,27 @@ function altapayCaptureCallback() {
 		$orderLines = array();
 		if ( $postOrderLines ) {
 			$selectedProducts = array(
-				'skuList' => array(),
-				'skuQty'  => array(),
+				'itemList' => array(),
+				'itemQty'  => array(),
 			);
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['skuList'][]                          = $productData[0]['value'];
-					$selectedProducts['skuQty'][ $productData[0]['value'] ] = $productData[1]['value'];
+					$selectedProducts['itemList'][]                          = $productData[0]['value'];
+					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
 
 			$orderLines = $utilMethods->createOrderLines( $order, $selectedProducts );
 		}
 
-		$response = null;
+		$response    = null;
 		$rawResponse = null;
 		try {
 			$api = new CaptureReservation( $settings->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
-			$response = $api->call();
+			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
 			error_log( 'Response header exception ' . $e->getMessage() );
@@ -382,10 +383,10 @@ function altapayCaptureCallback() {
 			wp_send_json_error( array( 'error' => __( 'Could not capture reservation' ) ) );
 		}
 
-		$charge      = 0;
-		$reserved    = 0;
-		$captured    = 0;
-		$refunded    = 0;
+		$charge   = 0;
+		$reserved = 0;
+		$captured = 0;
+		$refunded = 0;
 
 		if ( $rawResponse ) {
 			$body = $rawResponse->getBody();
@@ -464,13 +465,13 @@ function altapayRefundCallback() {
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 		if ( $postOrderLines ) {
 			$selectedProducts = array(
-				'skuList' => array(),
-				'skuQty'  => array(),
+				'itemList' => array(),
+				'itemQty'  => array(),
 			);
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['skuList'][]                          = $productData[0]['value'];
-					$selectedProducts['skuQty'][ $productData[0]['value'] ] = $productData[1]['value'];
+					$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
+					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
 			$orderLines         = $utilMethods->createOrderLines( $order, $selectedProducts );

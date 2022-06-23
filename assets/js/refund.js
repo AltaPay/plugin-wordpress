@@ -62,15 +62,15 @@ jQuery( document ).ready(
 					function (response) {
 						var result = response.data;
 						if (response.success === true) {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Payment refunded.</b>' )
+							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="green">Payment refunded.</strong>' );
 							jQuery( '.payment-reserved' ).text( result.reserved );
 							jQuery( '.payment-captured' ).text( result.captured );
 							jQuery( '.payment-refunded' ).text( result.refunded );
 							jQuery( '.payment-chargeable' ).text( result.chargeable );
 							jQuery( 'ul.order_notes' ).prepend( result.note );
-							location.reload();
+							window.setTimeout(function(){location.reload()},1000);
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<b>Refund failed: ' + result.error + '</b>' );
+							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="red">Refund failed: ' + result.error + '</strong>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}

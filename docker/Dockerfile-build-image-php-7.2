@@ -1,6 +1,6 @@
-FROM php:7.0-cli
+FROM php:7.2-cli
 RUN apt-get update && apt-get install -y libmemcached-dev zlib1g-dev \
-	&& ln -s /usr/local/bin/php /usr/local/bin/php7.0 \
+	&& ln -s /usr/local/bin/php /usr/local/bin/php7.2 \
 	&& apt-get install -yq zip \
 	&& php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 	&& php composer-setup.php \

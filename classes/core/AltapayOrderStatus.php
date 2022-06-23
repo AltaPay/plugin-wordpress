@@ -36,7 +36,7 @@ class AltapayOrderStatus {
 	 * @param string   $nextStatus
 	 * @param WC_Order $order
 	 *
-	 * @return WP_Error
+	 * @return void|WP_Error
 	 */
 	public function orderStatusChanged( $orderID, $currentStatus, $nextStatus, $order ) {
 		$txnID    = $order->get_transaction_id();
@@ -63,7 +63,7 @@ class AltapayOrderStatus {
 				$reserved += $pay->ReservedAmount;
 				$captured += $pay->CapturedAmount;
 				$refunded += $pay->RefundedAmount;
-				$status   += $pay->TransactionStatus;
+				$status    = $pay->TransactionStatus;
 			}
 		}
 
