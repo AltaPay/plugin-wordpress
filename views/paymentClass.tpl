@@ -457,6 +457,28 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
+	* Process refund.
+	*
+	* If the gateway declares 'refunds' support, this will allow it to refund.
+	* a passed in amount.
+	*
+	* @param  int        $order_id Order ID.
+	* @param  float|null $amount Refund amount.
+	* @param  string     $reason Refund reason.
+	* @return boolean True on success, or a WP_Error object.
+	*/
+	public function process_refund( $order_id, $amount = null, $reason = '' ) {
+
+		$refund = altapayRefundPayment( $order_id, $amount, $reason );
+
+		if ( isset( $refund['error'] ) ) {
+			return new WP_Error( 'error', __( $refund['error'], 'altapay' ) );
+		}
+
+		return true;
+	}
+
+	/**
 	 * @param array   $addressInfo
 	 * @param Address $address
 	 *
