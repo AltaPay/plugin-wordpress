@@ -469,7 +469,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	*/
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 
-		$refund = altapayRefundPayment( $order_id, $amount, $reason );
+		$refund = altapayRefundPayment( $order_id, $amount, $reason, false );
 
 		if ( isset( $refund['error'] ) ) {
 			return new WP_Error( 'error', __( $refund['error'], 'altapay' ) );

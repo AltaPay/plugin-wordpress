@@ -443,7 +443,7 @@ function altapayRefundCallback() {
 	$orderID = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 	$amount  = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : 0;
 
-	$refund = altapayRefundPayment( $orderID, $amount, null );
+	$refund = altapayRefundPayment( $orderID, $amount, null, true );
 
 	if ( $refund['success'] === true ) {
 		wp_send_json_success( $refund );
@@ -459,9 +459,10 @@ function altapayRefundCallback() {
  * @param int        $orderID Order ID.
  * @param float|null $amount Refund amount.
  * @param string     $reason Refund reason.
+ * @param boolean    $isAjax
  * @return array
  */
-function altapayRefundPayment( $orderID, $amount, $reason ) {
+function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 
 	$utilMethods        = new Util\UtilMethods();
 	$settings           = new Core\AltapaySettings();
@@ -518,21 +519,25 @@ function altapayRefundPayment( $orderID, $amount, $reason ) {
 		try {
 			$response = $api->call();
 			if ( $response->Result === 'Success' ) {
-				// Restock the items
-				$refundOperation = wc_create_refund(
-					array(
-						'amount'         => $amount,
-						'reason'         => $reason,
-						'order_id'       => $orderID,
-						'line_items'     => $wcRefundOrderLines,
-						'refund_payment' => false,
-						'restock_items'  => true,
-					)
-				);
-				if ( $refundOperation instanceof WP_Error ) {
-					$order->add_order_note( __( $refundOperation->get_error_message(), 'altapay' ) );
-				} else {
-					$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
+				// Create refund in WooCommerce
+				if ( $isAjax ) {
+					// Restock the items
+					$refundOperation = wc_create_refund(
+						array(
+							'amount'         => $amount,
+							'reason'         => $reason,
+							'order_id'       => $orderID,
+							'line_items'     => $wcRefundOrderLines,
+							'refund_payment' => false,
+							'restock_items'  => true,
+						)
+					);
+
+					if ( $refundOperation instanceof WP_Error ) {
+						$order->add_order_note( __( $refundOperation->get_error_message(), 'altapay' ) );
+					} else {
+						$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
+					}
 				}
 				update_post_meta( $orderID, '_refunded', true );
 				$refundFlag = true;
