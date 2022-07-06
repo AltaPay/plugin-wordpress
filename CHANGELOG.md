@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.3.1]
-- Add support for refund with WooCommerce default form
+- Add support for WooCommerce default refund button
 
 ## [3.3.0]
 - Update minimum PHP supported version to 7.2
