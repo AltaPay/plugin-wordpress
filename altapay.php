@@ -465,8 +465,8 @@ function altapayRefundPayment( $orderID, $amount, $reason ) {
 
 	$utilMethods        = new Util\UtilMethods();
 	$settings           = new Core\AltapaySettings();
-	$orderLines         = array( array() );
-	$wcRefundOrderLines = array( array() );
+	$orderLines         = array();
+	$wcRefundOrderLines = array();
 
 	if ( ! $orderID || ! $amount ) {
 		return array( 'error' => 'Invalid order' );
