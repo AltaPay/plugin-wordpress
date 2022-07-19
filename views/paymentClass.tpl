@@ -9,6 +9,7 @@
 
 use Altapay\Helpers\Traits\AltapayMaster;
 use Altapay\Classes\Util;
+use Altapay\Classes\Core;
 use Altapay\Helpers;
 use Altapay\Api\Ecommerce\PaymentRequest;
 use Altapay\Request\Address;
@@ -136,14 +137,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function init_form_fields() {
-		$tokenStatus = '{tokenStatus}';
-		if($tokenStatus === 'CreditCard'){
-			$this->form_fields = include __DIR__. '/../includes/AltapayFormFieldsToken.php';
-		} else {
 			$this->form_fields = include __DIR__. '/../includes/AltapayFormFields.php';
-		}
-
 	}
+
 	/**
 	 * @param int $order_id
 	 *
@@ -152,7 +148,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function createPaymentRequest( $order_id ) {
 		global $wpdb;
-		$utilMethods = new Util\UtilMethods;
+		$utilMethods 	= new Util\UtilMethods;
 		$altapayHelpers = new Helpers\AltapayHelpers;
 		// Create form request etc.
 		$login = $this->altapayApiLogin();
@@ -163,13 +159,13 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$order = new WC_Order( $order_id );
 
 		// TODO Get terminal form instance
-		$terminal = $this->terminal;
-		$amount = $order->get_total();
-		$currency = $order->get_currency();
-		$customerInfo = $this->setCustomer( $order );
-		$cookie = isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
-		$language = 'en';
-		$languages = array(
+		$terminal 		= $this->terminal;
+		$amount 		= $order->get_total();
+		$currency		= $order->get_currency();
+		$customerInfo	= $this->setCustomer( $order );
+		$cookie 		= isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
+		$language 		= 'en';
+		$languages 		= array(
 			'da_DK' => 'da',
 			'sv_SE' => 'sv',
 			'nn_NO' => 'no',
@@ -225,7 +221,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			),
 		);
 
-		$config       = new Config();
+		$config = new Config();
 		$config->setCallbackOk( $configUrl['callback_ok'] );
 		$config->setCallbackFail( $configUrl['callback_fail'] );
 		$config->setCallbackOpen( $configUrl['callback_open'] );
@@ -330,7 +326,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
-			$maskedCCNo		= isset( $_POST['masked_credit_card'] ) ? sanitize_text_field( wp_unslash( $_POST['masked_credit_card'] ) ) : '';
 			$amount         = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
 			$credToken      = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
 			$merchantError  = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
@@ -344,9 +339,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$xml                  = new SimpleXMLElement( $xmlResponse );
 			$xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
 			$jsonToArray          = json_decode( $xmlToJson, true );
-			$creditCardCardBrand  = $jsonToArray['PaymentSchemeName'];
-			$creditCardExpiryDate = isset( $jsonToArray['CreditCardExpiry'] ) ? ( $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'] ) : '';
 
+			$paymentScheme  = $jsonToArray['PaymentSchemeName'];
+			$lastFourDigits = $jsonToArray['CardInformation']['LastFourDigits'] ?? '';
+			$ccToken        = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
+			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) ) : false;
+			$ccExpiryDate = isset( $jsonToArray['CreditCardExpiry'] ) ? ( $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'] ) : '';
 			$order = new WC_Order( $order_id );
 
 			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
@@ -375,10 +373,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$order->payment_complete();
 
 					update_post_meta( $order_id, '_transaction_id', $txnId );
-					update_post_meta( $order_id, '_cardno', $maskedCCNo );
-					update_post_meta( $order_id, '_credit_card_token', $credToken );
-					update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
-					update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );
+
+					if ( $saveCreditCard ) {
+						$objTokenControl = new Core\AltapayTokenControl();
+						$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
+					}
 
 				} else {
 					if ( $status === 'error' || $status === 'failed' ) {
@@ -424,10 +423,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
 				$order->payment_complete();
 				update_post_meta( $order_id, '_transaction_id', $txnId );
-				update_post_meta( $order_id, '_cardno', $maskedCCNo );
-				update_post_meta( $order_id, '_credit_card_token', $credToken );
-				update_post_meta( $order_id, '_credit_card_brand', $creditCardCardBrand );
-				update_post_meta( $order_id, '_credit_card_expiry_date', $creditCardExpiryDate );
+
+				if ( $saveCreditCard ) {
+					$objTokenControl = new Core\AltapayTokenControl();
+					$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
+				}
 			}
 
 			// Redirect to Order Confirmation Page
@@ -526,7 +526,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		}
 		$customer = new Customer( $address );
 		if ( $order->get_shipping_address_1() ) {
-			$shippingAddress         = new Address();
+			$shippingAddress = new Address();
 			$this->populateAddressObject( $shippingInfo, $shippingAddress );
 			$customer->setShipping( $shippingAddress );
 		} else {

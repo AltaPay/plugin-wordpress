@@ -21,17 +21,17 @@
     <form method="post">
         <table class="responsive-table bordered centered">
             <tbody>
-                <tr style="font-weight: bold; border-collapse: collapse; padding: 15px;">
-                    <td>Card type</td>
-                    <td>Masked pan</td>
-                    <td>Expires</td>
-                    <td>Action</td>
+                <tr>
+                    <th>Card type</th>
+                    <th>Last 4 Digits</th>
+                    <th>Expires</th>
+                    <th>Action</th>
                 </tr>
             </tbody>
             @foreach($results as $result)
             <tr class="ap-orderlines-capture">
                 <td> {{$result->cardBrand}} </td>
-                <!-- masked credit card number  -->
+                <!-- Last 4 Digits  -->
                 <td> {{$result->creditCardNumber}} </td>
                 <td> {{$result->cardExpiryDate}} </td>
                 <td><a href="{{wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) )}}?delete_card={{$result->creditCardNumber}}">Delete</a></td>

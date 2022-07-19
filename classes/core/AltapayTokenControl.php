@@ -14,7 +14,6 @@ use WC_Checkout;
 
 class AltapayTokenControl {
 
-
 	/**
 	 * Register required hooks
 	 *
@@ -33,7 +32,7 @@ class AltapayTokenControl {
 			2
 		);
 		add_action( 'woocommerce_checkout_process', array( $this, 'setCreditCardSessionVariable' ) );
-		add_action ('wp_loaded', array( $this, 'altapay_saved_credit_card_actions' ) );
+		add_action( 'wp_loaded', array( $this, 'altapay_saved_credit_card_actions' ) );
 	}
 
 	/**
@@ -76,14 +75,14 @@ class AltapayTokenControl {
 		$blade   = new Helpers\AltapayHelpers();
 		echo _( '<h3>Saved credit card(s)</h3>' );
 
-		if($results){
+		if ( $results ) {
 			echo $blade->loadBladeLibrary()->run(
 				'tables.creditCard',
 				array(
 					'results' => $results,
 				)
 			);
-		}else{
+		} else {
 			echo _( 'No saved credit cards.' );
 		}
 	}
@@ -103,35 +102,30 @@ class AltapayTokenControl {
 		if ( $gateways ) {
 			foreach ( $gateways as $gateway ) {
 
-				if ( $gateway->enabled === 'yes' && isset( $gateway->settings['token_control'] )
-					&& $gateway->settings['token_control'] === 'yes'
-				) {
+				if ( $gateway->enabled === 'yes' && $gateway->id === $payment_id && is_user_logged_in() ) {
+					ob_start();
+					global $wpdb;
 
-					if ( $gateway->id === $payment_id && is_user_logged_in() ) {
-						ob_start();
-						global $wpdb;
+					$userID  = get_current_user_id();
+					$results
+							= $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
 
-						$userID  = get_current_user_id();
-						$results
-								= $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
-
-						$creditCard[] = _( 'Select a saved credit card' );
-						foreach ( $results as $result ) {
-							$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
-						}
-
-						woocommerce_form_field(
-							'savedCreditCard',
-							array(
-								'type'    => 'select',
-								'class'   => array( 'wps-drop' ),
-								'options' => $creditCard,
-								'default' => '',
-							),
-							$checkout->get_value( 'savedCreditCard' )
-						);
-						$description .= ob_get_clean(); // Append buffered content
+					$creditCard[] = _( 'Select a saved credit card' );
+					foreach ( $results as $result ) {
+						$creditCard[ $result->creditCardNumber ] = '**********' . $result->creditCardNumber; // Last four digits
 					}
+
+					woocommerce_form_field(
+						'savedCreditCard',
+						array(
+							'type'    => 'select',
+							'class'   => array( 'wps-drop' ),
+							'options' => $creditCard,
+							'default' => '',
+						),
+						$checkout->get_value( 'savedCreditCard' )
+					);
+					$description .= ob_get_clean(); // Append buffered content
 				}
 			}
 		}
@@ -141,7 +135,7 @@ class AltapayTokenControl {
 
 
 	/**
-	 * Display Saved Credit Card Details button after successful order
+	 * Display button to navigate to saved credit card(s) page
 	 *
 	 * @param string   $text
 	 * @param WC_Order $order
@@ -149,66 +143,56 @@ class AltapayTokenControl {
 	 * @return string|void
 	 */
 	public function filterSaveCreditCardDetailsButton( $text, $order ) {
-		global $wpdb;
-
 		// Get payment methods
 		$paymentMethods = WC()->payment_gateways->get_available_payment_gateways();
 
 		$orderMeta          = get_metadata( 'post', $order->get_id() );
-		$maskedCCNo			= $orderMeta['_cardno'][0]; // masked credit card number
-		$ccToken            = $orderMeta['_credit_card_token'][0];
-		$ccBrand            = $orderMeta['_credit_card_brand'][0];
-		$ccExpiryDate       = $orderMeta['_credit_card_expiry_date'][0];
 		$orderPaymentMethod = $orderMeta['_payment_method'][0];
-		$buttonText         = _( 'Save your credit card for later use' );
+		$saveCreditCard     = $orderMeta['_save_credit_card'][0];
 
-		$results = $wpdb->get_results(
-			"SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='"
-									  . get_current_user_id() . "' and ccToken='$ccToken'"
-		);
+		$buttonText = _( 'Credit card saved for later use' );
 
-		if ( array_key_exists( 'save_credit_card', $_POST ) ) {
-			$this->saveCreditCardDetails( $maskedCCNo, $ccToken, $ccBrand, $ccExpiryDate );
-		}
-
-		if ( ! empty( $orderMeta['_cardno'][0] ) && ! $results && is_user_logged_in() ) {
-			if ( $paymentMethods[ $orderPaymentMethod ]->settings['enabled'] === 'yes'
-				&& $paymentMethods[ $orderPaymentMethod ]->settings['token_control'] === 'yes'
-			) {
-				return '<form method="post" action="">
-		<input type="submit" name="save_credit_card" id="save_credit_card" value="' . $buttonText . '" /><br/>
-		</form>';
-			}
+		if ( is_user_logged_in() && $saveCreditCard && $paymentMethods[ $orderPaymentMethod ]->settings['enabled'] === 'yes' ) {
+			return '<a href="' . esc_url( wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) ) ) . '">' . $buttonText . '</a>';
 		}
 	}
 
 	/**
 	 * Save the credit card details in the database - Triggered when save credit card details button
 	 *
-	 * @param string $maskedCCNo
+	 * @param int    $orderId
+	 * @param string $lastFourDigits
 	 * @param string $ccToken
 	 * @param string $ccBrand
 	 * @param string $ccExpiryDate
 	 *
 	 * @return void
 	 */
-	public function saveCreditCardDetails( $maskedCCNo, $ccToken, $ccBrand, $ccExpiryDate ) {
+	public function saveCreditCardDetails( $orderId, $lastFourDigits, $ccToken, $ccBrand, $ccExpiryDate ) {
 		global $wpdb;
 
+		$record_exists = $wpdb->get_var(
+			$wpdb->prepare( "SELECT id from {$wpdb->prefix}altapayCreditCardDetails where userID = %d and ccToken = %s", get_current_user_id(), $ccToken )
+		);
+
+		if ( $record_exists ) {
+			return;
+		}
+
 		$wpdb->insert(
-			'wp_' . 'altapayCreditCardDetails',
+			$wpdb->prefix . 'altapayCreditCardDetails',
 			array(
 				'time'             => date( 'Y-m-d H:i:s' ),
 				'userID'           => get_current_user_id(),
 				'cardBrand'        => $ccBrand,
-				'creditCardNumber' => $maskedCCNo,
+				'creditCardNumber' => $lastFourDigits,
 				'cardExpiryDate'   => $ccExpiryDate,
 				'ccToken'          => $ccToken,
-			)
+			),
+			array( '%s', '%d', '%s', '%s', '%s', '%s' )
 		);
-		// Redirect user to Saved credit card(s) section of my account page
-		wp_redirect( wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) ) );
-		exit;
+
+		update_post_meta( $orderId, '_save_credit_card', true );
 	}
 
 	/**
@@ -223,17 +207,23 @@ class AltapayTokenControl {
 	}
 
 	/**
-	 * 
+	 *
 	 * Method to handle the delete action against the saved credit card.
-	 * 
+	 *
 	 * @return void
 	 */
 
 	function altapay_saved_credit_card_actions() {
 		global $wpdb;
-	
-		if (isset($_GET['delete_card'])) {
-			$wpdb->delete($wpdb->prefix . 'altapayCreditCardDetails', array('creditCardNumber' => $_GET['delete_card'], 'userID' => get_current_user_id()));
+
+		if ( isset( $_GET['delete_card'] ) ) {
+			$wpdb->delete(
+				$wpdb->prefix . 'altapayCreditCardDetails',
+				array(
+					'creditCardNumber' => $_GET['delete_card'],
+					'userID'           => get_current_user_id(),
+				)
+			);
 			wp_redirect( wc_get_endpoint_url( 'saved-credit-cards', '', get_permalink( wc_get_page_id( 'myaccount' ) ) ) );
 			exit;
 		}
