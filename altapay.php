@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.3.0
+ * Version: 3.3.1
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 6.6.0
+ * WC tested up to: 6.6.1
  *
  * @package Altapay
  */
@@ -437,166 +437,192 @@ function altapayCaptureCallback() {
 /**
  * Method for handling refund action and call back
  *
- * @return WP_Error
+ * @return void
  */
 function altapayRefundCallback() {
-	$utilMethods        = new Util\UtilMethods();
-	$settings           = new Core\AltapaySettings();
-	$orderLines         = array( array() );
-	$wcRefundOrderLines = array( array() );
-	$orderID            = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
-	$amount             = (float) $_POST['amount'];
+	$orderID = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
+	$amount  = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : 0;
 
-	if ( ! $orderID || ! $amount ) {
-		wp_send_json_error( array( 'error' => 'error' ) );
-	}
+	$refund = altapayRefundPayment( $orderID, $amount, null, true );
 
-	// Load order
-	$order = new WC_Order( $orderID );
-	$txnID = $order->get_transaction_id();
-	if ( $txnID ) {
-		$login = $settings->altapayApiLogin();
-		if ( ! $login ) {
-			wp_send_json_error( array( 'error' => 'Could not login to the Merchant API:' ) );
-		} elseif ( is_wp_error( $login ) ) {
-			wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
-		}
-
-		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
-		if ( $postOrderLines ) {
-			$selectedProducts = array(
-				'itemList' => array(),
-				'itemQty'  => array(),
-			);
-			foreach ( $postOrderLines as $productData ) {
-				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
-					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
-				}
-			}
-			$orderLines         = $utilMethods->createOrderLines( $order, $selectedProducts );
-			$wcRefundOrderLines = $utilMethods->createOrderLines( $order, $selectedProducts, true );
-		}
-
-		// Refund the amount OR release if a refund is not possible
-		$releaseFlag = false;
-		$refundFlag  = false;
-		$auth        = $settings->getAuth();
-		$error       = '';
-
-		if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
-
-			$api = new RefundCapturedReservation( $auth );
-			$api->setAmount( round( $amount, 2 ) );
-			$api->setOrderLines( $orderLines );
-			$api->setTransaction( $txnID );
-
-			try {
-				$response = $api->call();
-				if ( $response->Result === 'Success' ) {
-					// Restock the items
-					$refundOperation = wc_create_refund(
-						array(
-							'amount'         => $amount,
-							'reason'         => null,
-							'order_id'       => $orderID,
-							'line_items'     => $wcRefundOrderLines,
-							'refund_payment' => false,
-							'restock_items'  => true,
-						)
-					);
-					if ( $refundOperation instanceof WP_Error ) {
-						$order->add_order_note( __( $refundOperation->get_error_message(), 'altapay' ) );
-					} else {
-						$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
-					}
-					update_post_meta( $orderID, '_refunded', true );
-					$refundFlag = true;
-				} else {
-					$error = $response->MerchantErrorMessage;
-				}
-			} catch ( ResponseHeaderException $e ) {
-				$error = 'Response header exception ' . $e->getMessage();
-			} catch ( \Exception $e ) {
-				$error = 'Response header exception ' . $e->getMessage();
-			}
-		} elseif ( $order->get_remaining_refund_amount() == 0 ) {
-
-			try {
-				$api = new ReleaseReservation( $auth );
-				$api->setTransaction( $txnID );
-				/** @var ReleaseReservationResponse $response */
-				$response = $api->call();
-				if ( $response->Result === 'Success' ) {
-					$releaseFlag = true;
-					$refundFlag  = true;
-					update_post_meta( $orderID, '_released', true );
-				} else {
-					$error = $response->MerchantErrorMessage;
-				}
-			} catch ( ResponseHeaderException $e ) {
-				$error = 'Response header exception ' . $e->getMessage();
-			}
-		}
-
-		if ( ! $refundFlag ) {
-			$order->add_order_note( __( 'Refund failed: ' . $error, 'altapay' ) );
-			wp_send_json_error( array( 'error' => $error ) );
-		} else {
-			$reserved = 0;
-			$captured = 0;
-			$refunded = 0;
-			$api      = new Payments( $auth );
-			$api->setTransaction( $txnID );
-			$payments = $api->call();
-
-			if ( $payments ) {
-				foreach ( $payments as $pay ) {
-					$reserved += $pay->ReservedAmount;
-					$captured += $pay->CapturedAmount;
-					$refunded += $pay->RefundedAmount;
-				}
-			}
-
-			$charge = $reserved - $captured - $refunded;
-			if ( $charge <= 0 ) {
-				$charge = 0.00;
-			}
-
-			if ( $releaseFlag ) {
-				$order->add_order_note( __( 'Order released', 'altapay' ) );
-				$orderNote = 'The order has been released';
-			} else {
-				$order->add_order_note( __( 'Order refunded: amount ' . $amount, 'altapay' ) );
-				$orderNote = 'Order refunded: amount ' . $amount;
-			}
-			$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
-				__(
-					'added on %1$s at %2$s',
-					'woocommerce'
-				),
-				date_i18n( wc_date_format(), time() ),
-				date_i18n( wc_time_format(), time() )
-			) . '</abbr></p></li>';
-			wp_send_json_success(
-				array(
-					'captured'   => $captured,
-					'reserved'   => $reserved,
-					'refunded'   => $refunded,
-					'chargeable' => round( $charge, 2 ),
-					'note'       => $noteHtml,
-				)
-			);
-		}
+	if ( $refund['success'] === true ) {
+		wp_send_json_success( $refund );
+	} else {
+		$error = $refund['error'] ?? 'Error in the refund operation.';
+		wp_send_json_error( array( 'error' => __( $error, 'altapay' ) ) );
 	}
 
 	wp_die();
 }
 
 /**
+ * @param int        $orderID Order ID.
+ * @param float|null $amount Refund amount.
+ * @param string     $reason Refund reason.
+ * @param boolean    $isAjax
+ * @return array
+ */
+function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
+
+	$utilMethods        = new Util\UtilMethods();
+	$settings           = new Core\AltapaySettings();
+	$orderLines         = array();
+	$wcRefundOrderLines = array();
+
+	if ( ! $orderID || ! $amount ) {
+		return array( 'error' => 'Invalid order' );
+	}
+
+	// Load order
+	$order = new WC_Order( $orderID );
+	$txnID = $order->get_transaction_id();
+	if ( ! $txnID ) {
+		return array( 'error' => 'Invalid order' );
+	}
+
+	$login = $settings->altapayApiLogin();
+	if ( ! $login ) {
+		return array( 'error' => 'Could not login to the Merchant API:' );
+	} elseif ( is_wp_error( $login ) ) {
+		return array( 'error' => wp_kses_post( $login->get_error_message() ) );
+	}
+
+	$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
+	if ( $postOrderLines ) {
+		$selectedProducts = array(
+			'itemList' => array(),
+			'itemQty'  => array(),
+		);
+		foreach ( $postOrderLines as $productData ) {
+			if ( $productData[1]['value'] > 0 ) {
+				$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
+				$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
+			}
+		}
+		$orderLines         = $utilMethods->createOrderLines( $order, $selectedProducts );
+		$wcRefundOrderLines = $utilMethods->createOrderLines( $order, $selectedProducts, true );
+	}
+
+	// Refund the amount OR release if a refund is not possible
+	$releaseFlag = false;
+	$refundFlag  = false;
+	$auth        = $settings->getAuth();
+	$error       = '';
+
+	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
+
+		$api = new RefundCapturedReservation( $auth );
+		$api->setAmount( round( $amount, 2 ) );
+		$api->setOrderLines( $orderLines );
+		$api->setTransaction( $txnID );
+
+		try {
+			$response = $api->call();
+			if ( $response->Result === 'Success' ) {
+				// Create refund in WooCommerce
+				if ( $isAjax ) {
+					// Restock the items
+					$refundOperation = wc_create_refund(
+						array(
+							'amount'         => $amount,
+							'reason'         => $reason,
+							'order_id'       => $orderID,
+							'line_items'     => $wcRefundOrderLines,
+							'refund_payment' => false,
+							'restock_items'  => true,
+						)
+					);
+
+					if ( $refundOperation instanceof WP_Error ) {
+						$order->add_order_note( __( $refundOperation->get_error_message(), 'altapay' ) );
+					} else {
+						$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
+					}
+				}
+				update_post_meta( $orderID, '_refunded', true );
+				$refundFlag = true;
+			} else {
+				$error = $response->MerchantErrorMessage;
+			}
+		} catch ( ResponseHeaderException $e ) {
+			$error = 'Response header exception ' . $e->getMessage();
+		} catch ( \Exception $e ) {
+			$error = 'Response header exception ' . $e->getMessage();
+		}
+	} elseif ( $order->get_remaining_refund_amount() == 0 ) {
+
+		try {
+			$api = new ReleaseReservation( $auth );
+			$api->setTransaction( $txnID );
+			/** @var ReleaseReservationResponse $response */
+			$response = $api->call();
+			if ( $response->Result === 'Success' ) {
+				$releaseFlag = true;
+				$refundFlag  = true;
+				update_post_meta( $orderID, '_released', true );
+			} else {
+				$error = $response->MerchantErrorMessage;
+			}
+		} catch ( ResponseHeaderException $e ) {
+			$error = 'Response header exception ' . $e->getMessage();
+		}
+	}
+
+	if ( ! $refundFlag ) {
+		$order->add_order_note( __( 'Refund failed: ' . $error, 'altapay' ) );
+		return array( 'error' => $error );
+	} else {
+		$reserved = 0;
+		$captured = 0;
+		$refunded = 0;
+		$api      = new Payments( $auth );
+		$api->setTransaction( $txnID );
+		$payments = $api->call();
+
+		if ( $payments ) {
+			foreach ( $payments as $pay ) {
+				$reserved += $pay->ReservedAmount;
+				$captured += $pay->CapturedAmount;
+				$refunded += $pay->RefundedAmount;
+			}
+		}
+
+		$charge = $reserved - $captured - $refunded;
+		if ( $charge <= 0 ) {
+			$charge = 0.00;
+		}
+
+		if ( $releaseFlag ) {
+			$order->add_order_note( __( 'Order released', 'altapay' ) );
+			$orderNote = 'The order has been released';
+		} else {
+			$order->add_order_note( __( 'Order refunded: amount ' . $amount, 'altapay' ) );
+			$orderNote = 'Order refunded: amount ' . $amount;
+		}
+		$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
+			__(
+				'added on %1$s at %2$s',
+				'woocommerce'
+			),
+			date_i18n( wc_date_format(), time() ),
+			date_i18n( wc_time_format(), time() )
+		) . '</abbr></p></li>';
+
+		return array(
+			'captured'   => $captured,
+			'reserved'   => $reserved,
+			'refunded'   => $refunded,
+			'chargeable' => round( $charge, 2 ),
+			'note'       => $noteHtml,
+			'success'    => true,
+		);
+	}
+}
+
+/**
  * Method for handling release action and call back
  *
- * @return WP_Error
+ * @return void
  */
 function altapayReleasePayment() {
 	$orderID  = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
@@ -650,7 +676,7 @@ function altapayReleasePayment() {
 			wp_send_json_error( array( 'error' => $response->MerchantErrorMessage ) );
 		}
 	} catch ( Exception $e ) {
-		return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
+		wp_send_json_error( array( 'error' => 'Could not login to the Merchant API: ' . $e->getMessage() ) );
 	}
 	wp_die();
 }
