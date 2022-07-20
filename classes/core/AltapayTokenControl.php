@@ -107,24 +107,25 @@ class AltapayTokenControl {
 					global $wpdb;
 
 					$userID  = get_current_user_id();
-					$results
-							= $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
+					$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
 
-					$creditCard[] = _( 'Select a saved credit card' );
-					foreach ( $results as $result ) {
-						$creditCard[ $result->creditCardNumber ] = '**********' . $result->creditCardNumber; // Last four digits
+					if ( $results ) {
+						$creditCard[] = _( 'Select a saved credit card' );
+						foreach ( $results as $result ) {
+							$creditCard[ $result->creditCardNumber ] = '**********' . $result->creditCardNumber; // Last four digits
+						}
+
+						woocommerce_form_field(
+							'savedCreditCard',
+							array(
+								'type'    => 'select',
+								'class'   => array( 'wps-drop' ),
+								'options' => $creditCard,
+								'default' => '',
+							),
+							$checkout->get_value( 'savedCreditCard' )
+						);
 					}
-
-					woocommerce_form_field(
-						'savedCreditCard',
-						array(
-							'type'    => 'select',
-							'class'   => array( 'wps-drop' ),
-							'options' => $creditCard,
-							'default' => '',
-						),
-						$checkout->get_value( 'savedCreditCard' )
-					);
 					$description .= ob_get_clean(); // Append buffered content
 				}
 			}
@@ -147,8 +148,8 @@ class AltapayTokenControl {
 		$paymentMethods = WC()->payment_gateways->get_available_payment_gateways();
 
 		$orderMeta          = get_metadata( 'post', $order->get_id() );
-		$orderPaymentMethod = $orderMeta['_payment_method'][0];
-		$saveCreditCard     = $orderMeta['_save_credit_card'][0];
+		$orderPaymentMethod = $orderMeta['_payment_method'][0] ?? '';
+		$saveCreditCard     = $orderMeta['_save_credit_card'][0] ?? false;
 
 		$buttonText = _( 'Credit card saved for later use' );
 
