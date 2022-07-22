@@ -74,10 +74,17 @@ function altapay_add_gateway( $methods ) {
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
+			$tokenStatus  = '';
 			$terminalName = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
 					$terminalName = $term->name;
+					foreach ( $term->nature as $nature ) {
+						if ( $nature->Nature === 'CreditCard' ) {
+							$tokenStatus = 'CreditCard';
+							break;
+						}
+					}
 				}
 			}
 
@@ -100,7 +107,7 @@ function altapay_add_gateway( $methods ) {
 					$filename = $tmpDir . '/' . $terminal . '.class.php';
 				}
 				// Replace patterns
-				$content = str_replace( array( '{key}', '{name}' ), array( $terminal, $terminalName ), $template );
+				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}' ), array( $terminal, $terminalName, $tokenStatus ), $template );
 
 				file_put_contents( $filename, $content );
 			}

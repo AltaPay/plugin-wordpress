@@ -137,7 +137,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function init_form_fields() {
+		$tokenStatus = '{tokenStatus}';
+		if($tokenStatus === 'CreditCard'){
+			$this->form_fields = include __DIR__. '/../includes/AltapayFormFieldsToken.php';
+		} else {
 			$this->form_fields = include __DIR__. '/../includes/AltapayFormFields.php';
+		}
 	}
 
 	/**
