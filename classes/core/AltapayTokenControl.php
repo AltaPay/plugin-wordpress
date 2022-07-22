@@ -102,9 +102,9 @@ class AltapayTokenControl {
 		if ( $gateways ) {
 			foreach ( $gateways as $gateway ) {
 
-				if (  $gateway->enabled === 'yes' && isset( $gateway->settings['token_control'] )
-                    && $gateway->settings['token_control'] === 'yes'
-                    && $gateway->id === $payment_id && is_user_logged_in() ) {
+				if ( $gateway->enabled === 'yes' && isset( $gateway->settings['token_control'] )
+					&& $gateway->settings['token_control'] === 'yes'
+					&& $gateway->id === $payment_id && is_user_logged_in() ) {
 					ob_start();
 					global $wpdb;
 
@@ -203,11 +203,11 @@ class AltapayTokenControl {
 	 *
 	 * @return void
 	 */
-    public function setCreditCardSessionVariable() {
-        if ( isset( $_POST['savedCreditCard'] ) ) {
-            WC()->session->set( 'cardNumber', sanitize_text_field( wp_unslash( $_POST['savedCreditCard'] ) ) );
-        }
-    }
+	public function setCreditCardSessionVariable() {
+		if ( isset( $_POST['savedCreditCard'] ) ) {
+			WC()->session->set( 'cardNumber', sanitize_text_field( wp_unslash( $_POST['savedCreditCard'] ) ) );
+		}
+	}
 
 	/**
 	 *
