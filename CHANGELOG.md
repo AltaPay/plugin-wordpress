@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.2]
+- Save credit card token based on "Save my card details" checkbox on credit card payment form.
+
 ## [3.3.1]
 - Add support for WooCommerce default refund button
 
