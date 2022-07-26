@@ -182,7 +182,7 @@
             </div>
         </section>
     </div>
-    @if (number_format($captured, 2) == 0)
+    @if ($captured == 0)
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px;">Release Payment</a>
     @endif
