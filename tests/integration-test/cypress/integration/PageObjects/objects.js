@@ -59,7 +59,7 @@ class Order {
         cy.get('#billing_city').clear().type('København Ø')
         cy.get('#billing_phone').clear().type('33 13 71 12')
         cy.get('#billing_email').clear().type('customer@email.dk')
-        cy.get('#place_order').click()
+        cy.get('#place_order').click().wait(10000)
         cy.get('#submitbutton').click().wait(8000)
         cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
             const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
