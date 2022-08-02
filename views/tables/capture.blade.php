@@ -88,7 +88,7 @@
             <td class="pv3 pr3 bb b--black-20"> {{$itemData->get_product()->get_name()}} </td>
             <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
             <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
-            <td class="ap-orderline-capture-max-quantity pv3 pr3 bb b--black-20">{{ $capturableQty }}</td>
+            <td class="ap-orderline-capture-max-quantity pv3 pr3 bb b--black-20">{{ $qty }}</td>
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercent}}</td>
             <td class="pv3 pr3 bb b--black-20"><input class="form-control ap-order-capture-modify" name="qty" value="{{$capturableQty}}" type="number"/></td>
             <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20"><span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span></td>
