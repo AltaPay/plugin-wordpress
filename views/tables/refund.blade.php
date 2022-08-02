@@ -86,16 +86,24 @@
         @endphp
 
         <tr class="ap-orderlines-refund">
-            <td style="display:none"><input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/></td>
+            <td style="display:none">
+                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/>
+            </td>
             <td class="pv3 pr3 bb b--black-20"> {{$itemData->get_product()->get_name()}} </td>
             <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
             <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
             <td class="ap-orderline-refund-max-quantity pv3 pr3 bb b--black-20">{{$qty}}</td>
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercent}}</td>
             <td class="pv3 pr3 bb b--black-20">
-                <input class="form-control ap-order-refund-modify" name="qty" value="{{$refundableQty}}" type="number"/>
+                <input class="form-control ap-order-refund-modify"
+                        name="qty"
+                        value="{{$refundableQty}}"
+                        type="number"
+                        {{ !$refundableQty ? 'disabled' : '' }} />
             </td>
-            <td class="ap-orderline-totalprice-refund pv3 pr3 bb b--black-20"><span class="totalprice-refund">{{$order->get_currency()}} {{$totalIncTax}}</span></td>
+            <td class="ap-orderline-totalprice-refund pv3 pr3 bb b--black-20">
+                <span class="totalprice-refund">{{$order->get_currency()}} {{$totalIncTax}}</span>
+            </td>
         </tr>
     @endforeach
 
