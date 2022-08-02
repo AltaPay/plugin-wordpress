@@ -412,11 +412,14 @@ function altapayCaptureCallback() {
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'InvalidArgumentException ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'InvalidArgumentException: ' . $e->getMessage() ) );
 		} catch ( ResponseHeaderException $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'ResponseHeaderException ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'ResponseHeaderException: ' . $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'Exception ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'Error: ' . $e->getMessage() ) );
 		}
 
 		if ( $response && $response->Result !== 'Success' ) {
