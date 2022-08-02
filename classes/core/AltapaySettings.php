@@ -27,6 +27,7 @@ class AltapaySettings {
 	public function __construct() {
 		// Load localization files
 		add_action( 'init', array( $this, 'altapayLocalizationInit' ) );
+		add_action( 'init', array( $this, 'altapayCapturesPostInit' ) );
 		// Add admin menu
 		add_action( 'admin_menu', array( $this, 'altapaySettingsMenu' ), 60 );
 		// Register settings
@@ -367,25 +368,25 @@ class AltapaySettings {
 	 */
 	function refreshTerminals() {
 		$login = $this->altapayApiLogin();
-        if ( ! $login || is_wp_error( $login ) ) {
-            if ( is_wp_error( $login ) ) {
-                echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
-            } else {
-                echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
-            }
-            // Delete terminals and enabled terminals from database
-            update_option( 'altapay_terminals', '' );
-            update_option( 'altapay_terminals_enabled', '' );
-            ?>
-            <script>
-                setTimeout("location.reload()", 1500);
-            </script>
-            <?php
-            return;
-        }
+		if ( ! $login || is_wp_error( $login ) ) {
+			if ( is_wp_error( $login ) ) {
+				echo '<div class="error"><p>' . wp_kses_post( $login->get_error_message() ) . '</p></div>';
+			} else {
+				echo '<div class="error"><p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p></div>';
+			}
+			// Delete terminals and enabled terminals from database
+			update_option( 'altapay_terminals', '' );
+			update_option( 'altapay_terminals_enabled', '' );
+			?>
+			<script>
+				setTimeout("location.reload()", 1500);
+			</script>
+			<?php
+			return;
+		}
 
-        echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Connection OK !', 'altapay' ) . "</p> </div>";
-		
+		echo "<div class='notice notice-success is-dismissible'> <p>" . __( 'Connection OK !', 'altapay' ) . '</p> </div>';
+
 		$terminals = array();
 		$auth      = $this->getAuth();
 		$api       = new Terminals( $auth );
@@ -448,42 +449,42 @@ class AltapaySettings {
 		}
 
 		// return if terminals does not exist
-		if ( !get_option( 'altapay_terminals' ) ) {
+		if ( ! get_option( 'altapay_terminals' ) ) {
 			echo '<div id="message" class="notice notice-error"><p>Terminals are missing. Click "Refresh connection" button to re-create terminal data.</p></div>';
 			return;
 		}
 
-		$terminals	= array();
-		$api		= new Terminals( $this->getAuth() );
-		$response	= $api->call();
-		$wcCountry	= get_option('woocommerce_default_country');
+		$terminals = array();
+		$api       = new Terminals( $this->getAuth() );
+		$response  = $api->call();
+		$wcCountry = get_option( 'woocommerce_default_country' );
 
 		foreach ( $response->Terminals as $key => $terminal ) {
 
-			if( $terminal->Country  !== $wcCountry ){
+			if ( $terminal->Country !== $wcCountry ) {
 				continue;
 			}
 
-			$terminalTitle	= str_replace(array(' ', '-'), '_', $terminal->Title);
-			$terminals[]	= $terminalTitle;
+			$terminalTitle = str_replace( array( ' ', '-' ), '_', $terminal->Title );
+			$terminals[]   = $terminalTitle;
 
 			$terminalSettings = array(
-				"enabled"        => "yes",
-				"title"          => str_replace('-', ' ', $terminal->Title),
-				"description"    => "",
-				"payment_action" => "authorize",
-				"payment_icon"   => "default",
-				"currency"       => get_option('woocommerce_currency'),
+				'enabled'        => 'yes',
+				'title'          => str_replace( '-', ' ', $terminal->Title ),
+				'description'    => '',
+				'payment_action' => 'authorize',
+				'payment_icon'   => 'default',
+				'currency'       => get_option( 'woocommerce_currency' ),
 			);
 
 			update_option(
-				'woocommerce_altapay_' . strtolower($terminalTitle) . '_settings',
+				'woocommerce_altapay_' . strtolower( $terminalTitle ) . '_settings',
 				$terminalSettings,
 				'yes'
 			);
 		}
 
-		if($terminals){
+		if ( $terminals ) {
 			delete_option( 'altapay_terminals_enabled' );
 			add_option( 'altapay_terminals_enabled', $terminals );
 		}
@@ -495,11 +496,11 @@ class AltapaySettings {
 
 	/**
 	 * Form with synchronize payment methods button on AltaPay Settings page
-	 * 
+	 *
 	 * @return void
 	 */
 	private function altapaySynchronizeTerminalsForm() {
-		$this->showUserMessage( 'altapay_sync_terminals', 'notice-success');
+		$this->showUserMessage( 'altapay_sync_terminals', 'notice-success' );
 		?>
 		<form method="post" action="">
 			<p><?php esc_html_e( 'Click below to synchronize payment methods', 'altapay' ); ?></p>
@@ -513,4 +514,23 @@ class AltapaySettings {
 		}
 	}
 
+	/**
+	 * Register post type to record captures.
+	 *
+	 * @return void
+	 */
+	function altapayCapturesPostInit() {
+
+		$args = array(
+			'labels'          => __( 'Captures', 'altapay' ),
+			'capability_type' => 'post',
+			'public'          => false,
+			'hierarchical'    => false,
+			'supports'        => false,
+			'rewrite'         => false,
+			'query_var'       => false,
+		);
+
+		register_post_type( 'altapay_captures', $args );
+	}
 }
