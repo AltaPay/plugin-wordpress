@@ -394,7 +394,7 @@ function altapayCaptureCallback() {
 		if ( $postOrderLines ) {
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['itemList'][]                          = $productData[0]['value'];
+					$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
 					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
