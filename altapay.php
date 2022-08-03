@@ -269,13 +269,13 @@ function altapay_meta_box( $post ) {
 function altapayActionJavascript() {
 	global $post;
 	if ( isset( $post->ID ) ) {
+		$postID = $post->ID;
+
 		// Check if WooCommerce order
 		if ( $post->post_type === 'shop_order' || $post->post_type === 'altapay_captures' ) {
 
-			$postID = $post->ID;
-
 			if ( $post->post_type === 'altapay_captures' ) {
-				$postID = wp_get_post_parent_id( $post->ID );
+				$postID = wp_get_post_parent_id( $postID );
 			}
 			?>
 			<script type="text/javascript">
