@@ -114,7 +114,7 @@ class AltapayTokenControl {
 					if ( $results ) {
 						$creditCard[] = _( 'Select a saved credit card' );
 						foreach ( $results as $result ) {
-							$creditCard[ $result->creditCardNumber ] = '**********' . $result->creditCardNumber; // Last four digits
+							$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
 						}
 
 						woocommerce_form_field(
@@ -188,7 +188,7 @@ class AltapayTokenControl {
 				'time'             => date( 'Y-m-d H:i:s' ),
 				'userID'           => get_current_user_id(),
 				'cardBrand'        => $ccBrand,
-				'creditCardNumber' => $lastFourDigits,
+				'creditCardNumber' => '************' . $lastFourDigits,
 				'cardExpiryDate'   => $ccExpiryDate,
 				'ccToken'          => $ccToken,
 			),
