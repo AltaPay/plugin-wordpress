@@ -125,13 +125,13 @@
                         @endphp
                         <br>
                         <div>
-                            @if (number_format($captured, 2) < number_format($reserved, 2))
-                            <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="capture-amount"
-                                   name="capture-amount" value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}"
-                                   placeholder="Amount"/>
-                            <a id="altapay_capture" class="f7 link dim ph4 pv2 mb1 dib white"
-                               style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Capture</a>
-                                @endif
+                            @if ( $captured < $reserved )
+                                <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="capture-amount"
+                                    name="capture-amount" value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}"
+                                    placeholder="Amount"/>
+                                <a id="altapay_capture" class="f7 link dim ph4 pv2 mb1 dib white"
+                                style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Capture</a>
+                            @endif
                         </div>
 
                     </div>
@@ -170,19 +170,19 @@
                     @endphp
                     <br>
                     <div>
-                        @if (number_format($refunded, 2) < number_format($reserved, 2))
-                        <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="refund-amount" name="refund-amount"
-                               value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}" placeholder="Amount"/>
-                        <a id="altapay_refund" class="f7 link dim ph4 pv2 mb1 dib white"
-                           style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Refund</a>
-                            @endif
+                        @if ( $refunded < $reserved )
+                            <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="refund-amount" name="refund-amount"
+                                value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}" placeholder="Amount"/>
+                            <a id="altapay_refund" class="f7 link dim ph4 pv2 mb1 dib white"
+                            style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Refund</a>
+                        @endif
                     </div>
 
                 </div>
             </div>
         </section>
     </div>
-    @if (number_format($captured, 2) == 0)
+    @if ($captured == 0)
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px;">Release Payment</a>
     @endif
