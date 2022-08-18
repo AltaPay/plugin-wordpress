@@ -180,6 +180,6 @@
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px;">Release Payment</a>
     @endif
-
+</div>
 </body>
 </html>
