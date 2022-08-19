@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.3.2
+ * Version: 3.3.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 6.7.0
+ * WC tested up to: 6.8.0
  *
  * @package Altapay
  */
@@ -194,6 +194,39 @@ function altapay_meta_box( $post ) {
 		$api->setTransaction( $txnID );
 		$payments = $api->call();
 
+		$args     = array(
+			'posts_per_page' => -1,
+			'post_type'      => 'altapay_captures',
+			'post_status'    => 'captured',
+			'post_parent'    => $order->get_id(),
+			'meta_query'     => array(
+				array(
+					'key'     => 'qty_captured',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'item_id',
+					'compare' => 'EXISTS',
+				),
+			),
+		);
+		$captures = new WP_Query( $args );
+
+		$itemsCaptured = array();
+
+		if ( $captures->have_posts() ) {
+			while ( $captures->have_posts() ) {
+				$captures->the_post();
+				if ( isset( $itemsCaptured[ get_post_meta( get_the_ID(), 'item_id', true ) ] ) ) {
+					$itemsCaptured[ get_post_meta( get_the_ID(), 'item_id', true ) ] += get_post_meta( get_the_ID(), 'qty_captured', true );
+				} else {
+					$itemsCaptured[ get_post_meta( get_the_ID(), 'item_id', true ) ] = get_post_meta( get_the_ID(), 'qty_captured', true );
+				}
+			}
+
+			wp_reset_postdata();
+		}
+
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved = $pay->ReservedAmount;
@@ -212,11 +245,12 @@ function altapay_meta_box( $post ) {
 					echo $blade->loadBladeLibrary()->run(
 						'tables.index',
 						array(
-							'reserved' => $reserved,
-							'captured' => $captured,
-							'charge'   => $charge,
-							'refunded' => $refunded,
-							'order'    => $order,
+							'reserved'       => $reserved,
+							'captured'       => $captured,
+							'charge'         => $charge,
+							'refunded'       => $refunded,
+							'order'          => $order,
+							'items_captured' => $itemsCaptured,
 						)
 					);
 				}
@@ -235,11 +269,17 @@ function altapay_meta_box( $post ) {
 function altapayActionJavascript() {
 	global $post;
 	if ( isset( $post->ID ) ) {
+		$postID = $post->ID;
+
 		// Check if WooCommerce order
-		if ( $post->post_type === 'shop_order' ) {
+		if ( $post->post_type === 'shop_order' || $post->post_type === 'altapay_captures' ) {
+
+			if ( $post->post_type === 'altapay_captures' ) {
+				$postID = wp_get_post_parent_id( $postID );
+			}
 			?>
 			<script type="text/javascript">
-				let Globals = <?php echo wp_json_encode( array( 'postId' => $post->ID ) ); ?>;
+				let Globals = <?php echo wp_json_encode( array( 'postId' => $postID ) ); ?>;
 			</script>
 			<?php
 			wp_enqueue_script(
@@ -346,15 +386,15 @@ function altapayCaptureCallback() {
 
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 
-		$orderLines = array();
+		$orderLines       = array();
+		$selectedProducts = array(
+			'itemList' => array(),
+			'itemQty'  => array(),
+		);
 		if ( $postOrderLines ) {
-			$selectedProducts = array(
-				'itemList' => array(),
-				'itemQty'  => array(),
-			);
 			foreach ( $postOrderLines as $productData ) {
 				if ( $productData[1]['value'] > 0 ) {
-					$selectedProducts['itemList'][]                          = $productData[0]['value'];
+					$selectedProducts['itemList'][]                          = intval( $productData[0]['value'] );
 					$selectedProducts['itemQty'][ $productData[0]['value'] ] = $productData[1]['value'];
 				}
 			}
@@ -372,11 +412,14 @@ function altapayCaptureCallback() {
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'InvalidArgumentException ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'InvalidArgumentException: ' . $e->getMessage() ) );
 		} catch ( ResponseHeaderException $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'ResponseHeaderException ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'ResponseHeaderException: ' . $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			error_log( 'Response header exception ' . $e->getMessage() );
+			error_log( 'Exception ' . $e->getMessage() );
+			wp_send_json_error( array( 'error' => 'Error: ' . $e->getMessage() ) );
 		}
 
 		if ( $response && $response->Result !== 'Success' ) {
@@ -406,6 +449,21 @@ function altapayCaptureCallback() {
 
 		if ( $charge <= 0 ) {
 			$charge = 0.00;
+		}
+
+		foreach ( $selectedProducts['itemQty'] as $itemId => $qty ) {
+			$args = array(
+				'post_type'   => 'altapay_captures',
+				'post_status' => 'captured',
+				'post_parent' => $orderID,
+			);
+
+			$post_id = wp_insert_post( $args );
+
+			if ( ! is_wp_error( $post_id ) ) {
+				update_post_meta( $post_id, 'qty_captured', $qty );
+				update_post_meta( $post_id, 'item_id', $itemId );
+			}
 		}
 
 		update_post_meta( $orderID, '_captured', true );

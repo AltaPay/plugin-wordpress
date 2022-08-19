@@ -108,33 +108,30 @@
                             @include('tables.capture', ['order' => $order])
                         </div>
                     </div>
-
-                    <div class="row row-ap">
-                        <br>
-                        <div class="col-lg-12">
-                            <div>
-                                <input class="action-select filled-in" name="allow-orderlines"
-                                       type="checkbox" id="ap-allow-orderlines" checked="checked"/>
-                                <label for="ap-allow-orderlines" class="form-check-label"> Send order
-                                    lines</label>
+                    @php
+                        $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
+                        $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
+                    @endphp
+                    @if ( $captured < $reserved )
+                        <div class="row row-ap">
+                            <br>
+                            <div class="col-lg-12">
+                                <div>
+                                    <input class="action-select filled-in" name="allow-orderlines"
+                                           type="checkbox" id="ap-allow-orderlines" checked="checked"/>
+                                    <label for="ap-allow-orderlines" class="form-check-label"> Send order lines</label>
+                                </div>
                             </div>
-                        </div>
-                        @php
-                            $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
-                            $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
-                        @endphp
-                        <br>
-                        <div>
-                            @if ( $captured < $reserved )
+                            <br>
+                            <div>
                                 <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="capture-amount"
-                                    name="capture-amount" value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}"
+                                    name="capture-amount" value="{{max($toBeCaptured, 0)}}"
                                     placeholder="Amount"/>
                                 <a id="altapay_capture" class="f7 link dim ph4 pv2 mb1 dib white"
                                 style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Capture</a>
-                            @endif
+                            </div>
                         </div>
-
-                    </div>
+                    @endif
                 </div>
             </div>
         </section>
@@ -153,32 +150,29 @@
                         @include('tables.refund', ['order' => $order])
                     </div>
                 </div>
-
-                <div class="row row-ap">
-                    <br>
-                    <div class="col-lg-12">
-                        <div>
-                            <input class="action-select filled-in" name="allow-refund-orderlines"
-                                   type="checkbox" id="ap-allow-refund-orderlines" checked="checked"/>
-                            <label for="ap-allow-refund-orderlines" class="form-check-label"> Send order
-                                lines</label>
+                @php
+                    $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
+                    $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
+                @endphp
+                @if ( $refunded < $reserved )
+                    <div class="row row-ap">
+                        <br>
+                        <div class="col-lg-12">
+                            <div>
+                                <input class="action-select filled-in" name="allow-refund-orderlines"
+                                       type="checkbox" id="ap-allow-refund-orderlines" checked="checked"/>
+                                <label for="ap-allow-refund-orderlines" class="form-check-label"> Send order lines</label>
+                            </div>
                         </div>
-                    </div>
-                    @php
-                        $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
-                        $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
-                    @endphp
-                    <br>
-                    <div>
-                        @if ( $refunded < $reserved )
+                        <br>
+                        <div>
                             <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="refund-amount" name="refund-amount"
-                                value="{{$toBeRefunded > 0 ? $toBeRefunded : $toBeCaptured}}" placeholder="Amount"/>
+                                value="{{max($toBeRefunded, 0)}}" placeholder="Amount"/>
                             <a id="altapay_refund" class="f7 link dim ph4 pv2 mb1 dib white"
                             style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Refund</a>
-                        @endif
+                        </div>
                     </div>
-
-                </div>
+                @endif
             </div>
         </section>
     </div>
@@ -186,6 +180,6 @@
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px;">Release Payment</a>
     @endif
-
+</div>
 </body>
 </html>
