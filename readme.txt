@@ -1,21 +1,21 @@
-===  Altapay for WooCommerce ===
+===  AltaPay for WooCommerce ===
 Contributors: altapay_integrations
-Tags: Altapay, Gateway, Payments, WooCommerce, Payment Card Industry
+Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.2
 Requires at least: 5.0
-Tested up to: 6.0.1
+Tested up to: 6.0.3
 Stable tag: 3.3.3
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 6.8.0
+WC tested up to: 7.0.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 == Description ==
 
-Altapay has made it much easier for you as merchant/developer to receive secure payments in your WooCommerce web shop.
-Altapay is fully integrated with WooCommerce via a plug-in. All you have to do is to install the plug-in, which will only take a few minutes to complete.
+AltaPay has made it much easier for you as merchant/developer to receive secure payments in your WooCommerce web shop.
+AltaPay is fully integrated with WooCommerce via a plug-in. All you have to do is to install the plug-in, which will only take a few minutes to complete.
 
 == Installation ==
 
@@ -30,10 +30,10 @@ The whole installation and configuration process is described in our [integratio
 
 Feel free to contact our support team (support@altapay.com) if you need any assistance during the installation process or have questions regarding specific payment methods and functionalities.
 
-== About Altapay ==
+== About AltaPay ==
 
-AltaPay supports major acquiring banks, global payment methods and over 50 preferred local schemes like Dankort in Denmark, Vipps and Bank Axept in Norway, Swish in Sweden etc., across multiple sales channels (in-store and terminals & eCommerce), geographies and currencies. This includes credit and debit card acquiring, bank transfer networks, direct debit, wallets, mobile payment types, online invoicing, prepaid and gift card networks. With offices in Denmark, Altapay serves Pan European and Global customers including JD Sports, Sports Direct, Paul Smith, Laura Ashley, DFDS Seaways, ZARA, ECCO and Stokke.
-Altapay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for Altapay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
+AltaPay supports major acquiring banks, global payment methods and over 50 preferred local schemes like Dankort in Denmark, Vipps and Bank Axept in Norway, Swish in Sweden etc., across multiple sales channels (in-store and terminals & eCommerce), geographies and currencies. This includes credit and debit card acquiring, bank transfer networks, direct debit, wallets, mobile payment types, online invoicing, prepaid and gift card networks. With offices in Denmark, AltaPay serves Pan European and Global customers including JD Sports, Sports Direct, Paul Smith, Laura Ashley, DFDS Seaways, ZARA, ECCO and Stokke.
+AltaPay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for AltaPay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
 
 == Changelog ==
 
@@ -89,18 +89,18 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 * Added fix for payment page CSS
 
 = 3.1.0 =
-* Rebranding from Valitor to Altapay
+* Rebranding from Valitor to AltaPay
 * Added payment methods logo selection functionality
-* Support provided for Wordpress version 5.5
-* Support provided for Woocommerce version 4.3.2
+* Support provided for WordPress version 5.5
+* Support provided for WooCommerce version 4.3.2
 
 = 3.0.1 =
 * Fix - saved credit card deletion
 
 = 3.0.0 =
 * Added plugin disclaimer
-* Added support for WooCommerce version 3.9.2 and Wordpress version 5.3.2
-* Added support for auto-fill credit card details when using credit card token
+* Added support for WooCommerce version 3.9.2 and WordPress version 5.3.2
+* Added support for autofill credit card details when using credit card token
 * Major refactoring for improving the source code quality
 * Added support for Klarna Payments (Klarna reintegration)
 * Added release payment functionality, by:
@@ -144,7 +144,7 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 * Fix - error log spammed with error messages due to the wrong autoloader implementation
 
 = 1.9.0 =
-* SDK rebranding from Altapay to Valitor
+* SDK rebranding from AltaPay to Valitor
 * Added support for WooCommerce 3.6.3 and WordPress 5.2.0
 
 = 1.8.0 =
@@ -158,8 +158,8 @@ Altapay's Payment Gateway for WooCommerce provides merchants with access to a fu
 * Fix - Small cosmetic fixes after rebranding
 
 = 1.7.0 =
-* Rebranding from Altapay to Valitor
-* Update the Wordpress and WooCommerce supported versions
+* Rebranding from AltaPay to Valitor
+* Update the WordPress and WooCommerce supported versions
 * Fix - extension update
 
 = 1.6.3 =

@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+- Add support for payment reconciliation.
+
 ## [3.3.3]
 - Maintain record for partial/full captures in the AltaPay actions grid.
 

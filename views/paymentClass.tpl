@@ -270,6 +270,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
+			mt_srand( crc32( serialize( array( microtime( true ), $order_id ) ) ) );
+			$reconciliation_identifier = wp_generate_uuid4();
+			add_post_meta( $order_id, '_reconciliation_identifier', $reconciliation_identifier , true);
+
 			$auth    = $this->getAuth();
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
@@ -285,7 +289,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					->setFraudService( null )
 					->setLanguage( $language )
 					->setType( $payment_type )
-					->setOrderLines( $orderLines );
+					->setOrderLines( $orderLines )
+					->setSaleReconciliationIdentifier($reconciliation_identifier);
 			if ( $request ) {
 				try {
 					$response                 = $request->call();
@@ -441,9 +446,15 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 					return;
 				}
+
+				$reconciliation_identifier = get_post_meta( $order_id, '_reconciliation_identifier', true );
+
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
+				if ( ! empty( $reconciliation_identifier ) ) {
+					$api->setReconciliationIdentifier($reconciliation_identifier);
+				}
 
 				/** @var CaptureReservationResponse $response */
 				try {

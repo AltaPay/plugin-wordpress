@@ -106,8 +106,14 @@ class AltapayOrderStatus {
 				if ( $status === 'captured' ) {
 					return;
 				} elseif ( $captured == 0 ) {
+					$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
+
 					$api = new CaptureReservation( $auth );
 					$api->setTransaction( $txnID );
+					if ( ! empty( $reconciliation_identifier ) ) {
+						$api->setReconciliationIdentifier($reconciliation_identifier);
+					}
+
 					$response = $api->call();
 					if ( isset( $response->Result ) && $response->Result === 'Success' ) {
 						update_post_meta( $orderID, '_captured', true );
