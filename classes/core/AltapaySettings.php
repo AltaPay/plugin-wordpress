@@ -83,9 +83,9 @@ class AltapaySettings {
 			$api    = new CaptureReservation( $this->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
-            if ( ! empty( $reconciliation_identifier ) ) {
-                $api->setReconciliationIdentifier($reconciliation_identifier);
-            }
+			if ( ! empty( $reconciliation_identifier ) ) {
+				$api->setReconciliationIdentifier($reconciliation_identifier);
+			}
 
 			$response = $api->call();
 			if ( $response->Result !== 'Success' ) {
