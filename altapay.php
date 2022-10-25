@@ -163,13 +163,14 @@ function altapayAddMetaBoxes() {
 			'shop_order',
 			'normal'
 		);
-        add_meta_box(
+		
+		add_meta_box(
 			'altapay-order-reconciliation-identifier',
 			__('Reconciliation Identifier', 'altapay'),
 			'altapay_order_reconciliation_identifier_meta_box',
 			'shop_order',
 			'side'
-        );
+		);
 	}
 
 	return true;
@@ -428,9 +429,9 @@ function altapayCaptureCallback() {
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
-            if ( ! empty( $reconciliation_identifier ) ) {
-                $api->setReconciliationIdentifier($reconciliation_identifier);
-            }
+			if ( ! empty( $reconciliation_identifier ) ) {
+				$api->setReconciliationIdentifier($reconciliation_identifier);
+			}
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
