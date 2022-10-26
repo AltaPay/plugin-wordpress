@@ -21,6 +21,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Synchronize payment methods](#synchronize-payment-methods)
 
+[Reconcile Orders](#reconcile-orders)
+
 [Supported versions](#supported-versions)
 
 [Troubleshooting](#troubleshooting)
@@ -150,6 +152,26 @@ When the status of an order is manually changed to 'Completed', the plug-in will
 If the order was already fully or partially captured, no capture will be made.
 
 
+# Reconcile Orders
+In order to reconcile payments please follow the steps below:
+
+1. From the admin panel, navigate to: **WooCommerce > Orders**
+2. Select the order you want to view.
+3. Copy the Reconciliation Identifier from the **Reconciliation Identifier** section on the right side.
+
+   ![magento_order_view](docs/altapay_wp_order_reconcile_view.jpg)
+
+4. Navigate to AltaPay Gateway dashboard
+5. Click on **FUNDING FILES** under **FINANCES** menu
+6. Download the CSV file
+7. Or you can find the payment in the transaction list, open the reconciliation file from there and download a csv file
+8. Open the downloaded CSV file and match the **Reconciliation Identifier** with WordPress's **Reconciliation Identifier**.
+
+**Sample AltaPay Gateway CSV:**
+
+![funding_list_csv](docs/funding_list_csv.png)
+
+
 
 # Supported versions
 
@@ -161,7 +183,7 @@ Minimum system requirements are:
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.0.1, WooCommerce 6.8.0 and PHP 7.4
+- WordPress 6.0.3, WooCommerce 7.0.0 and PHP 8.1
 
 
 # Troubleshooting

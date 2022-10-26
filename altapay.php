@@ -8,7 +8,7 @@
  * Version: 3.3.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 6.8.0
+ * WC tested up to: 7.0.0
  *
  * @package Altapay
  */
@@ -18,7 +18,6 @@ use Altapay\Classes\Util;
 use Altapay\Helpers;
 use Altapay\Api\Payments\CaptureReservation;
 use Altapay\Exceptions\ResponseHeaderException;
-use Altapay\Response\CaptureReservationResponse;
 use Altapay\Api\Payments\RefundCapturedReservation;
 use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
@@ -28,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-// Include the autoloader so we can dynamically include the rest of the classes.
+// Include the autoloader, so we can dynamically include the rest of the classes.
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
 /**
@@ -164,6 +163,14 @@ function altapayAddMetaBoxes() {
 			'shop_order',
 			'normal'
 		);
+		
+		add_meta_box(
+			'altapay-order-reconciliation-identifier',
+			__('Reconciliation Identifier', 'altapay'),
+			'altapay_order_reconciliation_identifier_meta_box',
+			'shop_order',
+			'side'
+		);
 	}
 
 	return true;
@@ -259,6 +266,17 @@ function altapay_meta_box( $post ) {
 	} else {
 		esc_html_e( 'Order got no transaction', 'altapay' );
 	}
+}
+
+/**
+ * Meta box display callback for AltaPay reconciliation identifier
+ *
+ * @param WP_Post $post Current post object.
+ * @return void
+ */
+function altapay_order_reconciliation_identifier_meta_box( $post ) {
+	// Fetch order reconciliation identifier
+	echo esc_html(get_post_meta( $post->ID, '_reconciliation_identifier', true ));
 }
 
 /**
@@ -405,10 +423,15 @@ function altapayCaptureCallback() {
 		$response    = null;
 		$rawResponse = null;
 		try {
+			$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
+
 			$api = new CaptureReservation( $settings->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
+			if ( ! empty( $reconciliation_identifier ) ) {
+				$api->setReconciliationIdentifier($reconciliation_identifier);
+			}
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
@@ -569,10 +592,15 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 
 	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
 
+		$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
+
 		$api = new RefundCapturedReservation( $auth );
 		$api->setAmount( round( $amount, 2 ) );
 		$api->setOrderLines( $orderLines );
 		$api->setTransaction( $txnID );
+		if ( ! empty( $reconciliation_identifier ) ) {
+			$api->setReconciliationIdentifier($reconciliation_identifier);
+		}
 
 		try {
 			$response = $api->call();

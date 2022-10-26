@@ -51,7 +51,7 @@ fi
 mkdir -p dist
 rm -rf vendor
 php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
-zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" wiki.md build.sh README.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
+zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh README.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
 
 if [ -f composer.lock.backup ]; then
     rm -rf composer.lock
