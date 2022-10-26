@@ -87,7 +87,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->default_currency	= end($currency);
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
-			$this->icon = plugin_dir_url( __DIR__ ) .'assets/images/payment_icons/'.$this->get_option( 'payment_icon' );
+			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
 		}
 		// Load form fields
 		$this->init_form_fields();
@@ -139,9 +139,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	public function init_form_fields() {
 		$tokenStatus = '{tokenStatus}';
 		if($tokenStatus === 'CreditCard'){
-			$this->form_fields = include __DIR__. '/../includes/AltapayFormFieldsToken.php';
+			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFieldsToken.php';
 		} else {
-			$this->form_fields = include __DIR__. '/../includes/AltapayFormFields.php';
+			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFields.php';
 		}
 	}
 

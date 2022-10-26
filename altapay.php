@@ -27,6 +27,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
+    define( 'ALTAPAY_PLUGIN_FILE', __FILE__ );
+}
+
 // Include the autoloader, so we can dynamically include the rest of the classes.
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
