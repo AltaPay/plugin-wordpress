@@ -37,6 +37,10 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 == Changelog ==
 
+= 3.3.4 =
+* Add support for payment reconciliation.
+* Add support for WooCommerce Subscriptions.
+
 = 3.3.3 =
 * Maintain record for partial/full captures in the AltaPay actions grid.
 
