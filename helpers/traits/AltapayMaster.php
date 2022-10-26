@@ -68,6 +68,7 @@ trait AltapayMaster {
 					return;
 				}
 
+                // @phpstan-ignore-next-line
 				if ( $this->payment_action === 'authorize_capture' ) {
 					$api = new ChargeSubscription( $this->getAuth() );
 				} else {
