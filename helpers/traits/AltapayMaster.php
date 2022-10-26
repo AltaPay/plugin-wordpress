@@ -15,8 +15,8 @@ use WP_Error;
 use Altapay\Authentication;
 use Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
-use WC_Subscriptions_Renewal_Order;
 use Altapay\Api\Subscription\ChargeSubscription;
+use Altapay\Api\Subscription\ReserveSubscriptionCharge;
 
 trait AltapayMaster {
 
@@ -48,38 +48,51 @@ trait AltapayMaster {
 				return;
 			}
 
-			$parent_order_id = 0;
-			if ( wcs_order_contains_renewal( $renewal_order->id ) ) {
-				$parent_order_id = WC_Subscriptions_Renewal_Order::get_parent_order_id( $renewal_order->id );
+			if ( wcs_order_contains_renewal( $renewal_order->get_id() ) ) {
+				$subscriptions = wcs_get_subscriptions_for_renewal_order( $renewal_order->get_id() );
 			}
 
-			$orderinfo      = new WC_Order( $parent_order_id );
-			$transaction_id = $orderinfo->get_transaction_id();
+			foreach ( $subscriptions as $subscription ) {
+				$parent_order_id = $subscription->get_parent_id();
+				$agreement_id    = get_post_meta( $parent_order_id, '_agreement_id', true );
 
-			if ( ! $transaction_id ) {
-				// Set subscription payment as failure
-				$renewal_order->update_status( 'failed', __( 'AltaPay could not locate transaction ID', 'altapay' ) );
-				return;
-			}
+				if ( ! $agreement_id ) {
+					// Set subscription payment as failure
+					$renewal_order->update_status( 'failed', __( 'AltaPay could not locate agreement ID', 'altapay' ) );
+					return;
+				}
 
-			$login = $this->altapayApiLogin();
-			if ( ! $login || is_wp_error( $login ) ) {
-				echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-				return;
-			}
+				$login = $this->altapayApiLogin();
+				if ( ! $login || is_wp_error( $login ) ) {
+					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+					return;
+				}
 
-			$api = new ChargeSubscription( $this->getAuth() );
-			$api->setTransaction( $transaction_id );
-			$api->setAmount( round( $amount, 2 ) );
-			$response = $api->call();
+				if ( $this->payment_action === 'authorize_capture' ) {
+					$api = new ChargeSubscription( $this->getAuth() );
+				} else {
+					$api = new ReserveSubscriptionCharge( $this->getAuth() );
+				}
+				$api->setTransaction( $agreement_id );
+				$api->setAmount( round( $amount, 2 ) );
+				$response = $api->call();
 
-			if ( $response->Result === 'Success' ) {
-				$renewal_order->payment_complete();
-			} else {
-				$renewal_order->update_status(
-					'failed',
-					sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
-				);
+				$xmlToJson          = wp_json_encode( $response->Transactions );
+				$jsonToArray        = json_decode( $xmlToJson, true );
+				$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
+				$transaction_id     = $jsonToArray[ $latest_transaction ]['TransactionId'];
+
+				update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
+				update_post_meta( $renewal_order->get_id(), '_agreement_id', $agreement_id );
+
+				if ( $response->Result === 'Success' ) {
+					$renewal_order->payment_complete();
+				} else {
+					$renewal_order->update_status(
+						'failed',
+						sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
+					);
+				}
 			}
 		} catch ( Exception $e ) {
 			$renewal_order->update_status(
@@ -201,5 +214,23 @@ trait AltapayMaster {
 			 '990' => 'CLF',
 		 );
 		 return $codes[ $number ];
+	}
+
+    /**
+     * @param $transactions
+     * @param $authType
+     * @return int|string
+     */
+	public function getLatestTransaction( $transactions, $authType ) {
+		$max_date       = '';
+		$latest_transaction = '';
+		foreach ( $transactions as $key => $transaction ) {
+			if ( $transaction['AuthType'] === $authType && $transaction['CreatedDate'] > $max_date ) {
+				$max_date       = $transaction['CreatedDate'];
+				$latest_transaction = $key;
+			}
+		}
+
+		return $latest_transaction;
 	}
 }
