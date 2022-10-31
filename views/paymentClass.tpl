@@ -249,10 +249,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			mt_srand( crc32( serialize( array( microtime( true ), $order_id ) ) ) );
-			$reconciliation_identifier = wp_generate_uuid4();
-			add_post_meta( $order_id, '_reconciliation_identifier', $reconciliation_identifier , true);
-
 			$auth    = $this->getAuth();
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
@@ -267,8 +263,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					->setCcToken( $ccToken )
 					->setFraudService( null )
 					->setLanguage( $language )
-					->setOrderLines( $orderLines )
-					->setSaleReconciliationIdentifier( $reconciliation_identifier );
+					->setOrderLines( $orderLines );
 
 			// Check if WooCommerce subscriptions is enabled and contains subscription product
 			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
@@ -463,14 +458,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					return;
 				}
 
-				$reconciliation_identifier = get_post_meta( $order_id, '_reconciliation_identifier', true );
-
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
-				if ( ! empty( $reconciliation_identifier ) ) {
-					$api->setReconciliationIdentifier($reconciliation_identifier);
-				}
 
 				/** @var CaptureReservationResponse $response */
 				try {
