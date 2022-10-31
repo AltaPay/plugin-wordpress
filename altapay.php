@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
-    define( 'ALTAPAY_PLUGIN_FILE', __FILE__ );
+	define( 'ALTAPAY_PLUGIN_FILE', __FILE__ );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -77,19 +77,19 @@ function altapay_add_gateway( $methods ) {
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
-			$tokenStatus  = '';
-            $subscriptions = false;
-			$terminalName = $terminal;
+			$tokenStatus   = '';
+			$subscriptions = false;
+			$terminalName  = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
 					$terminalName = $term->name;
-                    foreach ( $term->nature as $nature ) {
-                        if ( $nature->Nature === 'CreditCard' || $nature->Nature === 'CreditCardWallet') {
-                            $tokenStatus = 'CreditCard';
-                            $subscriptions = true;
-                            break;
-                        }
-                    }
+					foreach ( $term->nature as $nature ) {
+						if ( $nature->Nature === 'CreditCard' || $nature->Nature === 'CreditCardWallet' ) {
+							$tokenStatus   = 'CreditCard';
+							$subscriptions = true;
+							break;
+						}
+					}
 				}
 			}
 
@@ -281,8 +281,36 @@ function altapay_meta_box( $post ) {
  * @return void
  */
 function altapay_order_reconciliation_identifier_meta_box( $post ) {
-	// Fetch order reconciliation identifier
-	echo esc_html(get_post_meta( $post->ID, '_reconciliation_identifier', true ));
+
+	$settings = new Core\AltapaySettings();
+	$login    = $settings->altapayApiLogin();
+
+	if ( ! $login || is_wp_error( $login ) ) {
+		echo '<p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p>';
+		return;
+	}
+
+	$auth = $settings->getAuth();
+
+	$order = new WC_Order( $post->ID );
+	$txnID = $order->get_transaction_id();
+
+	if ( $txnID ) {
+		$api = new Payments( $auth );
+		$api->setTransaction( $txnID );
+		$payments = $api->call();
+
+		echo '<ul>';
+		foreach ( $payments as $payment ) {
+			foreach ( $payment->ReconciliationIdentifiers as $identifier ) {
+				echo '<li><p><strong>';
+				echo $identifier->Type === 'captured' ? 'Capture' : 'Refund';
+				echo ' Reconciliation Id : ';
+				echo '</strong>' . $identifier->Id . '</p></li>';
+			}
+		}
+		echo '</ul>';
+	}
 }
 
 /**
@@ -429,15 +457,10 @@ function altapayCaptureCallback() {
 		$response    = null;
 		$rawResponse = null;
 		try {
-			$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
-
 			$api = new CaptureReservation( $settings->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
-			if ( ! empty( $reconciliation_identifier ) ) {
-				$api->setReconciliationIdentifier($reconciliation_identifier);
-			}
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
@@ -597,16 +620,10 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 	$error       = '';
 
 	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
-
-		$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
-
 		$api = new RefundCapturedReservation( $auth );
 		$api->setAmount( round( $amount, 2 ) );
 		$api->setOrderLines( $orderLines );
 		$api->setTransaction( $txnID );
-		if ( ! empty( $reconciliation_identifier ) ) {
-			$api->setReconciliationIdentifier($reconciliation_identifier);
-		}
 
 		try {
 			$response = $api->call();
