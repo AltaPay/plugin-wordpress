@@ -66,25 +66,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->has_fields			= false;
 		$this->method_title			= 'AltaPay - {name}';
 		$this->method_description	= __( 'Adds AltaPay Payment Gateway to use with WooCommerce', 'altapay');
-		$this->supports = array(
-			'refunds',
-			'subscriptions',
-			'subscription_cancellation',
-			'subscription_suspension',
-			'subscription_reactivation',
-			'subscription_amount_changes',
-			'subscription_date_changes',
-		);
-
-		$this->terminal			= '{name}';
-		$this->enabled			= $this->get_option( 'enabled' );
-		$this->title			= $this->get_option( 'title' );
-		$this->description		= $this->get_option( 'description' );
-		$this->token			= $this->get_option('token');
-		$this->payment_action	= $this->get_option( 'payment_action' );
-		$this->currency			= $this->get_option( 'currency' );
-		$currency				= explode(' ', '{name}');
-		$this->default_currency	= end($currency);
+		$this->supports				= $this->supportedFeatures();
+		$this->terminal				= '{name}';
+		$this->enabled				= $this->get_option( 'enabled' );
+		$this->title				= $this->get_option( 'title' );
+		$this->description			= $this->get_option( 'description' );
+		$this->token				= $this->get_option('token');
+		$this->payment_action		= $this->get_option( 'payment_action' );
+		$this->currency				= $this->get_option( 'currency' );
+		$currency					= explode(' ', '{name}');
+		$this->default_currency		= end($currency);
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
@@ -603,7 +594,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$subscriptions = wcs_get_subscriptions_for_order( $order );
 
 			foreach ( $subscriptions as $subscription ) {
-				$agreementDetails['frequency'] = $this->getAgreementFrequency($subscription->get_billing_period());
+				$agreementDetails['frequency'] = $this->agreementFrequency($subscription->get_billing_period());
 				$agreementDetails['next_charge_date'] = date("Ymd", $subscription->get_time('next_payment'));
 				$agreementDetails['admin_url'] = $subscription->get_view_order_url();
 
@@ -619,7 +610,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param $billing_period
 	 * @return string
 	 */
-	public function getAgreementFrequency($billing_period){
+	public function agreementFrequency($billing_period){
 
 		$arr = array(
 		'day'=> '1',
@@ -629,5 +620,29 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		);
 
 		return $arr[$billing_period] ?? '30';
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function supportedFeatures() {
+		$supportSubscriptions = '{supportSubscriptions}';
+		$features = array( 'refunds' );
+
+		if ( $supportSubscriptions == true ) {
+			$features = array_merge(
+				$features,
+				array(
+					'subscriptions',
+					'subscription_cancellation',
+					'subscription_suspension',
+					'subscription_reactivation',
+					'subscription_amount_changes',
+					'subscription_date_changes',
+				)
+		);
+	}
+
+		return $features;
 	}
 }
