@@ -157,7 +157,7 @@ In order to reconcile payments please follow the steps below:
 
 1. From the admin panel, navigate to: **WooCommerce > Orders**
 2. Select the order you want to view.
-3. Copy the Reconciliation Identifier from the **Reconciliation Identifier** section on the right side.
+3. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
 
    ![magento_order_view](docs/altapay_wp_order_reconcile_view.jpg)
 
