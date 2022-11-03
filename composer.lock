@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "altapay/api-php",
-            "version": "3.2.7",
+            "version": "3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AltaPay/api-php.git",
-                "reference": "f38e4f9a2b13af03064b36301457835cb4efecd0"
+                "reference": "2f80c986e96d903050927df4c561c2f6895c1712"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/f38e4f9a2b13af03064b36301457835cb4efecd0",
-                "reference": "f38e4f9a2b13af03064b36301457835cb4efecd0",
+                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/2f80c986e96d903050927df4c561c2f6895c1712",
+                "reference": "2f80c986e96d903050927df4c561c2f6895c1712",
                 "shasum": ""
             },
             "require": {
@@ -58,9 +58,9 @@
             ],
             "support": {
                 "issues": "https://github.com/AltaPay/api-php/issues",
-                "source": "https://github.com/AltaPay/api-php/tree/3.2.7"
+                "source": "https://github.com/AltaPay/api-php/tree/3.2.8"
             },
-            "time": "2022-10-20T13:58:06+00:00"
+            "time": "2022-11-03T08:09:46+00:00"
         },
         {
             "name": "eftec/bladeone",
@@ -332,16 +332,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.4.2",
+            "version": "2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "3148458748274be1546f8f2809a6c09fe66f44aa"
+                "reference": "67c26b443f348a51926030c83481b85718457d3d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/3148458748274be1546f8f2809a6c09fe66f44aa",
-                "reference": "3148458748274be1546f8f2809a6c09fe66f44aa",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/67c26b443f348a51926030c83481b85718457d3d",
+                "reference": "67c26b443f348a51926030c83481b85718457d3d",
                 "shasum": ""
             },
             "require": {
@@ -431,7 +431,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.4.2"
+                "source": "https://github.com/guzzle/psr7/tree/2.4.3"
             },
             "funding": [
                 {
@@ -447,7 +447,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-25T13:49:28+00:00"
+            "time": "2022-10-26T14:07:24+00:00"
         },
         {
             "name": "psr/event-dispatcher",
@@ -1501,16 +1501,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.99",
+            "version": "0.12.100",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7"
+                "reference": "48236ddf823547081b2b153d1cd2994b784328c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b4d40f1d759942f523be267a1bab6884f46ca3f7",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/48236ddf823547081b2b153d1cd2994b784328c3",
+                "reference": "48236ddf823547081b2b153d1cd2994b784328c3",
                 "shasum": ""
             },
             "require": {
@@ -1541,7 +1541,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.99"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.100"
             },
             "funding": [
                 {
@@ -1553,15 +1553,11 @@
                     "type": "github"
                 },
                 {
-                    "url": "https://www.patreon.com/phpstan",
-                    "type": "patreon"
-                },
-                {
                     "url": "https://tidelift.com/funding/github/packagist/phpstan/phpstan",
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-12T20:09:55+00:00"
+            "time": "2022-11-01T09:52:08+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1862,16 +1858,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.30",
+            "version": "8.5.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "4fd448df9affda65a5faa58f8b93087d415216ce"
+                "reference": "33c126b09a42de5c99e5e8032b54e8221264a74e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4fd448df9affda65a5faa58f8b93087d415216ce",
-                "reference": "4fd448df9affda65a5faa58f8b93087d415216ce",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/33c126b09a42de5c99e5e8032b54e8221264a74e",
+                "reference": "33c126b09a42de5c99e5e8032b54e8221264a74e",
                 "shasum": ""
             },
             "require": {
@@ -1939,7 +1935,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.30"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.31"
             },
             "funding": [
                 {
@@ -1955,7 +1951,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-09-25T03:43:00+00:00"
+            "time": "2022-10-28T05:57:37+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
