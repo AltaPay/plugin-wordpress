@@ -68,7 +68,7 @@ trait AltapayMaster {
 					return;
 				}
 
-                // @phpstan-ignore-next-line
+				// @phpstan-ignore-next-line
 				if ( $this->payment_action === 'authorize_capture' ) {
 					$api = new ChargeSubscription( $this->getAuth() );
 				} else {
@@ -217,17 +217,17 @@ trait AltapayMaster {
 		 return $codes[ $number ];
 	}
 
-    /**
-     * @param $transactions
-     * @param $authType
-     * @return int|string
-     */
+	/**
+	 * @param $transactions
+	 * @param $authType
+	 * @return int|string
+	 */
 	public function getLatestTransaction( $transactions, $authType ) {
-		$max_date       = '';
+		$max_date           = '';
 		$latest_transaction = '';
 		foreach ( $transactions as $key => $transaction ) {
 			if ( $transaction['AuthType'] === $authType && $transaction['CreatedDate'] > $max_date ) {
-				$max_date       = $transaction['CreatedDate'];
+				$max_date           = $transaction['CreatedDate'];
 				$latest_transaction = $key;
 			}
 		}

@@ -169,7 +169,7 @@ function altapayAddMetaBoxes() {
 			'shop_order',
 			'normal'
 		);
-		
+
 		add_meta_box(
 			'altapay-order-reconciliation-identifier',
 			__( 'Reconciliation Details', 'altapay' ),
@@ -290,11 +290,11 @@ function altapay_order_reconciliation_identifier_meta_box( $post ) {
 		return;
 	}
 
-    $postID = $post->ID;
+	$postID = $post->ID;
 
-    if ( $post->post_type === 'altapay_captures' ) {
-        $postID = wp_get_post_parent_id( $postID );
-    }
+	if ( $post->post_type === 'altapay_captures' ) {
+		$postID = wp_get_post_parent_id( $postID );
+	}
 
 	$auth = $settings->getAuth();
 
@@ -307,26 +307,26 @@ function altapay_order_reconciliation_identifier_meta_box( $post ) {
 		$payments = $api->call();
 		?>
 		<table width="100%" cellspacing="0" cellpadding="10">
-           <thead>
-           <tr>
-               <th align="left" width="40%">Reconciliation Identifier</th>
-               <th align="left" width="60%">Type</th>
-           </tr>
-           </thead>
-            <tbody>
-                <?php
-                foreach ( $payments as $payment ) {
-                    foreach ( $payment->ReconciliationIdentifiers as $identifier ) {
-                        ?>
-                        <tr>
-                            <td><?php echo $identifier->Id; ?></td>
-                            <td><?php echo $identifier->Type; ?></td>
-                        </tr>
-                        <?php
-                    }
-                }
-                ?>
-            </tbody>
+		   <thead>
+		   <tr>
+			   <th align="left" width="40%">Reconciliation Identifier</th>
+			   <th align="left" width="60%">Type</th>
+		   </tr>
+		   </thead>
+			<tbody>
+				<?php
+				foreach ( $payments as $payment ) {
+					foreach ( $payment->ReconciliationIdentifiers as $identifier ) {
+						?>
+						<tr>
+							<td><?php echo $identifier->Id; ?></td>
+							<td><?php echo $identifier->Type; ?></td>
+						</tr>
+						<?php
+					}
+				}
+				?>
+			</tbody>
 		</table>
 		<?php
 	}
