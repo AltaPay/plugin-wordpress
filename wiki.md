@@ -183,7 +183,7 @@ Minimum system requirements are:
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.0.3, WooCommerce 7.0.0 and PHP 8.1
+- WordPress 6.0.3, WooCommerce 7.0.1 and PHP 8.1
 
 
 # Troubleshooting
