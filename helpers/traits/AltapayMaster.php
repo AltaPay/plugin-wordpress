@@ -71,29 +71,30 @@ trait AltapayMaster {
 				// @phpstan-ignore-next-line
 				if ( $this->payment_action === 'authorize_capture' ) {
 					$api = new ChargeSubscription( $this->getAuth() );
+					$api->setTransaction( $agreement_id );
+					$api->setAmount( round( $amount, 2 ) );
+					$response = $api->call();
+
+					$xmlToJson          = wp_json_encode( $response->Transactions );
+					$jsonToArray        = json_decode( $xmlToJson, true );
+					$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
+					$transaction_id     = $jsonToArray[ $latest_transaction ]['TransactionId'];
+
+					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
+
+					if ( $response->Result === 'Success' ) {
+						$renewal_order->payment_complete();
+					} else {
+						$renewal_order->update_status(
+							'failed',
+							sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
+						);
+					}
 				} else {
-					$api = new ReserveSubscriptionCharge( $this->getAuth() );
-				}
-				$api->setTransaction( $agreement_id );
-				$api->setAmount( round( $amount, 2 ) );
-				$response = $api->call();
-
-				$xmlToJson          = wp_json_encode( $response->Transactions );
-				$jsonToArray        = json_decode( $xmlToJson, true );
-				$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
-				$transaction_id     = $jsonToArray[ $latest_transaction ]['TransactionId'];
-
-				update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
-				update_post_meta( $renewal_order->get_id(), '_agreement_id', $agreement_id );
-
-				if ( $response->Result === 'Success' ) {
 					$renewal_order->payment_complete();
-				} else {
-					$renewal_order->update_status(
-						'failed',
-						sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
-					);
 				}
+
+				update_post_meta( $renewal_order->get_id(), '_agreement_id', $agreement_id );
 			}
 		} catch ( Exception $e ) {
 			$renewal_order->update_status(

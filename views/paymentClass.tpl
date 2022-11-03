@@ -270,10 +270,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				if ( $this->payment_action === 'authorize_capture' ) {
 					$payment_type = 'subscriptionAndCharge';
 				} else {
-					$payment_type = 'subscriptionAndReserve';
+					$payment_type = 'subscription';
 				}
 
-				$request->setAgreement($this->getAgreementDetail($order));
+				$request->setAgreement( $this->getAgreementDetail( $order ) );
 			}
 
 			$request->setType( $payment_type );
@@ -337,24 +337,21 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$xmlResponse = wp_unslash( $_POST['xml'] );
 			$xml         = new SimpleXMLElement( $xmlResponse );
 
-			if ( $type === 'subscriptionAndCharge' || $type === 'subscriptionAndReserve' ) {
-				$agreement_id      = $txnId;
+			if ( $type === 'subscriptionAndCharge' || $type === 'subscription' ) {
+				$agreement_id = $txnId;
+			}
+
+			if ( $type === 'subscriptionAndCharge' ) {
 				$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
 				$jsonToArray       = json_decode( $xmlToJson, true );
 				$latestTransaction = $this->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
 				$transaction       = $jsonToArray['Transaction'][ $latestTransaction ];
 				$txnId             = $transaction['TransactionId'];
 
-				// validate if both transaction agreement setup and reservation/capture are successful
 				if ( $status === 'succeeded' ) {
 					foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
-						if ( ( $transaction_data['AuthType'] === 'subscriptionAndReserve' &&
-						$transaction_data['TransactionStatus'] !== 'recurring_confirmed' ) ||
-						( $type === 'subscriptionAndReserve' && $transaction_data['AuthType'] === 'subscription_payment' &&
-						$transaction_data['TransactionStatus'] !== 'preauth' ) ||
-						( $type === 'subscriptionAndCharge' && $transaction_data['AuthType'] === 'subscription_payment' &&
-						$transaction_data['TransactionStatus'] !== 'captured' )
-						) {
+						if ( $transaction_data['AuthType'] === 'subscription_payment' &&
+						$transaction_data['TransactionStatus'] !== 'captured' ) {
 							$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
 							wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
 							wp_redirect( wc_get_cart_url() );
@@ -365,6 +362,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			} else {
 				$xmlToJson   = wp_json_encode( $xml->Body->Transactions->Transaction );
 				$transaction = json_decode( $xmlToJson, true );
+			}
+
+			if ( $type === 'subscription' ) {
+				$txnId = '';
 			}
 
 			$paymentScheme  = $transaction['PaymentSchemeName'];
@@ -478,16 +479,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* Process refund.
-	*
-	* If the gateway declares 'refunds' support, this will allow it to refund.
-	* a passed in amount.
-	*
-	* @param  int        $order_id Order ID.
-	* @param  float|null $amount Refund amount.
-	* @param  string     $reason Refund reason.
-	* @return boolean True on success, or a WP_Error object.
-	*/
+	 * Process refund.
+	 *
+	 * If the gateway declares 'refunds' support, this will allow it to refund.
+	 * a passed in amount.
+	 *
+	 * @param  int        $order_id Order ID.
+	 * @param  float|null $amount Refund amount.
+	 * @param  string     $reason Refund reason.
+	 * @return boolean True on success, or a WP_Error object.
+	 */
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 
 		$refund = altapayRefundPayment( $order_id, $amount, $reason, false );
@@ -578,20 +579,20 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param $order
 	 * @return array
 	 */
-	public function getAgreementDetail($order){
-		$agreementDetails  = [];
+	public function getAgreementDetail( $order ) {
+		$agreementDetails             = array();
 			$agreementDetails['type'] = 'recurring';
-			$subscriptions = wcs_get_subscriptions_for_order( $order );
+			$subscriptions            = wcs_get_subscriptions_for_order( $order );
 
-			foreach ( $subscriptions as $subscription ) {
-				$agreementDetails['frequency'] = $this->agreementFrequency($subscription->get_billing_period());
-				$agreementDetails['next_charge_date'] = date("Ymd", $subscription->get_time('next_payment'));
-				$agreementDetails['admin_url'] = $subscription->get_view_order_url();
+		foreach ( $subscriptions as $subscription ) {
+			$agreementDetails['frequency']        = $this->agreementFrequency( $subscription->get_billing_period() );
+			$agreementDetails['next_charge_date'] = date( 'Ymd', $subscription->get_time( 'next_payment' ) );
+			$agreementDetails['admin_url']        = $subscription->get_view_order_url();
 
-				if($subscription->get_time('end')){
-					$agreementDetails['expiry'] = date("Ymd", $subscription->get_time('end'));
-				}
+			if ( $subscription->get_time( 'end' ) ) {
+				$agreementDetails['expiry'] = date( 'Ymd', $subscription->get_time( 'end' ) );
 			}
+		}
 
 		return $agreementDetails;
 	}
@@ -600,16 +601,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @param $billing_period
 	 * @return string
 	 */
-	public function agreementFrequency($billing_period){
+	public function agreementFrequency( $billing_period ) {
 
 		$arr = array(
-		'day'=> '1',
-		'week'=> '7',
-		'month'=> '30',
-		'year'=> '365'
+			'day'   => '1',
+			'week'  => '7',
+			'month' => '30',
+			'year'  => '365',
 		);
 
-		return $arr[$billing_period] ?? '30';
+		return $arr[ $billing_period ] ?? '30';
 	}
 
 	/**
@@ -617,7 +618,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function supportedFeatures() {
 		$supportSubscriptions = '{supportSubscriptions}';
-		$features = array( 'refunds' );
+		$features             = array( 'refunds' );
 
 		if ( $supportSubscriptions == true ) {
 			$features = array_merge(
@@ -630,8 +631,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					'subscription_amount_changes',
 					'subscription_date_changes',
 				)
-		);
-	}
+			);
+		}
 
 		return $features;
 	}

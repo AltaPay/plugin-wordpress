@@ -22,6 +22,7 @@ use Altapay\Api\Payments\RefundCapturedReservation;
 use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
+use Altapay\Api\Subscription\ChargeSubscription;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -190,16 +191,21 @@ function altapayAddMetaBoxes() {
  */
 function altapay_meta_box( $post ) {
 	// Load order
-	$order = new WC_Order( $post->ID );
-	$txnID = $order->get_transaction_id();
+	$order        = new WC_Order( $post->ID );
+	$txnID        = $order->get_transaction_id();
+	$agreement_id = get_post_meta( $post->ID, '_agreement_id', true );
 
-	if ( $txnID ) {
+	if ( $txnID || $agreement_id ) {
 		$settings = new Core\AltapaySettings();
 		$login    = $settings->altapayApiLogin();
 
 		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 			return;
+		}
+
+		if ( ! $txnID ) {
+			$txnID = $agreement_id;
 		}
 
 		$auth = $settings->getAuth();
@@ -434,11 +440,11 @@ function createAltapayPaymentPageCallback() {
  * @return WP_Error
  */
 function altapayCaptureCallback() {
-	$utilMethods = new Util\UtilMethods();
-	$settings    = new Core\AltapaySettings();
-	$orderID     = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
-	$amount      = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
-
+	$utilMethods  = new Util\UtilMethods();
+	$settings     = new Core\AltapaySettings();
+	$orderID      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
+	$amount       = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
+	$subscription = false;
 	if ( ! $orderID || ! $amount ) {
 		wp_send_json_error( array( 'error' => 'error' ) );
 	}
@@ -446,6 +452,12 @@ function altapayCaptureCallback() {
 	// Load order
 	$order = new WC_Order( $orderID );
 	$txnID = $order->get_transaction_id();
+
+	if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) {
+		$txnID        = get_post_meta( $orderID, '_agreement_id', true );
+		$subscription = true;
+	}
+
 	if ( $txnID ) {
 
 		$login = $settings->altapayApiLogin();
@@ -476,9 +488,14 @@ function altapayCaptureCallback() {
 		$response    = null;
 		$rawResponse = null;
 		try {
-			$api = new CaptureReservation( $settings->getAuth() );
+			if ( $subscription === true ) {
+				$api = new ChargeSubscription( $settings->getAuth() );
+			} else {
+				$api = new CaptureReservation( $settings->getAuth() );
+				$api->setOrderLines( $orderLines );
+			}
+
 			$api->setAmount( round( $amount, 2 ) );
-			$api->setOrderLines( $orderLines );
 			$api->setTransaction( $txnID );
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
@@ -516,6 +533,14 @@ function altapayCaptureCallback() {
 			$captured = (float) $xml->Body->Transactions->Transaction->CapturedAmount;
 			$refunded = (float) $xml->Body->Transactions->Transaction->RefundedAmount;
 			$charge   = $reserved - $captured - $refunded;
+
+			if ( $subscription === true ) {
+				$xmlToJson          = wp_json_encode( $xml->Body->Transactions );
+				$jsonToArray        = json_decode( $xmlToJson, true );
+				$latest_transaction = $settings->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
+				$transaction_id     = $jsonToArray['Transaction'][ $latest_transaction ]['TransactionId'];
+				update_post_meta( $orderID, '_transaction_id', $transaction_id );
+			}
 		}
 
 		if ( $charge <= 0 ) {
