@@ -68,7 +68,7 @@ class UtilMethods {
 			}
 
 			// check if compensation exists to bind it in orderline details
-			if ( ! $wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
+			if ( !$wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 		}
@@ -244,13 +244,7 @@ class UtilMethods {
 		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
 		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
 		$orderLine->unitCode   = $unitCode;
-
-		if ( in_array( $singleProduct->get_type(), array( 'subscription', 'variable-subscription', 'subscription_variation' ), true ) ) {
-			$orderLine->setGoodsType( 'subscription_model' );
-		} else {
-			$orderLine->setGoodsType( 'item' );
-		}
-
+		$orderLine->setGoodsType( 'item' );
 		$lineData[] = $orderLine;
 
 		// return array with product and compensation linedata

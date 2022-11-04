@@ -84,12 +84,12 @@ function altapay_add_gateway( $methods ) {
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
 					$terminalName = $term->name;
-					foreach ( $term->nature as $nature ) {
-						if ( $nature->Nature === 'CreditCard' || $nature->Nature === 'CreditCardWallet' ) {
-							$tokenStatus   = 'CreditCard';
-							$subscriptions = true;
-							break;
-						}
+					$natures      = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
+
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) ) {
+						$subscriptions = true;
+					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
+						$tokenStatus = 'CreditCard';
 					}
 				}
 			}
