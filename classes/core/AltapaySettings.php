@@ -78,14 +78,9 @@ class AltapaySettings {
 		} else { // Order wasn't captured and must be captured now.
 			$amount = $pay->ReservedAmount; // Amount to capture.
 
-			$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
-
 			$api    = new CaptureReservation( $this->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
-			if ( ! empty( $reconciliation_identifier ) ) {
-				$api->setReconciliationIdentifier($reconciliation_identifier);
-			}
 
 			$response = $api->call();
 			if ( $response->Result !== 'Success' ) {

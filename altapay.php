@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.3.3
+ * Version: 3.3.4
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 7.0.0
+ * WC tested up to: 7.0.1
  *
  * @package Altapay
  */
@@ -22,9 +22,14 @@ use Altapay\Api\Payments\RefundCapturedReservation;
 use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
+use Altapay\Api\Subscription\ChargeSubscription;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
+}
+
+if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
+	define( 'ALTAPAY_PLUGIN_FILE', __FILE__ );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -73,16 +78,18 @@ function altapay_add_gateway( $methods ) {
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
 		foreach ( $terminals as $terminal ) {
-			$tokenStatus  = '';
-			$terminalName = $terminal;
+			$tokenStatus   = '';
+			$subscriptions = false;
+			$terminalName  = $terminal;
 			foreach ( $terminalInfo as $term ) {
 				if ( $term->key === $terminal ) {
 					$terminalName = $term->name;
-					foreach ( $term->nature as $nature ) {
-						if ( $nature->Nature === 'CreditCard' ) {
-							$tokenStatus = 'CreditCard';
-							break;
-						}
+					$natures      = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
+
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) ) {
+						$subscriptions = true;
+					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
+						$tokenStatus = 'CreditCard';
 					}
 				}
 			}
@@ -106,7 +113,7 @@ function altapay_add_gateway( $methods ) {
 					$filename = $tmpDir . '/' . $terminal . '.class.php';
 				}
 				// Replace patterns
-				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}' ), array( $terminal, $terminalName, $tokenStatus ), $template );
+				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
 				file_put_contents( $filename, $content );
 			}
@@ -163,13 +170,13 @@ function altapayAddMetaBoxes() {
 			'shop_order',
 			'normal'
 		);
-		
+
 		add_meta_box(
 			'altapay-order-reconciliation-identifier',
-			__('Reconciliation Identifier', 'altapay'),
+			__( 'Reconciliation Details', 'altapay' ),
 			'altapay_order_reconciliation_identifier_meta_box',
 			'shop_order',
-			'side'
+			'normal'
 		);
 	}
 
@@ -184,16 +191,21 @@ function altapayAddMetaBoxes() {
  */
 function altapay_meta_box( $post ) {
 	// Load order
-	$order = new WC_Order( $post->ID );
-	$txnID = $order->get_transaction_id();
+	$order        = new WC_Order( $post->ID );
+	$txnID        = $order->get_transaction_id();
+	$agreement_id = get_post_meta( $post->ID, '_agreement_id', true );
 
-	if ( $txnID ) {
+	if ( $txnID || $agreement_id ) {
 		$settings = new Core\AltapaySettings();
 		$login    = $settings->altapayApiLogin();
 
 		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 			return;
+		}
+
+		if ( ! $txnID ) {
+			$txnID = $agreement_id;
 		}
 
 		$auth = $settings->getAuth();
@@ -275,8 +287,55 @@ function altapay_meta_box( $post ) {
  * @return void
  */
 function altapay_order_reconciliation_identifier_meta_box( $post ) {
-	// Fetch order reconciliation identifier
-	echo esc_html(get_post_meta( $post->ID, '_reconciliation_identifier', true ));
+
+	$settings = new Core\AltapaySettings();
+	$login    = $settings->altapayApiLogin();
+
+	if ( ! $login || is_wp_error( $login ) ) {
+		echo '<p>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</p>';
+		return;
+	}
+
+	$postID = $post->ID;
+
+	if ( $post->post_type === 'altapay_captures' ) {
+		$postID = wp_get_post_parent_id( $postID );
+	}
+
+	$auth = $settings->getAuth();
+
+	$order = new WC_Order( $postID );
+	$txnID = $order->get_transaction_id();
+
+	if ( $txnID ) {
+		$api = new Payments( $auth );
+		$api->setTransaction( $txnID );
+		$payments = $api->call();
+		?>
+		<table width="100%" cellspacing="0" cellpadding="10">
+		   <thead>
+		   <tr>
+			   <th align="left" width="40%">Reconciliation Identifier</th>
+			   <th align="left" width="60%">Type</th>
+		   </tr>
+		   </thead>
+			<tbody>
+				<?php
+				foreach ( $payments as $payment ) {
+					foreach ( $payment->ReconciliationIdentifiers as $identifier ) {
+						?>
+						<tr>
+							<td><?php echo $identifier->Id; ?></td>
+							<td><?php echo $identifier->Type; ?></td>
+						</tr>
+						<?php
+					}
+				}
+				?>
+			</tbody>
+		</table>
+		<?php
+	}
 }
 
 /**
@@ -381,11 +440,11 @@ function createAltapayPaymentPageCallback() {
  * @return WP_Error
  */
 function altapayCaptureCallback() {
-	$utilMethods = new Util\UtilMethods();
-	$settings    = new Core\AltapaySettings();
-	$orderID     = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
-	$amount      = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
-
+	$utilMethods  = new Util\UtilMethods();
+	$settings     = new Core\AltapaySettings();
+	$orderID      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
+	$amount       = isset( $_POST['amount'] ) ? (float) wp_unslash( $_POST['amount'] ) : '';
+	$subscription = false;
 	if ( ! $orderID || ! $amount ) {
 		wp_send_json_error( array( 'error' => 'error' ) );
 	}
@@ -393,6 +452,12 @@ function altapayCaptureCallback() {
 	// Load order
 	$order = new WC_Order( $orderID );
 	$txnID = $order->get_transaction_id();
+
+	if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) {
+		$txnID        = get_post_meta( $orderID, '_agreement_id', true );
+		$subscription = true;
+	}
+
 	if ( $txnID ) {
 
 		$login = $settings->altapayApiLogin();
@@ -423,15 +488,15 @@ function altapayCaptureCallback() {
 		$response    = null;
 		$rawResponse = null;
 		try {
-			$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
-
-			$api = new CaptureReservation( $settings->getAuth() );
-			$api->setAmount( round( $amount, 2 ) );
-			$api->setOrderLines( $orderLines );
-			$api->setTransaction( $txnID );
-			if ( ! empty( $reconciliation_identifier ) ) {
-				$api->setReconciliationIdentifier($reconciliation_identifier);
+			if ( $subscription === true ) {
+				$api = new ChargeSubscription( $settings->getAuth() );
+			} else {
+				$api = new CaptureReservation( $settings->getAuth() );
+				$api->setOrderLines( $orderLines );
 			}
+
+			$api->setAmount( round( $amount, 2 ) );
+			$api->setTransaction( $txnID );
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
@@ -468,6 +533,14 @@ function altapayCaptureCallback() {
 			$captured = (float) $xml->Body->Transactions->Transaction->CapturedAmount;
 			$refunded = (float) $xml->Body->Transactions->Transaction->RefundedAmount;
 			$charge   = $reserved - $captured - $refunded;
+
+			if ( $subscription === true ) {
+				$xmlToJson          = wp_json_encode( $xml->Body->Transactions );
+				$jsonToArray        = json_decode( $xmlToJson, true );
+				$latest_transaction = $settings->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
+				$transaction_id     = $jsonToArray['Transaction'][ $latest_transaction ]['TransactionId'];
+				update_post_meta( $orderID, '_transaction_id', $transaction_id );
+			}
 		}
 
 		if ( $charge <= 0 ) {
@@ -591,16 +664,10 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 	$error       = '';
 
 	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
-
-		$reconciliation_identifier = get_post_meta( $orderID, '_reconciliation_identifier', true );
-
 		$api = new RefundCapturedReservation( $auth );
 		$api->setAmount( round( $amount, 2 ) );
 		$api->setOrderLines( $orderLines );
 		$api->setTransaction( $txnID );
-		if ( ! empty( $reconciliation_identifier ) ) {
-			$api->setReconciliationIdentifier($reconciliation_identifier);
-		}
 
 		try {
 			$response = $api->call();

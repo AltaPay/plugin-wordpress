@@ -66,28 +66,19 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->has_fields			= false;
 		$this->method_title			= 'AltaPay - {name}';
 		$this->method_description	= __( 'Adds AltaPay Payment Gateway to use with WooCommerce', 'altapay');
-		$this->supports = array(
-			'refunds',
-			'subscriptions',
-			'subscription_cancellation',
-			'subscription_suspension',
-			'subscription_reactivation',
-			'subscription_amount_changes',
-			'subscription_date_changes',
-		);
-
-		$this->terminal			= '{name}';
-		$this->enabled			= $this->get_option( 'enabled' );
-		$this->title			= $this->get_option( 'title' );
-		$this->description		= $this->get_option( 'description' );
-		$this->token			= $this->get_option('token');
-		$this->payment_action	= $this->get_option( 'payment_action' );
-		$this->currency			= $this->get_option( 'currency' );
-		$currency				= explode(' ', '{name}');
-		$this->default_currency	= end($currency);
+		$this->supports				= $this->supportedFeatures();
+		$this->terminal				= '{name}';
+		$this->enabled				= $this->get_option( 'enabled' );
+		$this->title				= $this->get_option( 'title' );
+		$this->description			= $this->get_option( 'description' );
+		$this->token				= $this->get_option('token');
+		$this->payment_action		= $this->get_option( 'payment_action' );
+		$this->currency				= $this->get_option( 'currency' );
+		$currency					= explode(' ', '{name}');
+		$this->default_currency		= end($currency);
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
-			$this->icon = plugin_dir_url( __DIR__ ) .'assets/images/payment_icons/'.$this->get_option( 'payment_icon' );
+			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
 		}
 		// Load form fields
 		$this->init_form_fields();
@@ -99,7 +90,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		add_action( 'woocommerce_api_wc_gateway_' . $this->id, array( $this, 'checkAltapayResponse' ) );
 
 		// Subscription actions
-		add_action( 'woocommerce_scheduled_subscription_payment_altapay', array($this, 'scheduledSubscriptionPayment'), 10, 2 );
+		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduledSubscriptionsPayment'), 10, 2 );
 
 	}
 
@@ -139,9 +130,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	public function init_form_fields() {
 		$tokenStatus = '{tokenStatus}';
 		if($tokenStatus === 'CreditCard'){
-			$this->form_fields = include __DIR__. '/../includes/AltapayFormFieldsToken.php';
+			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFieldsToken.php';
 		} else {
-			$this->form_fields = include __DIR__. '/../includes/AltapayFormFields.php';
+			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFields.php';
 		}
 	}
 
@@ -239,18 +230,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$payment_type = 'paymentAndCapture';
 		}
 
-		// Check if WooCommerce subscriptions is enabled
-		if ( class_exists( 'WC_Subscriptions_Order' ) ) {
-			// Check if cart contain subscription product
-			if( WC_Subscriptions_Order::order_contains_subscription( $order_id ) ) {
-				if ( $this->payment_action === 'authorize_capture' ) {
-					$payment_type = 'subscriptionAndCharge';
-				} else {
-					$payment_type = 'subscriptionAndReserve';
-				}
-			}
-		}
-
 		$transactionInfo = $altapayHelpers->transactionInfo();
 
 		// Add orderlines to AltaPay request
@@ -270,10 +249,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			mt_srand( crc32( serialize( array( microtime( true ), $order_id ) ) ) );
-			$reconciliation_identifier = wp_generate_uuid4();
-			add_post_meta( $order_id, '_reconciliation_identifier', $reconciliation_identifier , true);
-
 			$auth    = $this->getAuth();
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
@@ -288,9 +263,21 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					->setCcToken( $ccToken )
 					->setFraudService( null )
 					->setLanguage( $language )
-					->setType( $payment_type )
-					->setOrderLines( $orderLines )
-					->setSaleReconciliationIdentifier($reconciliation_identifier);
+					->setOrderLines( $orderLines );
+
+			// Check if WooCommerce subscriptions is enabled and contains subscription product
+			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
+				if ( $this->payment_action === 'authorize_capture' ) {
+					$payment_type = 'subscriptionAndCharge';
+				} else {
+					$payment_type = 'subscription';
+				}
+
+				$request->setAgreement( $this->getAgreementDetail( $order ) );
+			}
+
+			$request->setType( $payment_type );
+
 			if ( $request ) {
 				try {
 					$response                 = $request->call();
@@ -344,16 +331,48 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
 
-			$xmlResponse          = wp_unslash( $_POST['xml'] );
-			$xml                  = new SimpleXMLElement( $xmlResponse );
-			$xmlToJson            = wp_json_encode( $xml->Body->Transactions->Transaction );
-			$jsonToArray          = json_decode( $xmlToJson, true );
+			$order        = new WC_Order( $order_id );
+			$agreement_id = '';
 
-			$paymentScheme  = $jsonToArray['PaymentSchemeName'];
-			$lastFourDigits = $jsonToArray['CardInformation']['LastFourDigits'] ?? '';
+			$xmlResponse = wp_unslash( $_POST['xml'] );
+			$xml         = new SimpleXMLElement( $xmlResponse );
+
+			if ( $type === 'subscriptionAndCharge' || $type === 'subscription' ) {
+				$agreement_id = $txnId;
+			}
+
+			if ( $type === 'subscriptionAndCharge' ) {
+				$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
+				$jsonToArray       = json_decode( $xmlToJson, true );
+				$latestTransaction = $this->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
+				$transaction       = $jsonToArray['Transaction'][ $latestTransaction ];
+				$txnId             = $transaction['TransactionId'];
+
+				if ( $status === 'succeeded' ) {
+					foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
+						if ( $transaction_data['AuthType'] === 'subscription_payment' &&
+						$transaction_data['TransactionStatus'] !== 'captured' ) {
+							$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
+							wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
+							wp_redirect( wc_get_cart_url() );
+							exit;
+						}
+					}
+				}
+			} else {
+				$xmlToJson   = wp_json_encode( $xml->Body->Transactions->Transaction );
+				$transaction = json_decode( $xmlToJson, true );
+			}
+
+			if ( $type === 'subscription' ) {
+				$txnId = '';
+			}
+
+			$paymentScheme  = $transaction['PaymentSchemeName'];
+			$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
 			$ccToken        = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
-			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) ) : false;
-			$ccExpiryDate = isset( $jsonToArray['CreditCardExpiry'] ) ? ( $jsonToArray['CreditCardExpiry']['Month'] . '/' . $jsonToArray['CreditCardExpiry']['Year'] ) : '';
+			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
+			$ccExpiryDate = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 			$order = new WC_Order( $order_id );
 
 			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
@@ -382,17 +401,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$order->payment_complete();
 
 					update_post_meta( $order_id, '_transaction_id', $txnId );
+					update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
 					if ( $saveCreditCard ) {
 						$objTokenControl = new Core\AltapayTokenControl();
 						$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
 					}
 
-				} else {
-					if ( $status === 'error' || $status === 'failed' ) {
-						$order->update_status( 'failed', 'Payment failed: ' . $errorMessage );
-						$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
-					}
+				} elseif ($status === 'error' || $status === 'failed') {
+						$order->update_status( 'failed', 'Payment failed' . $errorMessage );
+						$order->add_order_note( __( 'Payment failed' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
 				}
 
 				exit;
@@ -412,15 +430,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				exit;
 			}
 
-			if ( array_key_exists( 'cancel_order', $_GET ) ) {
-				$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
-				wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $errorMessage, 'error' );
-				wp_redirect( wc_get_cart_url() );
-				exit;
-			}
-
 			// Make some validation
-			if ( $errorMessage || $merchantError ) {
+			if ( $errorMessage || $merchantError || array_key_exists( 'cancel_order', $_GET ) ) {
 				$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
 				wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $errorMessage, 'error' );
 				wp_redirect( wc_get_cart_url() );
@@ -432,6 +443,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
 				$order->payment_complete();
 				update_post_meta( $order_id, '_transaction_id', $txnId );
+				update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
 				if ( $saveCreditCard ) {
 					$objTokenControl = new Core\AltapayTokenControl();
@@ -447,14 +459,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					return;
 				}
 
-				$reconciliation_identifier = get_post_meta( $order_id, '_reconciliation_identifier', true );
-
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
-				if ( ! empty( $reconciliation_identifier ) ) {
-					$api->setReconciliationIdentifier($reconciliation_identifier);
-				}
 
 				/** @var CaptureReservationResponse $response */
 				try {
@@ -472,16 +479,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	* Process refund.
-	*
-	* If the gateway declares 'refunds' support, this will allow it to refund.
-	* a passed in amount.
-	*
-	* @param  int        $order_id Order ID.
-	* @param  float|null $amount Refund amount.
-	* @param  string     $reason Refund reason.
-	* @return boolean True on success, or a WP_Error object.
-	*/
+	 * Process refund.
+	 *
+	 * If the gateway declares 'refunds' support, this will allow it to refund.
+	 * a passed in amount.
+	 *
+	 * @param  int        $order_id Order ID.
+	 * @param  float|null $amount Refund amount.
+	 * @param  string     $reason Refund reason.
+	 * @return boolean True on success, or a WP_Error object.
+	 */
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 
 		$refund = altapayRefundPayment( $order_id, $amount, $reason, false );
@@ -566,5 +573,67 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		}
 
 		return $customer;
+	}
+
+	/**
+	 * @param $order
+	 * @return array
+	 */
+	public function getAgreementDetail( $order ) {
+		$agreementDetails             = array();
+			$agreementDetails['type'] = 'recurring';
+			$subscriptions            = wcs_get_subscriptions_for_order( $order );
+
+		foreach ( $subscriptions as $subscription ) {
+			$agreementDetails['frequency']        = $this->agreementFrequency( $subscription->get_billing_period() );
+			$agreementDetails['next_charge_date'] = date( 'Ymd', $subscription->get_time( 'next_payment' ) );
+			$agreementDetails['admin_url']        = $subscription->get_view_order_url();
+
+			if ( $subscription->get_time( 'end' ) ) {
+				$agreementDetails['expiry'] = date( 'Ymd', $subscription->get_time( 'end' ) );
+			}
+		}
+
+		return $agreementDetails;
+	}
+
+	/**
+	 * @param $billing_period
+	 * @return string
+	 */
+	public function agreementFrequency( $billing_period ) {
+
+		$arr = array(
+			'day'   => '1',
+			'week'  => '7',
+			'month' => '30',
+			'year'  => '365',
+		);
+
+		return $arr[ $billing_period ] ?? '30';
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function supportedFeatures() {
+		$supportSubscriptions = '{supportSubscriptions}';
+		$features             = array( 'refunds' );
+
+		if ( $supportSubscriptions == true ) {
+			$features = array_merge(
+				$features,
+				array(
+					'subscriptions',
+					'subscription_cancellation',
+					'subscription_suspension',
+					'subscription_reactivation',
+					'subscription_amount_changes',
+					'subscription_date_changes',
+				)
+			);
+		}
+
+		return $features;
 	}
 }

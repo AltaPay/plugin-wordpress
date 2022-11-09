@@ -19,6 +19,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Configuration](#configuration)
 
+[Subscriptions](#subscriptions)
+
 [Synchronize payment methods](#synchronize-payment-methods)
 
 [Reconcile Orders](#reconcile-orders)
@@ -71,7 +73,7 @@ To connect to the payment gateway:
 
 - Navigate to: **WooCommerce > AltaPay Settings**
 
-![altapay_settings_initial](docs/altapay_settings_initial.png)
+    ![altapay_settings_initial](docs/altapay_settings_initial.png)
 
 - Complete the Gateway URL, Username and Password fields with the information provided by AltaPay
 - Click on **Create Page** button **_(mandatory)_**
@@ -79,6 +81,14 @@ To connect to the payment gateway:
 
 This will populate all the available terminals for the currenct API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
+
+## Subscriptions
+
+AltaPay plugin is compatible with the [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) extension to accept recurring payments in your WooCommerce store.
+
+> Note:
+>
+> Currently, AltaPay plugin supports recurring payments with the credit card terminal only.
 
 ## Synchronize payment methods
 
@@ -109,12 +119,12 @@ For the AltaPay payment method to appear in the checkout page:
 - Navigate to WooCommerce > Settings
 - Click on the **Payments** tab.
 
-![altapay_woocommerce_payment_methods](docs/altapay_woocommerce_payment_methods.png)
+    ![altapay_woocommerce_payment_methods](docs/altapay_woocommerce_payment_methods.png)
 
 - For each AltaPay payment terminal, there must be a payment method. Refresh the page if you do not see any.
 - Click on the desired payment terminal.
 
-![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.png)
+    ![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.png)
 
 - Enable the payment terminal.
 - Complete the text field "Title"; this field will appear in the checkout page as the title of the payment terminal.
@@ -127,7 +137,7 @@ For the AltaPay payment method to appear in the checkout page:
 - Navigate to: Plugins > Installed Plugins
 - If there is a new version of the plug-in, you should see a warning message, as is shown in the image below.
 
-![configuring_woocommerce](docs/update_plugin.png)
+    ![configuring_woocommerce](docs/update_plugin.png)
 
 - Click on the "update now" link.
 
@@ -157,7 +167,7 @@ In order to reconcile payments please follow the steps below:
 
 1. From the admin panel, navigate to: **WooCommerce > Orders**
 2. Select the order you want to view.
-3. Copy the Reconciliation Identifier from the **Reconciliation Identifier** section on the right side.
+3. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
 
    ![magento_order_view](docs/altapay_wp_order_reconcile_view.jpg)
 
@@ -183,7 +193,7 @@ Minimum system requirements are:
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.0.3, WooCommerce 7.0.0 and PHP 8.1
+- WordPress 6.0.3, WooCommerce 7.0.1 and PHP 8.1
 
 
 # Troubleshooting

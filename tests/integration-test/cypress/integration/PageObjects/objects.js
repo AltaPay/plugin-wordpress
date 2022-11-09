@@ -60,7 +60,7 @@ class Order {
         cy.get('#billing_phone').clear().type('33 13 71 12')
         cy.get('#billing_email').clear().type('customer@email.dk')
         cy.get('#place_order').click().wait(10000)
-        cy.get('#submitbutton').click().wait(8000)
+        cy.get('#submitbutton').click({force:true}).wait(8000)
         cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
             const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
             cy.wrap(mobileNum).type('20222222')
@@ -148,7 +148,7 @@ class Order {
 
     partial_refund() {
 
-        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click().wait(3000)
+        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click({force:true}).wait(3000)
         cy.get('body').then(($a) => {
 
             if ($a.find('.components-modal__header > .components-button').length) {
@@ -183,7 +183,7 @@ class Order {
 
     change_currency_to_EUR_for_iDEAL() {
         cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click()
-        cy.get('#toplevel_page_woocommerce > .wp-submenu > :nth-child(7) > a').click()
+        cy.get('a[href="admin.php?page=wc-settings"]').click()
         cy.get('#select2-woocommerce_currency-container').click()
         cy.get('.select2-dropdown > .select2-search > .select2-search__field').type('Euro (€){enter}')
         cy.get('.submit > .button-primary').click()
@@ -237,7 +237,7 @@ class Order {
 
     change_currency_to_DKK() {
         cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click()
-        cy.get('#toplevel_page_woocommerce > .wp-submenu > :nth-child(7) > a').click()
+        cy.get('a[href="admin.php?page=wc-settings"]').click()
         cy.get('#select2-woocommerce_currency-container').click()
         cy.get('.select2-dropdown > .select2-search > .select2-search__field').type('Danish Krone{enter}')
         cy.get('.submit > .button-primary').click()
