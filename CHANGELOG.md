@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.5]
+- Save reconciliation identifiers with orders meta to make it available for CSV export.
+
 ## [3.3.4]
 - Add support for payment reconciliation.
 - Add support for WooCommerce Subscriptions with credit card terminal.
