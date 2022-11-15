@@ -73,14 +73,19 @@ trait AltapayMaster {
 					$api = new ChargeSubscription( $this->getAuth() );
 					$api->setTransaction( $agreement_id );
 					$api->setAmount( round( $amount, 2 ) );
+					$api->setReconciliationIdentifier( wp_generate_uuid4() );
+
 					$response = $api->call();
 
 					$xmlToJson          = wp_json_encode( $response->Transactions );
 					$jsonToArray        = json_decode( $xmlToJson, true );
 					$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
-					$transaction_id     = $jsonToArray[ $latest_transaction ]['TransactionId'];
+					$transaction        = $jsonToArray[ $latest_transaction ];
+
+					$transaction_id = $transaction['TransactionId'];
 
 					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
+					$this->saveReconciliationDetails( $renewal_order->get_id(), $transaction['ReconciliationIdentifiers'] );
 
 					if ( $response->Result === 'Success' ) {
 						$renewal_order->payment_complete();
@@ -234,5 +239,20 @@ trait AltapayMaster {
 		}
 
 		return $latest_transaction;
+	}
+
+	/**
+	 * @param $order_id
+	 * @param $reconciliationIdentifiers
+	 * @return void
+	 */
+	public function saveReconciliationDetails( $order_id, $reconciliationIdentifiers ) {
+		$arr = array();
+
+		foreach ( $reconciliationIdentifiers as $identifier ) {
+			$arr[] = 'Id: ' . $identifier['Id'] . ', Type: ' . $identifier['Type'];
+		}
+
+		update_post_meta( $order_id, '_reconciliation_identifier', implode( ' | ', $arr ) );
 	}
 }

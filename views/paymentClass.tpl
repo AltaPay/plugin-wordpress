@@ -263,7 +263,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					->setCcToken( $ccToken )
 					->setFraudService( null )
 					->setLanguage( $language )
-					->setOrderLines( $orderLines );
+					->setOrderLines( $orderLines )
+					->setSaleReconciliationIdentifier( wp_generate_uuid4() );
 
 			// Check if WooCommerce subscriptions is enabled and contains subscription product
 			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
@@ -402,6 +403,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 					update_post_meta( $order_id, '_transaction_id', $txnId );
 					update_post_meta( $order_id, '_agreement_id', $agreement_id );
+					$this->saveReconciliationDetails( $order_id, $transaction['ReconciliationIdentifiers'] );
 
 					if ( $saveCreditCard ) {
 						$objTokenControl = new Core\AltapayTokenControl();
@@ -444,6 +446,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$order->payment_complete();
 				update_post_meta( $order_id, '_transaction_id', $txnId );
 				update_post_meta( $order_id, '_agreement_id', $agreement_id );
+				$this->saveReconciliationDetails( $order_id, $transaction['ReconciliationIdentifiers'] );
 
 				if ( $saveCreditCard ) {
 					$objTokenControl = new Core\AltapayTokenControl();
@@ -462,10 +465,16 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
+				$api->setReconciliationIdentifier( wp_generate_uuid4() );
 
 				/** @var CaptureReservationResponse $response */
 				try {
 					$response = $api->call();
+
+					$transaction = json_decode( json_encode( $response->Transactions ), true );
+					$transaction = reset( $transaction );
+					$this->saveReconciliationDetails( $order_id, $transaction['ReconciliationIdentifiers'] );
+
 				} catch ( ResponseHeaderException $e ) {
 					error_log( 'Response header exception ' . $e->getMessage() );
 				} catch ( \Exception $e ) {
