@@ -169,7 +169,11 @@ In order to reconcile payments please follow the steps below:
 2. Select the order you want to view.
 3. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
 
-   ![magento_order_view](docs/altapay_wp_order_reconcile_view.jpg)
+   ![wp_order_view](docs/altapay_wp_order_reconcile_view.jpg)
+
+    Or export the order data to CSV from WooCommerce using any export orders extension. Make sure to include `_reconciliation_identifier` meta key in the exported fields. 
+
+   ![wp_orders_csv](docs/orders_csv.png)
 
 4. Navigate to AltaPay Gateway dashboard
 5. Click on **FUNDING FILES** under **FINANCES** menu
@@ -193,7 +197,7 @@ Minimum system requirements are:
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.0.3, WooCommerce 7.0.1 and PHP 8.1
+- WordPress 6.0.3, WooCommerce 7.1.0 and PHP 8.1
 
 
 # Troubleshooting
