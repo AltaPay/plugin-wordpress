@@ -440,7 +440,7 @@ function altapayCaptureCallback() {
 	$order = new WC_Order( $orderID );
 	$txnID = $order->get_transaction_id();
 
-	if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) {
+	if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
 		$txnID        = get_post_meta( $orderID, '_agreement_id', true );
 		$subscription = true;
 	}
