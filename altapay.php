@@ -32,6 +32,10 @@ if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
 	define( 'ALTAPAY_PLUGIN_FILE', __FILE__ );
 }
 
+if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
+	define( 'ALTAPAY_DB_VERSION', '335' );
+}
+
 // Include the autoloader, so we can dynamically include the rest of the classes.
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
@@ -57,6 +61,15 @@ function init_altapay_settings() {
 
 	$objOrderStatus = new Core\AltapayOrderStatus();
 	$objOrderStatus->registerHooks();
+
+	$objReconciliationData = new Core\AltapayReconciliation();
+	$objReconciliationData->registerHooks();
+
+	$altapayDbVersion = get_site_option( 'altapay_db_version' );
+
+	if ( empty( $altapayDbVersion ) || $altapayDbVersion !== ALTAPAY_DB_VERSION ) {
+		Core\AltapayPluginInstall::createReconciliationDataTable();
+	}
 }
 
 /**
@@ -437,8 +450,9 @@ function altapayCaptureCallback() {
 	}
 
 	// Load order
-	$order = new WC_Order( $orderID );
-	$txnID = $order->get_transaction_id();
+	$order            = new WC_Order( $orderID );
+	$txnID            = $order->get_transaction_id();
+	$reconciliationId = wp_generate_uuid4();
 
 	if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
 		$txnID        = get_post_meta( $orderID, '_agreement_id', true );
@@ -484,7 +498,7 @@ function altapayCaptureCallback() {
 
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
-			$api->setReconciliationIdentifier( wp_generate_uuid4() );
+			$api->setReconciliationIdentifier( $reconciliationId );
 			$response    = $api->call();
 			$rawResponse = $api->getRawResponse();
 		} catch ( InvalidArgumentException $e ) {
@@ -525,11 +539,13 @@ function altapayCaptureCallback() {
 				$transaction_id     = $transaction['TransactionId'];
 				update_post_meta( $orderID, '_transaction_id', $transaction_id );
 			} else {
-				$xmlToJson   = wp_json_encode( $xml->Body->Transactions->Transaction );
-				$transaction = json_decode( $xmlToJson, true );
+				$xmlToJson      = wp_json_encode( $xml->Body->Transactions->Transaction );
+				$transaction    = json_decode( $xmlToJson, true );
+				$transaction_id = $transaction['TransactionId'];
 			}
 
-			$settings->saveReconciliationDetails( $orderID, $transaction['ReconciliationIdentifiers'] );
+			$reconciliation = new Core\AltapayReconciliation();
+			$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction_id, $reconciliationId, 'captured' );
 
 			$reserved = (float) $transaction['ReservedAmount'];
 			$captured = (float) $transaction['CapturedAmount'];
@@ -652,17 +668,18 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 	}
 
 	// Refund the amount OR release if a refund is not possible
-	$releaseFlag = false;
-	$refundFlag  = false;
-	$auth        = $settings->getAuth();
-	$error       = '';
+	$releaseFlag      = false;
+	$refundFlag       = false;
+	$auth             = $settings->getAuth();
+	$error            = '';
+	$reconciliationId = wp_generate_uuid4();
 
 	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
 		$api = new RefundCapturedReservation( $auth );
 		$api->setAmount( round( $amount, 2 ) );
 		$api->setOrderLines( $orderLines );
 		$api->setTransaction( $txnID );
-		$api->setReconciliationIdentifier( wp_generate_uuid4() );
+		$api->setReconciliationIdentifier( $reconciliationId );
 
 		try {
 			$response = $api->call();
@@ -692,7 +709,9 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 
 				$transaction = json_decode( wp_json_encode( $response->Transactions ), true );
 				$transaction = reset( $transaction );
-				$settings->saveReconciliationDetails( $orderID, $transaction['ReconciliationIdentifiers'] );
+
+				$reconciliation = new Core\AltapayReconciliation();
+				$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction['TransactionId'], $reconciliationId, 'refunded' );
 			} else {
 				$error = $response->MerchantErrorMessage;
 			}
@@ -804,7 +823,7 @@ function altapayReleasePayment() {
 			$refunded += $pay->RefundedAmount;
 		}
 
-		if ( !$captured && !$refunded ) {
+		if ( ! $captured && ! $refunded ) {
 			$orderStatus = 'cancelled';
 		} elseif ( $captured == $refunded && $refunded == $reserved || $refunded == $reserved ) {
 			$orderStatus = 'refunded';

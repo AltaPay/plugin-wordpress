@@ -241,18 +241,4 @@ trait AltapayMaster {
 		return $latest_transaction;
 	}
 
-	/**
-	 * @param $order_id
-	 * @param $reconciliationIdentifiers
-	 * @return void
-	 */
-	public function saveReconciliationDetails( $order_id, $reconciliationIdentifiers ) {
-		$arr = array();
-
-		foreach ( $reconciliationIdentifiers as $identifier ) {
-			$arr[] = 'Id: ' . $identifier['Id'] . ', Type: ' . $identifier['Type'];
-		}
-
-		update_post_meta( $order_id, '_reconciliation_identifier', implode( ' | ', $arr ) );
-	}
 }
