@@ -78,4 +78,14 @@ class AltapayReconciliation {
 
 	}
 
+	/**
+	 * @param int $orderId
+	 *
+	 * @return array|null
+	 */
+	public function getReconciliationData( $orderId ) {
+		global $wpdb;
+
+		return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId = %d", $orderId ), ARRAY_A );
+	}
 }

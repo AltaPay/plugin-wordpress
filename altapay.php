@@ -307,9 +307,11 @@ function altapay_order_reconciliation_identifier_meta_box( $post ) {
 		$postID = wp_get_post_parent_id( $postID );
 	}
 
-	$reconciliation_identifiers = get_post_meta( $postID, '_reconciliation_identifier', true );
+	$reconciliation             = new Core\AltapayReconciliation();
+	$reconciliation_identifiers = $reconciliation->getReconciliationData( (int) $postID );
 
-	?>
+	if ( ! empty( $reconciliation_identifiers ) ) {
+		?>
 		<table width="100%" cellspacing="0" cellpadding="10">
 		   <thead>
 		   <tr>
@@ -319,23 +321,19 @@ function altapay_order_reconciliation_identifier_meta_box( $post ) {
 		   </thead>
 			<tbody>
 				<?php
-
-				if ( $reconciliation_identifiers ) {
-					$identifiers = explode( ' | ', $reconciliation_identifiers );
-					foreach ( $identifiers  as $value ) {
-						$identifier = explode( ',', $value );
-						?>
+				foreach ( $reconciliation_identifiers  as $identifier ) {
+					?>
 						<tr>
-							<td><?php echo str_replace( 'Id: ', '', $identifier[0] ); ?></td>
-							<td><?php echo str_replace( 'Type: ', '', $identifier[1] ); ?></td>
+							<td><?php echo $identifier['identifier']; ?></td>
+							<td><?php echo $identifier['transactionType']; ?></td>
 						</tr>
 						<?php
-					}
 				}
 				?>
 			</tbody>
 		</table>
 		<?php
+	}
 }
 
 /**
