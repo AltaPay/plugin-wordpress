@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.3.5]
 - Save reconciliation identifiers with orders meta to make it available for CSV export.
+- Update minimum PHP supported version to 7.4
 
 ## [3.3.4]
 - Add support for payment reconciliation.
