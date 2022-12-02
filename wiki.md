@@ -171,8 +171,9 @@ In order to reconcile payments please follow the steps below:
 
    ![wp_order_view](docs/altapay_wp_order_reconcile_view.jpg)
 
-    Or export the order data to CSV from WooCommerce using any export orders extension. Make sure to include `_reconciliation_identifier` meta key in the exported fields. 
+    Or export the reconciliation data to CSV using the `Export Reconciliation Data` button on the top of `Orders` page.
 
+   ![export_reconciliation_data](docs/export_reconciliation_data.png)
    ![wp_orders_csv](docs/orders_csv.png)
 
 4. Navigate to AltaPay Gateway dashboard
@@ -183,7 +184,7 @@ In order to reconcile payments please follow the steps below:
 
 **Sample AltaPay Gateway CSV:**
 
-![funding_list_csv](docs/funding_list_csv.png)
+ ![funding_list_csv](docs/funding_list_csv.png)
 
 
 

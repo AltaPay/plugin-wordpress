@@ -83,8 +83,7 @@ trait AltapayMaster {
 					$jsonToArray        = json_decode( $xmlToJson, true );
 					$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
 					$transaction        = $jsonToArray[ $latest_transaction ];
-
-					$transaction_id = $transaction['TransactionId'];
+					$transaction_id     = $transaction['TransactionId'];
 
 					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
 
@@ -244,5 +243,4 @@ trait AltapayMaster {
 
 		return $latest_transaction;
 	}
-
 }
