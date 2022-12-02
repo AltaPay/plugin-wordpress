@@ -3,7 +3,6 @@ All notable changes to this project will be documented in this file.
 
 ## [3.3.5]
 - Add option to export reconciliation data in CSV
-- Update minimum PHP supported version to 7.4
 
 ## [3.3.4]
 - Add support for payment reconciliation.

@@ -1,7 +1,7 @@
 ===  AltaPay for WooCommerce ===
 Contributors: altapay_integrations
 Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
-Requires PHP: 7.4
+Requires PHP: 7.2
 Requires at least: 5.0
 Tested up to: 6.1.1
 Stable tag: 3.3.5
@@ -39,7 +39,6 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.3.5 =
 * Add option to export reconciliation data in CSV
-* Update minimum PHP supported version to 7.4
 
 = 3.3.4 =
 * Add support for payment reconciliation.

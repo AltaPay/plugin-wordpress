@@ -4,9 +4,9 @@ if [ -z "$1" ]
   then
     echo "No PHP version supplied"
     echo "Usage: ./build.sh <php_version>"
-    echo "./build.sh 7.4"
+    echo "./build.sh 7.2"
     echo "./build.sh 8.1"
-    echo "composer.lock will be updated for php > 7.4"
+    echo "composer.lock will be updated for php > 7.2"
     exit
 fi
 
@@ -33,7 +33,7 @@ then
   exit
 fi
 
-if [ "$1" = "7.4" ]
+if [ "$1" = "7.2" ]
 then
   composer_command="install"
 else
