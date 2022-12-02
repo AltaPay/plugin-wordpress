@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.3.5]
-- Save reconciliation identifiers with orders meta to make it available for CSV export.
+- Add option to export reconciliation data in CSV
 - Update minimum PHP supported version to 7.4
 
 ## [3.3.4]
