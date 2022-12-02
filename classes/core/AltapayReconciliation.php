@@ -18,6 +18,7 @@ class AltapayReconciliation {
 	 */
 	public function registerHooks() {
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'reconciliation_data_export_button' ), 20, 1 );
+		add_action( 'woocommerce_after_register_post_type', array( $this, 'exportReconciliationCSV' ) );
 	}
 
 	/**
@@ -36,10 +37,6 @@ class AltapayReconciliation {
 				</button>
 			</div>
 			<?php
-
-			if ( isset( $_REQUEST['export_reconciliation_data'] ) ) {
-
-			}
 		}
 	}
 
@@ -87,5 +84,52 @@ class AltapayReconciliation {
 		global $wpdb;
 
 		return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId = %d", $orderId ), ARRAY_A );
+	}
+
+	/**
+	 * Export Reconciliation CSV file.
+	 *
+	 * @return void
+	 */
+	public function exportReconciliationCSV() {
+		if ( isset( $_REQUEST['export_reconciliation_data'] ) ) {
+			global $wpdb;
+
+			$output    = '';
+			$file_name = 'reconciliation_data.csv';
+
+			header( 'Content-Type: text/csv; charset=utf-8' );
+			header( 'Content-Disposition: attachment; filename=' . $file_name );
+			header( 'Pragma: no-cache' );
+			header( 'Expires: 0' );
+
+			$reconciliation_data = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers", ARRAY_A );
+
+			$output  = $output . 'Order ID,Date Created,Order Total,Currency,Transaction ID,Reconciliation Identifier,Type,Payment Method,Order Status';
+			$output .= "\n";
+
+			if ( ! empty( $reconciliation_data ) ) {
+				foreach ( $reconciliation_data as $data ) {
+					$order = wc_get_order( $data['orderId'] );
+
+					if ( $order ) {
+
+						$dateLocalised = ! is_null( $order->get_date_created() ) ? $order->get_date_created()->getOffsetTimestamp() : '';
+						$createdDate   = esc_attr( date_i18n( 'Y-m-d', $dateLocalised ) );
+						$paymentMethod = $order->get_payment_method_title();
+						$total         = $order->get_total();
+						$status        = $order->get_status();
+						$currency      = $order->get_currency();
+						$transactionId = $order->get_transaction_id();
+
+						$output .= $data['orderId'] . ',' . $createdDate . ',' . $total . ',' . $currency . ',' . $transactionId . ',' . $data['identifier'] . ',' . $data['transactionType'] . ',' . $paymentMethod . ',' . $status;
+						$output .= "\n";
+					}
+				}
+			}
+
+			echo $output;
+			exit;
+		}
 	}
 }
