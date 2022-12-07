@@ -22,6 +22,8 @@ class AltapayReconciliation {
 	}
 
 	/**
+	 * Add button to Export Reconciliation Data on WooCommerce order list table.
+	 *
 	 * @param string $which The location of the extra table nav markup: 'top' or 'bottom'.
 	 *
 	 * @return void
@@ -124,60 +126,82 @@ class AltapayReconciliation {
 				$args['meta_query'] = array(
 					array(
 						'key'     => '_customer_user',
-						'value'   => (int) $_GET['_customer_user'],
+						'value'   => (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) ),
 						'compare' => '=',
 					),
 				);
 			}
 
 			if ( ! empty( $_GET['post_status'] ) ) {
-				$args['post_status'] = $_GET['post_status'];
+				$args['post_status'] = sanitize_text_field( wp_unslash( $_GET['post_status'] ) );
 			}
 
 			if ( ! empty( $_GET['orderby'] ) ) {
-				$args['orderby'] = $_GET['orderby'];
-				$args['order']   = $_GET['order'];
+				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			}
+
+			if ( ! empty( $_GET['order'] ) ) {
+				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
 			}
 
 			if ( ! empty( $_GET['m'] ) ) {
-				$time               = strtotime( $_GET['m'] );
-				$args['date_query'] = array(
-					array(
-						'year'  => date( 'Y', $time ),
-						'month' => date( 'm', $time ),
-					),
-				);
+				$yearMonth = sanitize_text_field( wp_unslash( $_GET['m'] ) );
+
+				if ( ! empty( $yearMonth ) && preg_match( '/^[0-9]{6}$/', $yearMonth ) ) {
+
+					$year  = (int) substr( $yearMonth, 0, 4 );
+					$month = (int) substr( $yearMonth, 4, 2 );
+
+					$args['date_query'] = array(
+						array(
+							'year'  => $year,
+							'month' => $month,
+						),
+					);
+				}
 			}
 
 			$query = new \WP_Query( $args );
 
-			$PostToSelect = substr( str_repeat( ',%d', count( $query->posts ) ), 1 );
+			if ( $query->have_posts() ) {
 
-			$reconciliation_data = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ", $query->posts ), ARRAY_A );
+				$PostToSelect = substr( str_repeat( ',%d', count( $query->posts ) ), 1 );
 
-			$output  = $output . 'Order ID,Date Created,Order Total,Currency,Transaction ID,Reconciliation Identifier,Type,Payment Method,Order Status';
-			$output .= "\n";
+				$reconciliation_data =
+					$wpdb->get_results(
+						$wpdb->prepare(
+							"SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ",
+							$query->posts
+						),
+						ARRAY_A
+					);
 
-			if ( ! empty( $reconciliation_data ) ) {
-				foreach ( $reconciliation_data as $data ) {
-					$order = wc_get_order( $data['orderId'] );
+				$output  = $output . 'Order ID,Date Created,Order Total,Currency,Transaction ID,Reconciliation Identifier,Type,Payment Method,Order Status';
+				$output .= "\n";
 
-					if ( $order ) {
+				if ( ! empty( $reconciliation_data ) ) {
+					foreach ( $reconciliation_data as $data ) {
+						$order = wc_get_order( $data['orderId'] );
 
-						$dateLocalised = ! is_null( $order->get_date_created() ) ? $order->get_date_created()->getOffsetTimestamp() : '';
-						$createdDate   = esc_attr( date_i18n( 'Y-m-d', $dateLocalised ) );
-						$paymentMethod = $order->get_payment_method_title();
-						$total         = $order->get_total();
-						$status        = $order->get_status();
-						$currency      = $order->get_currency();
-						$transactionId = $order->get_transaction_id();
+						if ( $order ) {
+							$dateLocalised = ! is_null( $order->get_date_created() ) ? $order->get_date_created()->getOffsetTimestamp() : '';
+							$createdDate   = esc_attr( date_i18n( 'Y-m-d', $dateLocalised ) );
+							$paymentMethod = $order->get_payment_method_title();
+							$total         = $order->get_total();
+							$status        = $order->get_status();
+							$currency      = $order->get_currency();
+							$transactionId = $order->get_transaction_id();
 
-						$output .= $data['orderId'] . ',' . $createdDate . ',' . $total . ',' . $currency . ',' . $transactionId . ',' . $data['identifier'] . ',' . $data['transactionType'] . ',' . $paymentMethod . ',' . $status;
-						$output .= "\n";
+							$output .= $data['orderId'] . ',' . $createdDate
+								. ',' . $total . ',' . $currency . ','
+								. $transactionId . ',' . $data['identifier']
+								. ',' . $data['transactionType'] . ','
+								. $paymentMethod . ',' . $status;
+							$output .= "\n";
+						}
 					}
 				}
 			}
-
 			echo $output;
 			exit;
 		}
