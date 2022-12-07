@@ -18,7 +18,7 @@ class AltapayReconciliation {
 	 */
 	public function registerHooks() {
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'reconciliation_data_export_button' ), 20, 1 );
-		add_action( 'woocommerce_after_register_post_type', array( $this, 'exportReconciliationCSV' ) );
+		add_action( 'admin_init', array( $this, 'exportReconciliationCSV' ) );
 	}
 
 	/**
@@ -131,10 +131,7 @@ class AltapayReconciliation {
 			}
 
 			if ( ! empty( $_GET['post_status'] ) ) {
-				$post_statuses = wc_get_order_statuses();
-				if ( array_key_exists( $_GET['post_status'], $post_statuses ) ) {
-					$args['post_status'] = array( $_GET['post_status'] );
-				}
+				$args['post_status'] = $_GET['post_status'];
 			}
 
 			if ( ! empty( $_GET['orderby'] ) ) {
