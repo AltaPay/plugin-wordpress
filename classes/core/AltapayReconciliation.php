@@ -35,6 +35,7 @@ class AltapayReconciliation {
 				<button type="submit" name="export_reconciliation_data" class="button button-primary" value="1">
 					<?php echo __( 'Export Reconciliation Data', 'altapay' ); ?>
 				</button>
+				<input type="hidden" name="orders_pagenum" value="<?php echo isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 0; ?>>">
 			</div>
 			<?php
 		}
@@ -103,7 +104,59 @@ class AltapayReconciliation {
 			header( 'Pragma: no-cache' );
 			header( 'Expires: 0' );
 
-			$reconciliation_data = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers", ARRAY_A );
+			$perPage = (int) get_user_option( 'edit_shop_order_per_page', get_current_user_id() );
+
+			if ( empty( $perPage ) || $perPage < 1 ) {
+				$perPage = 20;
+			}
+
+			$paged = isset( $_REQUEST['orders_pagenum'] ) ? absint( $_REQUEST['orders_pagenum'] ) : 1;
+
+			$args = array(
+				'posts_per_page' => $perPage,
+				'fields'         => 'ids',
+				'post_type'      => 'shop_order',
+				'post_status'    => array_keys( wc_get_order_statuses() ),
+				'paged'          => $paged,
+			);
+
+			if ( ! empty( $_GET['_customer_user'] ) ) {
+				$args['meta_query'] = array(
+					array(
+						'key'     => '_customer_user',
+						'value'   => (int) $_GET['_customer_user'],
+						'compare' => '=',
+					),
+				);
+			}
+
+			if ( ! empty( $_GET['post_status'] ) ) {
+				$post_statuses = wc_get_order_statuses();
+				if ( array_key_exists( $_GET['post_status'], $post_statuses ) ) {
+					$args['post_status'] = array( $_GET['post_status'] );
+				}
+			}
+
+			if ( ! empty( $_GET['orderby'] ) ) {
+				$args['orderby'] = $_GET['orderby'];
+				$args['order']   = $_GET['order'];
+			}
+
+			if ( ! empty( $_GET['m'] ) ) {
+				$time               = strtotime( $_GET['m'] );
+				$args['date_query'] = array(
+					array(
+						'year'  => date( 'Y', $time ),
+						'month' => date( 'm', $time ),
+					),
+				);
+			}
+
+			$query = new \WP_Query( $args );
+
+			$PostToSelect = substr( str_repeat( ',%d', count( $query->posts ) ), 1 );
+
+			$reconciliation_data = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ", $query->posts ), ARRAY_A );
 
 			$output  = $output . 'Order ID,Date Created,Order Total,Currency,Transaction ID,Reconciliation Identifier,Type,Payment Method,Order Status';
 			$output .= "\n";
