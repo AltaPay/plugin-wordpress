@@ -17,7 +17,7 @@ class AltapayReconciliation {
 	 * @return void
 	 */
 	public function registerHooks() {
-		add_action( 'manage_posts_extra_tablenav', array( $this, 'reconciliation_data_export_button' ), 20, 1 );
+		add_action( 'manage_posts_extra_tablenav', array( $this, 'addReconciliationExportButton' ), 20, 1 );
 		add_action( 'admin_init', array( $this, 'exportReconciliationCSV' ) );
 	}
 
@@ -26,7 +26,7 @@ class AltapayReconciliation {
 	 *
 	 * @return void
 	 */
-	public function reconciliation_data_export_button( $which ) {
+	public function addReconciliationExportButton( $which ) {
 		global $typenow;
 
 		if ( 'shop_order' === $typenow && 'top' === $which ) {
