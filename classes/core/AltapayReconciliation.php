@@ -170,7 +170,7 @@ class AltapayReconciliation {
 				$reconciliation_data =
 					$wpdb->get_results(
 						$wpdb->prepare(
-							"SELECT * FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ",
+							"SELECT orderId, identifier, transactionType FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ",
 							$query->posts
 						),
 						ARRAY_A
