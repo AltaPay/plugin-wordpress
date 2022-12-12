@@ -35,5 +35,32 @@ class AltapayPluginInstall {
 		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
 	}
+
+	/**
+	 * Create table to store reconciliation identifiers
+	 *
+	 * @return void
+	 */
+	public static function createReconciliationDataTable() {
+		global $wpdb;
+		$tableName      = $wpdb->prefix . 'altapayReconciliationIdentifiers';
+		$charsetCollate = $wpdb->get_charset_collate();
+
+		$sql = "CREATE TABLE $tableName (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            time datetime NULL default null,
+            orderId BIGINT UNSIGNED NOT NULL,
+            transactionId varchar(200) DEFAULT '' NOT NULL,
+            identifier text DEFAULT '' NOT NULL,
+            transactionType varchar(200) DEFAULT '' NOT NULL,
+            PRIMARY KEY  (id)
+        ) $charsetCollate;";
+
+		require_once ABSPATH . '/wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+
+		update_option( 'altapay_db_version', ALTAPAY_DB_VERSION );
+
+	}
 }
 

@@ -169,7 +169,12 @@ In order to reconcile payments please follow the steps below:
 2. Select the order you want to view.
 3. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
 
-   ![magento_order_view](docs/altapay_wp_order_reconcile_view.jpg)
+   ![wp_order_view](docs/altapay_wp_order_reconcile_view.jpg)
+
+    Or export the reconciliation data to CSV using the `Export Reconciliation Data` button on the top of `Orders` page.
+
+   ![export_reconciliation_data](docs/export_reconciliation_data.png)
+   ![wp_orders_csv](docs/orders_csv.png)
 
 4. Navigate to AltaPay Gateway dashboard
 5. Click on **FUNDING FILES** under **FINANCES** menu
@@ -179,21 +184,21 @@ In order to reconcile payments please follow the steps below:
 
 **Sample AltaPay Gateway CSV:**
 
-![funding_list_csv](docs/funding_list_csv.png)
+ ![funding_list_csv](docs/funding_list_csv.png)
 
 
 
 # Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.0.1
-- WooCommerce min. 3.9.0 – max. 6.8.0
-- PHP 7.2+
+- WordPress min. 5.0 – max. 6.1.1
+- WooCommerce min. 3.9.0 – max. 7.1.0
+- PHP 7.2 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.0.3, WooCommerce 7.0.1 and PHP 8.1
+- WordPress 6.1.1, WooCommerce 7.1.0 and PHP 8.1
 
 
 # Troubleshooting

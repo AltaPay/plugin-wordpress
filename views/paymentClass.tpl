@@ -90,7 +90,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		add_action( 'woocommerce_api_wc_gateway_' . $this->id, array( $this, 'checkAltapayResponse' ) );
 
 		// Subscription actions
-		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduledSubscriptionsPayment'), 10, 2 );
+		add_action( 'woocommerce_scheduled_subscription_payment_' . $this->id, array( $this, 'scheduledSubscriptionsPayment' ), 10, 2 );
 
 	}
 
@@ -263,7 +263,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					->setCcToken( $ccToken )
 					->setFraudService( null )
 					->setLanguage( $language )
-					->setOrderLines( $orderLines );
+					->setOrderLines( $orderLines )
+					->setSaleReconciliationIdentifier( wp_generate_uuid4() );
 
 			// Check if WooCommerce subscriptions is enabled and contains subscription product
 			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
@@ -403,6 +404,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					update_post_meta( $order_id, '_transaction_id', $txnId );
 					update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
+					$reconciliation = new Core\AltapayReconciliation();
+					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
+						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					}
+
 					if ( $saveCreditCard ) {
 						$objTokenControl = new Core\AltapayTokenControl();
 						$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
@@ -445,6 +451,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				update_post_meta( $order_id, '_transaction_id', $txnId );
 				update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
+				$reconciliation = new Core\AltapayReconciliation();
+				foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
+					$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+				}
+
 				if ( $saveCreditCard ) {
 					$objTokenControl = new Core\AltapayTokenControl();
 					$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
@@ -462,10 +473,20 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
+				$api->setReconciliationIdentifier( wp_generate_uuid4() );
 
 				/** @var CaptureReservationResponse $response */
 				try {
 					$response = $api->call();
+
+					$transaction = json_decode( json_encode( $response->Transactions ), true );
+					$transaction = reset( $transaction );
+
+					$reconciliation = new Core\AltapayReconciliation();
+					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
+						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					}
+
 				} catch ( ResponseHeaderException $e ) {
 					error_log( 'Response header exception ' . $e->getMessage() );
 				} catch ( \Exception $e ) {

@@ -16,7 +16,7 @@ use Altapay\Authentication;
 use Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
 use Altapay\Api\Subscription\ChargeSubscription;
-use Altapay\Api\Subscription\ReserveSubscriptionCharge;
+use Altapay\Classes\Core;
 
 trait AltapayMaster {
 
@@ -70,17 +70,25 @@ trait AltapayMaster {
 
 				// @phpstan-ignore-next-line
 				if ( $this->payment_action === 'authorize_capture' ) {
+					$reconciliationId = wp_generate_uuid4();
+
 					$api = new ChargeSubscription( $this->getAuth() );
 					$api->setTransaction( $agreement_id );
 					$api->setAmount( round( $amount, 2 ) );
+					$api->setReconciliationIdentifier( wp_generate_uuid4() );
+
 					$response = $api->call();
 
 					$xmlToJson          = wp_json_encode( $response->Transactions );
 					$jsonToArray        = json_decode( $xmlToJson, true );
 					$latest_transaction = $this->getLatestTransaction( $jsonToArray, 'subscription_payment' );
-					$transaction_id     = $jsonToArray[ $latest_transaction ]['TransactionId'];
+					$transaction        = $jsonToArray[ $latest_transaction ];
+					$transaction_id     = $transaction['TransactionId'];
 
 					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
+
+					$reconciliation = new Core\AltapayReconciliation();
+					$reconciliation->saveReconciliationIdentifier( $renewal_order->get_id(), $transaction_id, $reconciliationId, 'captured' );
 
 					if ( $response->Result === 'Success' ) {
 						$renewal_order->payment_complete();
