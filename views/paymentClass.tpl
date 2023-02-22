@@ -46,20 +46,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
      */
     public $payment_action = '';
 
-    /**
-     * Currency for the terminal.
-     *
-     * @var string
-     */
-    private $currency;
-
-    /**
-     * Default currency for the terminal.
-     *
-     * @var string
-     */
-    private $default_currency;
-
 	public function __construct() {
 		// Set default gateway values
 		$this->id					= strtolower('altapay_{key}');
@@ -73,9 +59,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->description			= $this->get_option( 'description' );
 		$this->token				= $this->get_option('token');
 		$this->payment_action		= $this->get_option( 'payment_action' );
-		$this->currency				= $this->get_option( 'currency' );
-		$currency					= explode(' ', '{name}');
-		$this->default_currency		= end($currency);
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
@@ -129,11 +112,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function init_form_fields() {
 		$tokenStatus = '{tokenStatus}';
-		if($tokenStatus === 'CreditCard'){
-			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFieldsToken.php';
-		} else {
-			$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFields.php';
-		}
+		$this->form_fields = include dirname( ALTAPAY_PLUGIN_FILE ) . '/includes/AltapayFormFields.php';
 	}
 
 	/**
