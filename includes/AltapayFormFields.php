@@ -42,7 +42,7 @@ $formSettings = array(
 		'description' => __( 'Payment method description that the customer will see on your checkout.', 'woocommerce' ),
 		'type'        => 'textarea',
 		'default'     => '',
-        'desc_tip'    => true,
+		'desc_tip'    => true,
 	),
 	'payment_action' => array(
 		'title'       => __( 'Payment action', 'altapay' ),
@@ -53,7 +53,7 @@ $formSettings = array(
 			'authorize_capture' => __( 'Authorize and Capture', 'altapay' ),
 		),
 		'default'     => '',
-        'desc_tip'    => true,
+		'desc_tip'    => true,
 	),
 	'payment_icon'   => array(
 		'title'       => __( 'Icon', 'altapay' ),
@@ -61,24 +61,24 @@ $formSettings = array(
 		'type'        => 'select',
 		'options'     => $files,
 		'default'     => '',
-        'desc_tip'    => true,
+		'desc_tip'    => true,
 	),
 	'is_apple_pay'   => array(
-		'title'   => __( 'Is Apple Pay?', 'altapay' ),
-		'type'    => 'checkbox',
-		'label'   => __( 'Check if the terminal is for Apple Pay payments', 'altapay' ),
-		'default' => 'no',
-        'desc_tip'    => true,
+		'title'    => __( 'Is Apple Pay?', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Check if the terminal is for Apple Pay payments', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
 	),
 );
 
 if ( $tokenStatus === 'CreditCard' ) {
 	$formSettings['token_control'] = array(
-		'title'   => __( 'Token Control', 'altapay' ),
-		'type'    => 'checkbox',
-		'label'   => __( 'Enable Customer Token Control', 'altapay' ),
-		'default' => 'no',
-        'desc_tip'    => true,
+		'title'    => __( 'Token Control', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Enable Customer Token Control', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
 	);
 }
 
