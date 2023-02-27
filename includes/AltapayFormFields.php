@@ -33,18 +33,19 @@ $formSettings = array(
 	'title'          => array(
 		'title'       => __( 'Title', 'woocommerce' ),
 		'type'        => 'text',
-		'description' => __( 'Title to show during checkout.', 'altapay' ),
+		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 		'default'     => __( 'AltaPay', 'woocommerce' ),
 		'desc_tip'    => true,
 	),
 	'description'    => array(
-		'title'       => __( 'Message', 'woocommerce' ),
-		'description' => __( 'Message to show during checkout.', 'altapay' ),
+		'title'       => __( 'Description', 'woocommerce' ),
+		'description' => __( 'Payment method description that the customer will see on your checkout.', 'woocommerce' ),
 		'type'        => 'textarea',
 		'default'     => '',
+		'desc_tip'    => true,
 	),
 	'payment_action' => array(
-		'title'       => __( 'Payment action', 'woocommerce' ),
+		'title'       => __( 'Payment action', 'altapay' ),
 		'description' => __( 'Make payment authorized or authorized and captured', 'altapay' ),
 		'type'        => 'select',
 		'options'     => array(
@@ -52,21 +53,35 @@ $formSettings = array(
 			'authorize_capture' => __( 'Authorize and Capture', 'altapay' ),
 		),
 		'default'     => '',
+		'desc_tip'    => true,
 	),
 	'payment_icon'   => array(
-		'title'       => __( 'Icon', 'woocommerce' ),
+		'title'       => __( 'Icon', 'altapay' ),
 		'description' => __( 'Select image icon to display on checkout page', 'altapay' ),
 		'type'        => 'select',
 		'options'     => $files,
 		'default'     => '',
+		'desc_tip'    => true,
 	),
-	'currency'       => array(
-		'title'       => __( 'Currency', 'altapay' ),
-		'type'        => 'select',
-		'description' => __( 'Select the currency does this terminal work with' ),
-		'options'     => get_woocommerce_currencies(),
-		'default'     => get_option('woocommerce_currency'),
+	'is_apple_pay'   => array(
+		'title'    => __( 'Is Apple Pay?', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Check if the terminal is for Apple Pay payments', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
 	),
 );
+
+if ( $tokenStatus === 'CreditCard' ) {
+	$formSettings['token_control'] = array(
+		'title'    => __( 'Token Control', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Enable Customer Token Control', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
+	);
+}
+
+$formSettings = apply_filters_deprecated( 'altapay_gateway_payments_settings_with_token_control', array( $formSettings ), '3.3.6', 'altapay_gateway_payments_settings' );
 
 return apply_filters( 'altapay_gateway_payments_settings', $formSettings );
