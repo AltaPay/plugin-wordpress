@@ -23,7 +23,6 @@ use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Subscription\ChargeSubscription;
-use Altapay\Api\Payments\CardWalletSession;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
