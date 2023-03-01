@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Altapay for WooCommerce - Payments less complicated
+ * Plugin Name: AltaPay for WooCommerce - Payments less complicated
  * Plugin URI: https://documentation.altapay.com/Content/Plugins/Plugins.htm
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
@@ -23,6 +23,7 @@ use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Subscription\ChargeSubscription;
+use Altapay\Api\Payments\CardWalletSession;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -101,6 +102,7 @@ function altapay_add_gateway( $methods ) {
 
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) ) {
 						$subscriptions = true;
+						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
 						$tokenStatus = 'CreditCard';
 					}
@@ -857,11 +859,94 @@ function altapayPluginActivation() {
 	Core\AltapayPluginInstall::createPluginTables();
 }
 
+/**
+ * Enqueue Apple Pay scripts
+ *
+ * @return void
+ */
+function altapay_load_apple_pay_script() {
+	wp_enqueue_script(
+		'altapay-applepay-sdk',
+		'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
+		array( 'jquery' ),
+		'1.0.0',
+		true
+	);
+	wp_enqueue_script(
+		'altapay-applepay-main',
+		plugin_dir_url( __FILE__ ) . 'assets/js/applepay.js',
+		array( 'jquery', 'altapay-applepay-sdk' ),
+		'1.0.0',
+		true
+	);
+
+	$apple_pay_terminals = array();
+
+	foreach ( WC()->payment_gateways->payment_gateways() as $key => $payment_gateway ) {
+		if ( isset( $payment_gateway->settings['is_apple_pay'] ) && $payment_gateway->settings['is_apple_pay'] === 'yes' ) {
+			$apple_pay_terminals[] = $key;
+		}
+	}
+
+	wp_localize_script(
+		'altapay-applepay-main',
+		'applepay_ajax_obj',
+		array(
+			'ajax_url'           => admin_url( 'admin-ajax.php' ),
+			'nonce'              => wp_create_nonce( 'apple-pay' ),
+			'currency'           => get_woocommerce_currency(),
+			'country'            => get_option( 'woocommerce_default_country' ),
+			'cart_totals'        => WC()->session->get( 'cart_totals', null ),
+			'apple_pay_terminal' => $apple_pay_terminals,
+		)
+	);
+}
+
+/**
+ * Validate Apple Pay Session
+ *
+ * @return void
+ */
+function applepay_validate_merchant() {
+	$terminals   = json_decode( get_option( 'altapay_terminals' ) );
+	$terminal_id = isset( $_POST['terminal_id'] ) ? wc_clean( wp_unslash( $_POST['terminal_id'] ) ) : '';
+
+	$terminal = '';
+	foreach ( $terminals  as $terminal ) {
+		if ( 'altapay_' . strtolower( $terminal->key ) === $terminal_id ) {
+			$terminal = $terminal->name;
+			break;
+		}
+	}
+
+	$settings = new Core\AltapaySettings();
+	$auth     = $settings->getAuth();
+
+	$request = new CardWalletSession( $auth );
+	$request->setTerminal( $terminal )
+		->setValidationUrl( $_POST['validation_url'] )
+		->setDomain( $_SERVER['HTTP_HOST'] );
+
+	try {
+		$response = $request->call();
+		if ( $response->Result === 'Success' ) {
+			wp_send_json_success( $response->ApplePaySession, 200 );
+		} else {
+			wp_send_json_error();
+		}
+	} catch ( Exception $e ) {
+		wp_send_json_error( array( 'error' => $e->getMessage() ) );
+	}
+}
+
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
 add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
 add_action( 'wp_ajax_altapay_capture', 'altapayCaptureCallback' );
 add_action( 'wp_ajax_altapay_refund', 'altapayRefundCallback' );
 add_action( 'wp_ajax_altapay_release_payment', 'altapayReleasePayment' );
+add_action( 'wp_ajax_validate_merchant', 'applepay_validate_merchant' );
+add_action( 'wp_ajax_nopriv_validate_merchant', 'applepay_validate_merchant' );
+add_action( 'wp_enqueue_scripts', 'altapay_load_apple_pay_script' );
 add_action( 'admin_footer', 'altapayActionJavascript' );
 add_action( 'altapay_checkout_order_review', 'woocommerceOrderReview' );
 add_action( 'wp_ajax_create_altapay_payment_page', 'createAltapayPaymentPageCallback' );
