@@ -14,7 +14,7 @@ use Altapay\Helpers\Traits\AltapayMaster;
 
 class ApplePay {
 
-    use AltapayMaster;
+	use AltapayMaster;
 
 	/**
 	 * Register required hooks
