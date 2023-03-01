@@ -67,7 +67,7 @@ function init_altapay_settings() {
 	$objReconciliationData->registerHooks();
 
 	$objApplePay = new Core\ApplePay();
-    $objApplePay->registerHooks();
+	$objApplePay->registerHooks();
 
 	$altapayDbVersion = get_site_option( 'altapay_db_version' );
 
