@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.6]
+- Fix payment page styling issues
+
 ## [3.3.5]
 - Add option to export reconciliation data in CSV
 
