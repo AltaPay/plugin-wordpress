@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.3.5
+ * Version: 3.3.6
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 7.1.0
+ * WC tested up to: 7.4.1
  *
  * @package Altapay
  */
@@ -33,7 +33,7 @@ if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
-	define( 'ALTAPAY_DB_VERSION', '335' );
+	define( 'ALTAPAY_DB_VERSION', '336' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
