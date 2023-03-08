@@ -39,20 +39,20 @@ get_header();
 	.altapay-page-wrapper .altapay-payment-form-cnt {
 		padding-top: 50px;
 	}
-    input#creditCardNumberInput, input#cardholderNameInput {
-        width: 100%;
-        max-width: 300px;
-    }
-    input#cvcInput {
-        min-width: 100px;
-        max-width: 140px;
-    }
+	input#creditCardNumberInput, input#cardholderNameInput {
+		width: 100%;
+		max-width: 300px;
+	}
+	input#cvcInput {
+		min-width: 100px;
+		max-width: 140px;
+	}
 	select#emonth, select#eyear {
 		max-width: 100px;
 	}
-    .site-main {
-        width: 100%;
-    }
+	.site-main {
+		width: 100%;
+	}
 	@media screen and (min-width:769px){
 		.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
 			flex: 1;
