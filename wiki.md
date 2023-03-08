@@ -154,11 +154,11 @@ CSS code may be added to this file. Check the documentation about customizing th
 
 To capture the order follow below steps:
 
-* Nagivate to WooCommerce > Orders
-* Open order details page
+* Nagivate to **WooCommerce** > **Orders**
+* Open order that you want to capture
 * Scroll to **AltaPay actions** section
 * Select **Capture** tab (selected by default)
-* Change the item quantities for partial cature
+* Change the items quantities for partial cature
 * Click on **Capture** button
 
    ![capture_order](docs/capture_order.png)
@@ -167,12 +167,12 @@ To capture the order follow below steps:
 
 To refund the order follow below steps:
 
-* Nagivate to WooCommerce > Orders
-* Open order details page
+* Nagivate to **WooCommerce** > **Orders**
+* Open order that you want to refund
 * Scroll to **AltaPay actions** section
-* Select **Refund** tab (selected by default)
-* Change the item quantities for partial cature
-* Click on **Capture** button
+* Select **Refund** tab
+* Change the items quantities for partial refund
+* Click on **Refund** button
 
    ![refund_order](docs/refund_order.png)
 
