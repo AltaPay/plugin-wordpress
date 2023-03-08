@@ -6,7 +6,7 @@ AltaPay’s platform automizes, simplifies, and protects the transaction flow fo
 
 WooCommerce is an open-source eCommerce platform, built on WordPress. You can modify and customize it to meet your (merchant's) needs, and works alongside other plugins.
 
-# WooCommerce Payment plugin installation guide
+## Installation Guide
 
 Installing this plug-in will enable the web shop to handle card transactions through AltaPay's gateway.
 
@@ -19,11 +19,21 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Configuration](#configuration)
 
+* [Synchronize payment methods](#synchronize-payment-methods)
+
+* [Configure the terminals for the checkout page](#configure-the-terminals-for-the-checkout-page)
+
+* [Customize the checkout page](#customize-the-checkout-page)
+
+[Capture Payment](#capture-payment)
+
+[Refund Payment](#refund-payment)
+
 [Subscriptions](#subscriptions)
 
-[Synchronize payment methods](#synchronize-payment-methods)
-
 [Reconcile Orders](#reconcile-orders)
+
+[Update the plug-in](#update-the-plug-in)
 
 [Supported versions](#supported-versions)
 
@@ -31,28 +41,22 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 
 
-# Prerequisites
+## Prerequisites
 
 We highly recommend gathering all the below information before starting the installation:
 
 - AltaPay credentials for the payment gateway, terminals and custom gateway (i.e. yourShopName.altapaysecure.com). These will be provided by AltaPay.
 
 
-# Installation
+## Installation
 
-There are two ways of installing the plug-in: by uploading the build package or by search for the plug-in [Altapay for WooCommerce](https://wordpress.org/plugins/altapay-for-woocommerce/) on WordPress.org.
+There are two ways of installing the plug-in: by uploading the build package or by search for the plug-in [AltaPay for WooCommerce](https://wordpress.org/plugins/altapay-for-woocommerce/) on WordPress.org.
 
 AltaPay WooCommerce plug-in needs to be installed on the merchant WooCommerce/WordPress website
 
 There are two ways to install the plugin:
 
-## By uploading the build package:
-- From the admin panel, navigate to: Plugins > Add new
-- Select Upload Plugin;
-- Select the build package (zip file) that contains the plugin
-- Click on Install Now.
-
-## By searching for the plug-in on WordPress.org:
+### By searching for the plug-in on WordPress.org: (Recommended)
 - Navigate to Plugins > Add new.
 - In the search text box (Search plugins…) type in the keyword "altapay"
 - Wait for the plug-in to be found
@@ -60,14 +64,19 @@ There are two ways to install the plugin:
 - Click on the Activate Plugin button.
 - The message "Plugin activated" is displayed.
 
+### By uploading the build package:
+- From the admin panel, navigate to: Plugins > Add new
+- Select Upload Plugin;
+- Select the build package (zip file) that contains the plugin
+- Click on Install Now.
 
-# Configuration
+## Configuration
 
 You can configure the plugin to meet your (the merchant's) needs, adding payment methods and configuring payments.
 
 The standard configuration connects the plugin with the test gateway. Take the following steps to connect it with your custom payment gateway.
 
-## Connect the plugin to the custom payment gateway
+### Connect the plugin to the custom payment gateway
 
 To connect to the payment gateway:
 
@@ -81,14 +90,6 @@ To connect to the payment gateway:
 
 This will populate all the available terminals for the currenct API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
-
-## Subscriptions
-
-AltaPay plugin is compatible with the [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) extension to accept recurring payments in your WooCommerce store.
-
-> Note:
->
-> Currently, AltaPay plugin supports recurring payments with the credit card terminal only.
 
 ## Synchronize payment methods
 
@@ -132,37 +133,64 @@ For the AltaPay payment method to appear in the checkout page:
 - Check if the selected currency matches WooCommerce currency. (WooCommerce currency can be viewed in WooCommerce > Settings > General tab)
 - Save the changes.
 
-## Update the plug-in
-
-- Navigate to: Plugins > Installed Plugins
-- If there is a new version of the plug-in, you should see a warning message, as is shown in the image below.
-
-    ![configuring_woocommerce](docs/update_plugin.png)
-
-- Click on the "update now" link.
-
-> Warning:
->
-> If you customized the plugin source code, the changes may be overwritten in the update process.
-
 ## Customize the checkout page
 
 The checkout page is implemented by the following file:
 
 `<wordpress>/wp-content/plugins/altapay-for-woocommerce/views/altapay-payment-form.php`
 
-To customize this page, copy the file to the folder of the theme that WordPress is currently using. The file inside the theme folder will override the file inside the plugin folder.
+To customize this page, copy the file to the root director `yourtheme/altapay-payment-form.php` of your active theme. The file inside the theme folder will override the file inside the plugin folder.
 
 CSS code may be added to this file. Check the documentation about customizing the checkout page in [Styling the payment page (callback_form).](https://documentation.altapay.com/Content/Ecom/Payment%20Pages/Styling%20the%20payment%20page%20(callback_form).htm)
 
-## Auto-capture when order status changes to "Completed"
 
-When the status of an order is manually changed to 'Completed', the plug-in will automatically try to capture this order – there is no need of any setup for this.
+> Note:
+>
+> HOWEVER, on occasion AltaPay will need to update this file and you
+> (the theme developer) will need to copy the new file to your theme to
+> maintain compatibility. 
 
-If the order was already fully or partially captured, no capture will be made.
+## Capture Payment
 
+To capture the order follow below steps:
 
-# Reconcile Orders
+* Nagivate to WooCommerce > Orders
+* Open order details page
+* Scroll to **AltaPay actions** section
+* Select **Capture** tab (selected by default)
+* Change the item quantities for partial cature
+* Click on **Capture** button
+
+   ![capture_order](docs/capture_order.png)
+
+## Refund Payment
+
+To refund the order follow below steps:
+
+* Nagivate to WooCommerce > Orders
+* Open order details page
+* Scroll to **AltaPay actions** section
+* Select **Refund** tab (selected by default)
+* Change the item quantities for partial cature
+* Click on **Capture** button
+
+   ![refund_order](docs/refund_order.png)
+
+> Note:
+>
+> When the status of an order is manually changed to 'Completed', the plug-in will automatically try > to capture this order – there is no need of any setup for this.
+> 
+> If the order was already fully or partially captured, no capture will be made.
+
+## Subscriptions
+
+AltaPay plugin is compatible with the [WooCommerce Subscriptions](https://woocommerce.com/products/woocommerce-subscriptions/) extension to accept recurring payments in your WooCommerce store.
+
+> Note:
+>
+> Currently, AltaPay plugin supports recurring payments with the credit card terminal only.
+
+## Reconcile Orders
 In order to reconcile payments please follow the steps below:
 
 1. From the admin panel, navigate to: **WooCommerce > Orders**
@@ -186,9 +214,20 @@ In order to reconcile payments please follow the steps below:
 
  ![funding_list_csv](docs/funding_list_csv.png)
 
+## Update the plug-in
 
+- Navigate to: Plugins > Installed Plugins
+- If there is a new version of the plug-in, you should see a warning message, as is shown in the image below.
 
-# Supported versions
+    ![configuring_woocommerce](docs/update_plugin.png)
+
+- Click on the **update now** link.
+
+> Warning:
+>
+> If you customized the plugin source code, the changes may be overwritten in the update process.
+
+## Supported versions
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.1.1
@@ -201,7 +240,7 @@ The latest tested version is:
 - WordPress 6.1.1, WooCommerce 7.4.1 and PHP 8.1
 
 
-# Troubleshooting
+## Troubleshooting
 
 ### PHP Warning: Input variables exceeded 1000
 For orders that contain many products, this PHP warning may be issued. In the file "php.ini" there is a setting called "max_input_vars" that need to have the limit increased (i.e. from 1000 to 3000). Once the changes are made a restart to the web server is required.
@@ -217,7 +256,7 @@ The setting is located is in: WooCommerce > Settings > Shipping > Shipping Optio
 ![troubleshooting_woocommerce](docs/troubleshooting_woocommerce.png)
 
 
-## Providing error logs to support team
+### Providing error logs to support team
 
 **You can find the CMS logs by following the below steps:**
 
