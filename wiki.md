@@ -152,33 +152,33 @@ CSS code may be added to this file. Check the documentation about customizing th
 
 ## Capture Payment
 
-To capture the order follow below steps:
+To capture the order follow the below steps:
 
-* Nagivate to **WooCommerce** > **Orders**
-* Open order that you want to capture
+* Navigate to **WooCommerce** > **Orders**
+* Open an order that you want to capture
 * Scroll to **AltaPay actions** section
-* Select **Capture** tab (selected by default)
-* Change the items quantities for partial cature
+* Select the **Capture** tab (selected by default)
+* Change the quantities of the items for a partial capture
 * Click on **Capture** button
 
    ![capture_order](docs/capture_order.png)
 
 ## Refund Payment
 
-To refund the order follow below steps:
+To refund the order follow the below steps:
 
-* Nagivate to **WooCommerce** > **Orders**
-* Open order that you want to refund
+* Navigate to **WooCommerce** > **Orders**
+* Open an order that you want to refund
 * Scroll to **AltaPay actions** section
 * Select **Refund** tab
-* Change the items quantities for partial refund
+* Change the quantities of the items for a partial refund
 * Click on **Refund** button
 
    ![refund_order](docs/refund_order.png)
 
 > Note:
 >
-> When the status of an order is manually changed to 'Completed', the plug-in will automatically try > to capture this order – there is no need of any setup for this.
+> When the status of an order is manually changed to 'Completed', the plug-in will automatically try > to capture this order – there is no need for any setup for this.
 > 
 > If the order was already fully or partially captured, no capture will be made.
 
