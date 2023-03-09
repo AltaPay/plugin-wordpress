@@ -30,7 +30,6 @@ get_header();
 		vertical-align: middle;
 	}
 	.altapay-page-wrapper {
-		display: flex;
 		width: 100%;
 	}
 	.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
@@ -53,20 +52,26 @@ get_header();
 	.site-main {
 		width: 100%;
 	}
+	.woocommerce-page .col2-set .col-1, .woocommerce-column--shipping-address.col-2 {
+		padding: 0;
+	}
 	@media screen and (min-width:769px){
+		.altapay-page-wrapper {
+			display: flex;
+		}
 		.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
 			flex: 1;
 		}
 	}
 </style>
-<main id="main" class="site-main" role="main">
+<main id="main" class="site-main woocommerce-page" role="main">
 	<div class="container">
 		<div class="row">
 			<div class="altapay-page-wrapper">
 				<div class="altapay-payment-form-cnt">
 					<form id="PensioPaymentForm"></form>
 				</div>
-				<div class="altapay-order-details">
+				<div class="altapay-order-details woocommerce">
 				<?php
 					$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
 					woocommerce_order_details_table( $order_id );
