@@ -70,6 +70,13 @@ $formSettings = array(
 		'default'  => 'no',
 		'desc_tip' => true,
 	),
+	'apple_pay_label'          => array(
+		'title'       => __( 'Apple Pay form label', 'altapay' ),
+		'type'        => 'text',
+		'description' => __( 'This controls the label shown on Apple Pay popup window', 'woocommerce' ),
+		'default'     => __( 'AltaPay', 'woocommerce' ),
+		'desc_tip'    => true,
+	)
 );
 
 if ( $tokenStatus === 'CreditCard' ) {
