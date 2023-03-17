@@ -1,20 +1,4 @@
-jQuery( document ).ready(
-	function($) {
-		$( 'form.checkout' ).on(
-			'checkout_place_order',
-			function() {
-				const payment_method = $( 'form.checkout input[name="payment_method"]:checked' ).val();
-
-				if ($.inArray( payment_method, applepay_ajax_obj.apple_pay_terminal ) > -1) {
-					onApplePayButtonClicked( payment_method );
-					return false;
-				}
-			}
-		);
-	}
-);
-
-function onApplePayButtonClicked(payment_method) {
+function onApplePayButtonClicked(applepay_obj) {
 
 	if ( ! ApplePaySession) {
 		return;
@@ -22,21 +6,16 @@ function onApplePayButtonClicked(payment_method) {
 
 	// Define ApplePayPaymentRequest
 	const request = {
-		"countryCode": applepay_ajax_obj.country,
-		"currencyCode": applepay_ajax_obj.currency,
+		"countryCode": applepay_obj.country,
+		"currencyCode": applepay_obj.currency,
 		"merchantCapabilities": [
 			"supports3DS"
 		],
-		"supportedNetworks": [
-			"visa",
-			"masterCard",
-			"amex",
-			"discover"
-		],
+		"supportedNetworks": applepay_obj.apple_pay_supported_networks,
 		"total": {
-			"label": "AltaPay - Apple Pay",
+			"label": applepay_obj.apply_pay_label,
 			"type": "final",
-			"amount": applepay_ajax_obj.cart_totals.subtotal
+			"amount": applepay_obj.subtotal
 		}
 	};
 
@@ -45,18 +24,17 @@ function onApplePayButtonClicked(payment_method) {
 
 	session.onvalidatemerchant = async event => {
 		jQuery.post(
-			applepay_ajax_obj.ajax_url,
+			applepay_obj.ajax_url,
 			{
-				ajax_nonce: applepay_ajax_obj.nonce,
+				ajax_nonce: applepay_obj.nonce,
 				action: 'validate_merchant',
 				validation_url: event.validationURL,
-				terminal_id: payment_method
+				terminal: applepay_obj.terminal
 			},
 			function (res) {
 				if (res.success === true) {
 					const merchantSession = jQuery.parseJSON( res.data );
 					session.completeMerchantValidation( merchantSession );
-					jQuery( 'form.checkout' ).submit();
 				} else {
 					console.log( jQuery.parseJSON( res.error ) );
 				}
@@ -67,9 +45,9 @@ function onApplePayButtonClicked(payment_method) {
 	session.onpaymentmethodselected = event => {
 		// Define ApplePayPaymentMethodUpdate based on the selected payment method.
 		let total = {
-			"label": "AltaPay - Apple Pay",
+			"label": applepay_obj.apply_pay_label,
 			"type": "final",
-			"amount": applepay_ajax_obj.cart_totals.subtotal
+			"amount": applepay_obj.subtotal
 		}
 
 		const update = { "newTotal": total };

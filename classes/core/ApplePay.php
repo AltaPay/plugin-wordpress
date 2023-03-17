@@ -28,22 +28,36 @@ class ApplePay {
 	}
 
 	/**
+	 * Enqueue Apple Pay scripts
+	 *
+	 * @return void
+	 */
+	public function altapay_load_apple_pay_script() {
+
+		wp_enqueue_script(
+			'altapay-applepay-sdk',
+			'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
+			array( 'jquery' ),
+			'1.0.0',
+			false
+		);
+		wp_enqueue_script(
+			'altapay-applepay-main',
+			plugin_dir_url( ALTAPAY_PLUGIN_FILE ) . 'assets/js/applepay.js',
+			array( 'jquery', 'altapay-applepay-sdk' ),
+			'1.0.0',
+			false
+		);
+	}
+
+	/**
 	 * Validate Apple Pay Session
 	 *
 	 * @return void
 	 */
 	public function applepay_validate_merchant() {
-		$terminals      = json_decode( get_option( 'altapay_terminals' ) );
-		$terminal_id    = isset( $_POST['terminal_id'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal_id'] ) ) : '';
+		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
-
-		$terminal = '';
-		foreach ( $terminals  as $terminal ) {
-			if ( 'altapay_' . strtolower( $terminal->key ) === $terminal_id ) {
-				$terminal = $terminal->name;
-				break;
-			}
-		}
 
 		$request = new CardWalletSession( $this->getAuth() );
 		$request->setTerminal( $terminal )
@@ -61,49 +75,4 @@ class ApplePay {
 			wp_send_json_error( array( 'error' => $e->getMessage() ) );
 		}
 	}
-
-	/**
-	 * Enqueue Apple Pay scripts
-	 *
-	 * @return void
-	 */
-	public function altapay_load_apple_pay_script() {
-
-		wp_enqueue_script(
-			'altapay-applepay-sdk',
-			'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
-			array( 'jquery' ),
-			'1.0.0',
-			true
-		);
-		wp_enqueue_script(
-			'altapay-applepay-main',
-			plugin_dir_url( ALTAPAY_PLUGIN_FILE ) . 'assets/js/applepay.js',
-			array( 'jquery', 'altapay-applepay-sdk' ),
-			'1.0.0',
-			true
-		);
-
-		$apple_pay_terminals = array();
-
-		foreach ( WC()->payment_gateways->payment_gateways() as $key => $payment_gateway ) {
-			if ( isset( $payment_gateway->settings['is_apple_pay'] ) && $payment_gateway->settings['is_apple_pay'] === 'yes' ) {
-				$apple_pay_terminals[] = $key;
-			}
-		}
-
-		wp_localize_script(
-			'altapay-applepay-main',
-			'applepay_ajax_obj',
-			array(
-				'ajax_url'           => admin_url( 'admin-ajax.php' ),
-				'nonce'              => wp_create_nonce( 'apple-pay' ),
-				'currency'           => get_woocommerce_currency(),
-				'country'            => get_option( 'woocommerce_default_country' ),
-				'cart_totals'        => WC()->session->get( 'cart_totals', null ),
-				'apple_pay_terminal' => $apple_pay_terminals,
-			)
-		);
-	}
-
 }
