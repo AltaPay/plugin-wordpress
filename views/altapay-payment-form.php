@@ -17,149 +17,69 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 get_header();
 ?>
-<head>
-	<style>
-		.pensio_payment_form_cvc_cell img {
-			max-width: 60px;
+<style>
+	.pensio_payment_form_cvc_cell img {
+		max-width: 60px;
+	}
+	.pensio_payment_form_row {
+		margin-bottom: 15px;
+	}
+	.pensio_payment_form_input_cell img {
+		display: inline-block;
+		margin-left: 5px;
+		vertical-align: middle;
+	}
+	.altapay-page-wrapper {
+		width: 100%;
+	}
+	.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
+		padding: 15px;
+	}
+	.altapay-page-wrapper .altapay-payment-form-cnt {
+		padding-top: 50px;
+	}
+	input#creditCardNumberInput, input#cardholderNameInput {
+		width: 100%;
+		max-width: 300px;
+	}
+	input#cvcInput {
+		min-width: 100px;
+		max-width: 140px;
+	}
+	select#emonth, select#eyear {
+		max-width: 100px;
+	}
+	.site-main {
+		width: 100%;
+	}
+	.woocommerce-page .col2-set .col-1, .woocommerce-column--shipping-address.col-2 {
+		padding: 0;
+	}
+	@media screen and (min-width:769px){
+		.altapay-page-wrapper {
+			display: flex;
 		}
-		.theme-storefront .wp-altapay-payment-form-cnt {
-			max-width: 55%;
+		.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
+			flex: 1;
 		}
-		.theme-storefront .pensio_payment_form_row.cardholdername_row {
-			margin-bottom: 15px;
-		}
-	</style>
-</head>
-	<div id="primary" class="content-area">
-		<main id="main" class="site-main" role="main">
-			<h3 id="order_review_heading"><?php esc_html_e( 'Your order', 'woocommerce' ); ?></h3>
-			<div id="order_review" class="woocommerce-order-details">
+	}
+</style>
+<main id="main" class="site-main woocommerce-page" role="main">
+	<div class="container">
+		<div class="row">
+			<div class="altapay-page-wrapper">
+				<div class="altapay-payment-form-cnt">
+					<form id="PensioPaymentForm"></form>
+				</div>
+				<div class="altapay-order-details woocommerce">
 				<?php
-				$order = new WC_Order( wp_unslash( $_POST['shop_orderid'] ) );
+					$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
+					woocommerce_order_details_table( $order_id );
 				?>
-				<ul class="woocommerce-order-overview woocommerce-thankyou-order-details order_details">
-
-					<li class="woocommerce-order-overview__order order">
-						<?php esc_html_e( 'Order number:', 'woocommerce' ); ?>
-						<strong><?php echo $order->get_order_number(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
-					</li>
-
-					<li class="woocommerce-order-overview__date date">
-						<?php esc_html_e( 'Date:', 'woocommerce' ); ?>
-						<strong><?php echo wc_format_datetime( $order->get_date_created() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
-					</li>
-
-					<?php if ( is_user_logged_in() && $order->get_user_id() === get_current_user_id() && $order->get_billing_email() ) : ?>
-						<li class="woocommerce-order-overview__email email">
-							<?php esc_html_e( 'Email:', 'woocommerce' ); ?>
-							<strong><?php echo $order->get_billing_email(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
-						</li>
-					<?php endif; ?>
-
-					<li class="woocommerce-order-overview__total total">
-						<?php esc_html_e( 'Total:', 'woocommerce' ); ?>
-						<strong><?php echo $order->get_formatted_order_total(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
-					</li>
-
-					<?php if ( $order->get_payment_method_title() ) : ?>
-						<li class="woocommerce-order-overview__payment-method method">
-							<?php esc_html_e( 'Payment method:', 'woocommerce' ); ?>
-							<strong><?php echo wp_kses_post( $order->get_payment_method_title() ); ?></strong>
-						</li>
-					<?php endif; ?>
-
-				</ul>
-
-
-				<?php
-				do_action( 'woocommerce_order_details_before_order_table_items', $order );
-
-				$order_items           = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) );
-				$show_purchase_note    = $order->has_status( apply_filters( 'woocommerce_purchase_note_order_statuses', array( 'completed', 'processing' ) ) );
-				$show_customer_details = is_user_logged_in() && $order->get_user_id() === get_current_user_id();
-				$downloads             = $order->get_downloadable_items();
-				$show_downloads        = $order->has_downloadable_item() && $order->is_download_permitted();
-
-				if ( $show_downloads ) {
-					wc_get_template(
-						'order/order-downloads.php',
-						array(
-							'downloads'  => $downloads,
-							'show_title' => true,
-						)
-					);
-				}
-
-				?>
-
-				<section class="woocommerce-order-details">
-					<?php do_action( 'woocommerce_order_details_before_order_table', $order ); ?>
-
-					<h2 class="woocommerce-order-details__title"><?php esc_html_e( 'Order details', 'woocommerce' ); ?></h2>
-
-					<table class="woocommerce-table woocommerce-table--order-details shop_table order_details">
-
-						<thead>
-						<tr>
-							<th class="woocommerce-table__product-name product-name"><?php esc_html_e( 'Product', 'woocommerce' ); ?></th>
-							<th class="woocommerce-table__product-table product-total"><?php esc_html_e( 'Total', 'woocommerce' ); ?></th>
-						</tr>
-						</thead>
-
-						<tbody>
-						<?php
-						do_action( 'woocommerce_order_details_before_order_table_items', $order );
-
-						foreach ( $order_items as $item_id => $item ) {
-							$product = $item->get_product();
-
-							wc_get_template(
-								'order/order-details-item.php',
-								array(
-									'order'              => $order,
-									'item_id'            => $item_id,
-									'item'               => $item,
-									'show_purchase_note' => $show_purchase_note,
-									'purchase_note'      => $product ? $product->get_purchase_note() : '',
-									'product'            => $product,
-								)
-							);
-						}
-
-						do_action( 'woocommerce_order_details_after_order_table_items', $order );
-						?>
-						</tbody>
-
-						<tfoot>
-						<?php
-						foreach ( $order->get_order_item_totals() as $key => $total ) {
-							?>
-							<tr>
-								<th scope="row"><?php echo esc_html( $total['label'] ); ?></th>
-								<td><?php echo ( 'payment_method' === $key ) ? esc_html( $total['value'] ) : wp_kses_post( $total['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-							</tr>
-							<?php
-						}
-						?>
-						<?php if ( $order->get_customer_note() ) : ?>
-							<tr>
-								<th><?php esc_html_e( 'Note:', 'woocommerce' ); ?></th>
-								<td><?php echo wp_kses_post( nl2br( wptexturize( $order->get_customer_note() ) ) ); ?></td>
-							</tr>
-						<?php endif; ?>
-						</tfoot>
-					</table>
-
-					<?php do_action( 'woocommerce_order_details_after_order_table', $order ); ?>
-				</section>
+				</div>
 			</div>
-			<div class="wp-altapay-payment-form-cnt">
-				<form id="PensioPaymentForm"></form>
-			</div>
-
-		</main>
+		</div>
 	</div>
-
+</main>
 <?php
-get_sidebar();
 get_footer();
