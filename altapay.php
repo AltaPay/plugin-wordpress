@@ -62,11 +62,11 @@ function init_altapay_settings() {
 	$objOrderStatus = new Core\AltapayOrderStatus();
 	$objOrderStatus->registerHooks();
 
-    $objReconciliationData = new Core\AltapayReconciliation();
-    $objReconciliationData->registerHooks();
+	$objReconciliationData = new Core\AltapayReconciliation();
+	$objReconciliationData->registerHooks();
 
-    $objApplePay = new Core\ApplePay();
-    $objApplePay->registerHooks();
+	$objApplePay = new Core\ApplePay();
+	$objApplePay->registerHooks();
 
 	$altapayDbVersion = get_site_option( 'altapay_db_version' );
 
