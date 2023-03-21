@@ -69,10 +69,27 @@ function onApplePayButtonClicked(applepay_obj) {
 
 	session.onpaymentauthorized = event => {
 		// Define ApplePayPaymentAuthorizationResult
-		const result = {
-			"status": ApplePaySession.STATUS_SUCCESS
-		};
-		session.completePayment( result );
+		jQuery.post(
+			applepay_obj.ajax_url,
+			{
+				ajax_nonce: applepay_obj.nonce,
+				action: 'card_wallet_authorize',
+				provider_data: JSON.stringify( event.payment.token ),
+				terminal: applepay_obj.terminal,
+				order_id: applepay_obj.order_id
+			},
+			function (res) {
+				let status;
+				if (res.success === true) {
+					status = ApplePaySession.STATUS_SUCCESS;
+					session.completePayment( status );
+				} else {
+					status = ApplePaySession.STATUS_FAILURE;
+					session.completePayment( status );
+				}
+				window.location = res.data.redirect;
+			}
+		);
 	};
 
 	session.oncouponcodechanged = event => {

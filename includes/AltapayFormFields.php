@@ -70,25 +70,25 @@ $formSettings = array(
 		'default'  => 'no',
 		'desc_tip' => true,
 	),
-	'apple_pay_label'	=> array(
+	'apple_pay_label'          => array(
 		'title'       => __( 'Apple Pay form label', 'altapay' ),
 		'type'        => 'text',
 		'description' => __( 'This controls the label shown on Apple Pay popup window', 'woocommerce' ),
 		'default'     => __( 'AltaPay', 'woocommerce' ),
 		'desc_tip'    => true,
 	),
-	'apple_pay_supported_networks'	=> array(
+	'apple_pay_supported_networks'   => array(
 		'title'       => __( 'Apple Pay Supported Networks', 'altapay' ),
 		'description' => __( 'The payment networks the merchant supports.', 'altapay' ),
-		'type'        => 'multiselect',
+		'type'              => 'multiselect',
 		'options'     => array(
-			'visa'       => __( 'Visa', 'altapay' ),
-			'masterCard' => __( 'Mastercard', 'altapay' ),
-			'amex'       => __( 'Amex', 'altapay' ),
+			'visa'         => __( 'Visa', 'altapay' ),
+			'masterCard'         => __( 'Mastercard', 'altapay' ),
+			'amex'         => __( 'Amex', 'altapay' ),
 		),
-		'default'     => array( 'visa', 'masterCard', 'amex' ),
+		'default'     => array('visa','masterCard','amex'),
 		'desc_tip'    => true,
-	),
+	)
 );
 
 if ( $tokenStatus === 'CreditCard' ) {

@@ -10,6 +10,7 @@
 namespace Altapay\Classes\Core;
 
 use Altapay\Api\Payments\CardWalletSession;
+use Altapay\Api\Payments\CardWalletAuthorize;
 use Altapay\Helpers\Traits\AltapayMaster;
 
 class ApplePay {
@@ -25,6 +26,33 @@ class ApplePay {
 		add_action( 'wp_ajax_validate_merchant', array( $this, 'applepay_validate_merchant' ) );
 		add_action( 'wp_ajax_nopriv_validate_merchant', array( $this, 'applepay_validate_merchant' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'altapay_load_apple_pay_script' ) );
+		add_action( 'wp_ajax_card_wallet_authorize', array( $this, 'applepay_card_wallet_authorize' ) );
+		add_action( 'wp_ajax_nopriv_card_wallet_authorize', array( $this, 'applepay_card_wallet_authorize' ) );
+		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'filter_apple_pay_for_non_safari_browser' ), 10, 2 );
+	}
+
+	/**
+	 * @param $payment_methods
+	 * @return array
+	 */
+	public function filter_apple_pay_for_non_safari_browser( $payment_methods ) {
+
+		$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+		if ( is_checkout() ) {
+
+			$is_safari = ( strpos( $user_agent, 'Safari' ) !== false && strpos( $user_agent, 'Chrome' ) === false );
+
+			if ( ! $is_safari ) {
+				foreach ( $payment_methods as $key => $payment_gateway ) {
+					if ( isset( $payment_gateway->settings['is_apple_pay'] ) && $payment_gateway->settings['is_apple_pay'] === 'yes' ) {
+						unset( $payment_methods[ $key ] );
+					}
+				}
+			}
+		}
+
+		return $payment_methods;
 	}
 
 	/**
@@ -73,6 +101,62 @@ class ApplePay {
 			}
 		} catch ( Exception $e ) {
 			wp_send_json_error( array( 'error' => $e->getMessage() ) );
+		}
+	}
+
+	/**
+	 *  Call CardWalletAuthorize API
+	 *
+	 * @return void
+	 */
+	public function applepay_card_wallet_authorize() {
+		$provider_data = isset( $_POST['provider_data'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_data'] ) ) : '';
+		$terminal      = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
+		$order_id      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
+		$order         = wc_get_order( $order_id );
+
+		$request = new CardWalletAuthorize( $this->getAuth() );
+		$request->setTerminal( $terminal )
+			->setProviderData( $provider_data )
+			->setAmount( (float) $order->get_total() )
+			->setCurrency( $order->get_currency() )
+			->setShopOrderId( $order_id );
+
+		try {
+			$response = $request->call();
+
+			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
+			$latest_transaction = $this->getLatestTransaction( $transactions, 'payment' );
+			$txn_id             = $transactions[ $latest_transaction ]['TransactionId'];
+
+			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
+			$order->payment_complete();
+			update_post_meta( $order_id, '_transaction_id', $txn_id );
+
+			if ( $response->Result === 'Success' ) {
+				wp_send_json_success(
+					array(
+						'redirect' => $order->get_checkout_order_received_url()
+					),
+					200
+				);
+			} else {
+                $order->add_order_note( __( 'Payment failed: '  ) );
+                wc_add_notice( __( 'Payment error:', 'altapay' ), 'error' );
+                wp_send_json_error(
+                    array(
+                        'redirect'=> wc_get_cart_url()
+                    )
+                );
+			}
+		} catch ( \Exception $e ) {
+            $order->add_order_note( __( 'Payment failed: ' . $e->getMessage()  ) );
+            wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
+            wp_send_json_error(
+                array(
+                    'redirect'=> wc_get_cart_url(),
+                )
+            );
 		}
 	}
 }

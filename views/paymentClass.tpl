@@ -58,7 +58,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->title				= $this->get_option( 'title' );
 		$this->description			= $this->get_option( 'description' );
 		$this->token				= $this->get_option('token');
-		$this->payment_action			= $this->get_option( 'payment_action' );
+		$this->payment_action		= $this->get_option( 'payment_action' );
+		$this->is_apple_pay       	= $this->get_option( 'is_apple_pay' );
+		$this->apple_pay_label    	= $this->get_option( 'apple_pay_label' );
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
@@ -96,12 +98,47 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @throws Exception
 	 */
 	public function receipt_page_altapay( $order_id ) {
-		// Show text
-		$requestParams = $this->createPaymentRequest( $order_id );
-		if ( is_wp_error( $requestParams ) ) {
-			echo '<p>' . $requestParams->get_error_message() . '</p>';
+		 // Show text
+		if ( $this->is_apple_pay ) {
+			$order = new WC_Order( $order_id );
+
+			$applepay_obj = array(
+				'ajax_url'        => admin_url( 'admin-ajax.php' ),
+				'nonce'           => wp_create_nonce( 'apple-pay' ),
+				'currency'        => $order->get_currency(),
+				'country'         => get_option( 'woocommerce_default_country' ),
+				'subtotal'        => $order->get_total(),
+				'terminal'        => $this->terminal,
+				'order_id'        => $order_id,
+				'apply_pay_label' => $this->apple_pay_label,
+			);
+			?>
+			<style>
+				apple-pay-button {
+					--apple-pay-button-width: 200px;
+					--apple-pay-button-height: 50px;
+					--apple-pay-button-border-radius: 0px;
+					--apple-pay-button-padding: 5px 0px;
+					--apple-pay-button-box-sizing: border-box;
+				}
+			</style>
+			<apple-pay-button buttonstyle="black" type="pay" locale="en" id="apple-pay-button" style="float: right;"></apple-pay-button>
+			<script>
+				jQuery( document ).ready(function($) {
+					var applepay_obj= <?php echo json_encode( $applepay_obj ); ?>;
+					$('#apple-pay-button').click(function() {
+						onApplePayButtonClicked(applepay_obj);
+					});
+				});
+			</script>
+			<?php
 		} else {
-			echo '<script type="text/javascript">window.location.href = "' . $requestParams['formurl'] . '"</script>';
+			$requestParams = $this->createPaymentRequest( $order_id );
+			if ( is_wp_error( $requestParams ) ) {
+				echo '<p>' . $requestParams->get_error_message() . '</p>';
+			} else {
+				echo '<script type="text/javascript">window.location.href = "' . $requestParams['formurl'] . '"</script>';
+			}
 		}
 	}
 
