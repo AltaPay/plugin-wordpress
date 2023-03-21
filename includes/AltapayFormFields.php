@@ -24,27 +24,27 @@ foreach ( new DirectoryIterator( dirname( __DIR__, 1 ) . '/assets/images/payment
 }
 
 $formSettings = array(
-	'enabled'                      => array(
+	'enabled'        => array(
 		'title'   => __( 'Enable/Disable', 'woocommerce' ),
 		'type'    => 'checkbox',
 		'default' => 'yes',
 		'label'   => __( ' ', 'altapay' ),
 	),
-	'title'                        => array(
+	'title'          => array(
 		'title'       => __( 'Title', 'woocommerce' ),
 		'type'        => 'text',
 		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 		'default'     => __( 'AltaPay', 'woocommerce' ),
 		'desc_tip'    => true,
 	),
-	'description'                  => array(
+	'description'    => array(
 		'title'       => __( 'Description', 'woocommerce' ),
 		'description' => __( 'Payment method description that the customer will see on your checkout.', 'woocommerce' ),
 		'type'        => 'textarea',
 		'default'     => '',
 		'desc_tip'    => true,
 	),
-	'payment_action'               => array(
+	'payment_action' => array(
 		'title'       => __( 'Payment action', 'altapay' ),
 		'description' => __( 'Make payment authorized or authorized and captured', 'altapay' ),
 		'type'        => 'select',
@@ -55,7 +55,7 @@ $formSettings = array(
 		'default'     => '',
 		'desc_tip'    => true,
 	),
-	'payment_icon'                 => array(
+	'payment_icon'   => array(
 		'title'       => __( 'Icon', 'altapay' ),
 		'description' => __( 'Select image icon to display on checkout page', 'altapay' ),
 		'type'        => 'select',
@@ -63,21 +63,21 @@ $formSettings = array(
 		'default'     => '',
 		'desc_tip'    => true,
 	),
-	'is_apple_pay'                 => array(
+	'is_apple_pay'   => array(
 		'title'    => __( 'Is Apple Pay?', 'altapay' ),
 		'type'     => 'checkbox',
 		'label'    => __( 'Check if the terminal is for Apple Pay payments', 'altapay' ),
 		'default'  => 'no',
 		'desc_tip' => true,
 	),
-	'apple_pay_label'              => array(
+	'apple_pay_label'	=> array(
 		'title'       => __( 'Apple Pay form label', 'altapay' ),
 		'type'        => 'text',
 		'description' => __( 'This controls the label shown on Apple Pay popup window', 'woocommerce' ),
 		'default'     => __( 'AltaPay', 'woocommerce' ),
 		'desc_tip'    => true,
 	),
-	'apple_pay_supported_networks' => array(
+	'apple_pay_supported_networks'	=> array(
 		'title'       => __( 'Apple Pay Supported Networks', 'altapay' ),
 		'description' => __( 'The payment networks the merchant supports.', 'altapay' ),
 		'type'        => 'multiselect',
