@@ -84,8 +84,22 @@ class ApplePay {
 	 * @return void
 	 */
 	public function applepay_validate_merchant() {
+<<<<<<< HEAD
 		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
+=======
+		$terminals      = json_decode( get_option( 'altapay_terminals' ) );
+		$terminal_id    = isset( $_POST['terminal_id'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal_id'] ) ) : '';
+		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
+
+		$terminal = '';
+		foreach ( $terminals  as $terminal ) {
+			if ( 'altapay_' . strtolower( $terminal->key ) === $terminal_id ) {
+				$terminal = $terminal->name;
+				break;
+			}
+		}
+>>>>>>> ec3ec3b (Sanitize post data)
 
 		$request = new CardWalletSession( $this->getAuth() );
 		$request->setTerminal( $terminal )
