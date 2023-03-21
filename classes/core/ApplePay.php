@@ -79,57 +79,14 @@ class ApplePay {
 	}
 
 	/**
-	 * Enqueue Apple Pay scripts
-	 *
-	 * @return void
-	 */
-	public function altapay_load_apple_pay_script() {
-
-		wp_enqueue_script(
-			'altapay-applepay-sdk',
-			'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
-			array( 'jquery' ),
-			'1.0.0',
-			false
-		);
-		wp_enqueue_script(
-			'altapay-applepay-main',
-			plugin_dir_url( ALTAPAY_PLUGIN_FILE ) . 'assets/js/applepay.js',
-			array( 'jquery', 'altapay-applepay-sdk' ),
-			'1.0.0',
-			false
-		);
-	}
-
-	/**
 	 * Validate Apple Pay Session
 	 *
 	 * @return void
 	 */
 	public function applepay_validate_merchant() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
-		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
-=======
-		$terminals      = json_decode( get_option( 'altapay_terminals' ) );
-		$terminal_id    = isset( $_POST['terminal_id'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal_id'] ) ) : '';
-		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
-
-		$terminal = '';
-		foreach ( $terminals  as $terminal ) {
-			if ( 'altapay_' . strtolower( $terminal->key ) === $terminal_id ) {
-				$terminal = $terminal->name;
-				break;
-			}
-		}
->>>>>>> ec3ec3b (Sanitize post data)
-
-=======
 		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
 
->>>>>>> 60b27ec (Refacor code and get supported networks from configurations)
 		$request = new CardWalletSession( $this->getAuth() );
 		$request->setTerminal( $terminal )
 			->setValidationUrl( $validation_url )
@@ -146,7 +103,6 @@ class ApplePay {
 			wp_send_json_error( array( 'error' => $e->getMessage() ) );
 		}
 	}
-<<<<<<< HEAD
 
 	/**
 	 *  Call CardWalletAuthorize API
@@ -203,6 +159,4 @@ class ApplePay {
             );
 		}
 	}
-=======
->>>>>>> 60b27ec (Refacor code and get supported networks from configurations)
 }
