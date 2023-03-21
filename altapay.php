@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Altapay for WooCommerce - Payments less complicated
+ * Plugin Name: AltaPay for WooCommerce - Payments less complicated
  * Plugin URI: https://documentation.altapay.com/Content/Plugins/Plugins.htm
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
@@ -65,6 +65,9 @@ function init_altapay_settings() {
 	$objReconciliationData = new Core\AltapayReconciliation();
 	$objReconciliationData->registerHooks();
 
+	$objApplePay = new Core\ApplePay();
+	$objApplePay->registerHooks();
+
 	$altapayDbVersion = get_site_option( 'altapay_db_version' );
 
 	if ( empty( $altapayDbVersion ) || $altapayDbVersion !== ALTAPAY_DB_VERSION ) {
@@ -101,6 +104,7 @@ function altapay_add_gateway( $methods ) {
 
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) ) {
 						$subscriptions = true;
+						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
 						$tokenStatus = 'CreditCard';
 					}
