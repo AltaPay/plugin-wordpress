@@ -58,9 +58,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->title				= $this->get_option( 'title' );
 		$this->description			= $this->get_option( 'description' );
 		$this->token				= $this->get_option('token');
-		$this->payment_action			= $this->get_option( 'payment_action' );
-		$this->is_apple_pay       		= $this->get_option( 'is_apple_pay' );
-		$this->apple_pay_label    		= $this->get_option( 'apple_pay_label' );
+		$this->payment_action				= $this->get_option( 'payment_action' );
+		$this->is_apple_pay       			= $this->get_option( 'is_apple_pay' );
+		$this->apple_pay_label    			= $this->get_option( 'apple_pay_label' );
+        $this->apple_pay_supported_networks	= $this->get_option( 'apple_pay_supported_networks' );
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
@@ -103,14 +104,15 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$order = new WC_Order( $order_id );
 
 			$applepay_obj = array(
-				'ajax_url'        => admin_url( 'admin-ajax.php' ),
-				'nonce'           => wp_create_nonce( 'apple-pay' ),
-				'currency'        => $order->get_currency(),
-				'country'         => get_option( 'woocommerce_default_country' ),
-				'subtotal'        => $order->get_total(),
-				'terminal'        => $this->terminal,
-				'order_id'        => $order_id,
-				'apply_pay_label' => $this->apple_pay_label,
+				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
+				'nonce'                        => wp_create_nonce( 'apple-pay' ),
+				'currency'                     => $order->get_currency(),
+				'country'                      => get_option( 'woocommerce_default_country' ),
+				'subtotal'                     => $order->get_total(),
+				'terminal'                     => $this->terminal,
+				'order_id'                     => $order_id,
+				'apply_pay_label'              => $this->apple_pay_label,
+				'apple_pay_supported_networks' => $this->apple_pay_supported_networks,
 			);
 			?>
 			<style>
