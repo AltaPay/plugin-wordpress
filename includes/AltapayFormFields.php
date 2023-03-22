@@ -101,6 +101,6 @@ if ( $tokenStatus === 'CreditCard' ) {
 	);
 }
 
-$formSettings = apply_filters_deprecated( 'altapay_gateway_payments_settings_with_token_control', array( $formSettings ), '3.3.6', 'altapay_gateway_payments_settings' );
+$formSettings = apply_filters_deprecated( 'altapay_gateway_payments_settings_with_token_control', array( $formSettings ), '3.3.7', 'altapay_gateway_payments_settings' );
 
 return apply_filters( 'altapay_gateway_payments_settings', $formSettings );
