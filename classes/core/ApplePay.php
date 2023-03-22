@@ -12,6 +12,9 @@ namespace Altapay\Classes\Core;
 use Altapay\Api\Payments\CardWalletSession;
 use Altapay\Api\Payments\CardWalletAuthorize;
 use Altapay\Helpers\Traits\AltapayMaster;
+use Altapay\Helpers;
+use Altapay\Classes\Util;
+use Altapay\Classes\Core;
 
 class ApplePay {
 
@@ -129,28 +132,65 @@ class ApplePay {
 		$order_id      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
 		$order         = wc_get_order( $order_id );
 
+		$payment_gateways = WC()->payment_gateways()->payment_gateways();
+		$payment_method   = $order->get_payment_method();
+
+		$altapay_helpers  = new Helpers\AltapayHelpers();
+		$utils            = new Util\UtilMethods();
+		$transaction_info = $altapay_helpers->transactionInfo();
+
+		// Add order lines to AltaPay request
+		$order_lines = $utils->createOrderLines( $order );
+
+		$cookie = isset( $_SERVER['HTTP_COOKIE'] ) ? $_SERVER['HTTP_COOKIE'] : '';
+
 		$request = new CardWalletAuthorize( $this->getAuth() );
 		$request->setTerminal( $terminal )
 			->setProviderData( $provider_data )
+			->setShopOrderId( $order_id )
 			->setAmount( (float) $order->get_total() )
 			->setCurrency( $order->get_currency() )
-			->setShopOrderId( $order_id );
+			->setSalesTax( round( $order->get_total_tax(), 2 ) )
+			->setTransactionInfo( $transaction_info )
+			->setCookie( $cookie )
+			->setOrderLines( $order_lines )
+			->setSaleReconciliationIdentifier( wp_generate_uuid4() );
+
+		$payment_type = 'payment';
+
+		foreach ( $payment_gateways as $key => $payment_gateway ) {
+			if ( $key === $payment_method ) {
+				if ( $payment_gateway->payment_action === 'authorize_capture' ) {
+					$payment_type = 'paymentAndCapture';
+				}
+				break;
+			}
+		}
+
+		$request->setType( $payment_type );
 
 		try {
 			$response = $request->call();
 
 			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
-			$latest_transaction = $this->getLatestTransaction( $transactions, 'payment' );
-			$txn_id             = $transactions[ $latest_transaction ]['TransactionId'];
+			$latest_transaction = $this->getLatestTransaction( $transactions, $payment_type );
+			$transaction        = $transactions[ $latest_transaction ];
+			$txn_id             = $transaction['TransactionId'];
 
 			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
 			$order->payment_complete();
 			update_post_meta( $order_id, '_transaction_id', $txn_id );
 
 			if ( $response->Result === 'Success' ) {
+
+				$reconciliation = new Core\AltapayReconciliation();
+				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+					$reconciliation->saveReconciliationIdentifier( $order_id, $txn_id, $val['Id'], $val['Type'] );
+				}
+
 				wp_send_json_success(
 					array(
-						'redirect' => $order->get_checkout_order_received_url()
+						'redirect' => $order->get_checkout_order_received_url(),
 					),
 					200
 				);
