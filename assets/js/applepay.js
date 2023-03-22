@@ -35,8 +35,8 @@ function onApplePayButtonClicked(applepay_obj) {
 				if (res.success === true) {
 					const merchantSession = jQuery.parseJSON( res.data );
 					session.completeMerchantValidation( merchantSession );
-				} else {
-					console.log( jQuery.parseJSON( res.error ) );
+				} else if (res.data.redirect) {
+					window.location = res.data.redirect;
 				}
 			}
 		);
@@ -87,7 +87,10 @@ function onApplePayButtonClicked(applepay_obj) {
 					status = ApplePaySession.STATUS_FAILURE;
 					session.completePayment( status );
 				}
-				window.location = res.data.redirect;
+
+				if (res.data.redirect) {
+					window.location = res.data.redirect;
+				}
 			}
 		);
 	};

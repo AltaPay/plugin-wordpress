@@ -84,6 +84,12 @@ class ApplePay {
 	 * @return void
 	 */
 	public function applepay_validate_merchant() {
+
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ajax_nonce'] ), 'apple-pay' ) ) {
+			wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+		}
+
 		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
 
@@ -97,10 +103,12 @@ class ApplePay {
 			if ( $response->Result === 'Success' ) {
 				wp_send_json_success( $response->ApplePaySession, 200 );
 			} else {
-				wp_send_json_error();
+				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
+				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 			}
 		} catch ( Exception $e ) {
-			wp_send_json_error( array( 'error' => $e->getMessage() ) );
+			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
 	}
 
@@ -110,6 +118,12 @@ class ApplePay {
 	 * @return void
 	 */
 	public function applepay_card_wallet_authorize() {
+
+		if ( ! wp_verify_nonce( wp_unslash( $_POST['ajax_nonce'] ), 'apple-pay' ) ) {
+			wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+		}
+
 		$provider_data = isset( $_POST['provider_data'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_data'] ) ) : '';
 		$terminal      = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$order_id      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
@@ -141,22 +155,14 @@ class ApplePay {
 					200
 				);
 			} else {
-                $order->add_order_note( __( 'Payment failed: '  ) );
-                wc_add_notice( __( 'Payment error:', 'altapay' ), 'error' );
-                wp_send_json_error(
-                    array(
-                        'redirect'=> wc_get_cart_url()
-                    )
-                );
+				$order->add_order_note( __( 'Payment failed.' ) );
+				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
+				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 			}
 		} catch ( \Exception $e ) {
-            $order->add_order_note( __( 'Payment failed: ' . $e->getMessage()  ) );
-            wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
-            wp_send_json_error(
-                array(
-                    'redirect'=> wc_get_cart_url(),
-                )
-            );
+			$order->add_order_note( __( 'Payment failed: ' . $e->getMessage() ) );
+			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
 	}
 }
