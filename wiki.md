@@ -127,10 +127,19 @@ For the AltaPay payment method to appear in the checkout page:
 
     ![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.png)
 
-- Enable the payment terminal.
-- Complete the text field "Title"; this field will appear in the checkout page as the title of the payment terminal.
-- Complete the field "Message"; this field must contain the message that will appear for the customer in the checkout page and describes the payment terminal.
-- Check if the selected currency matches WooCommerce currency. (WooCommerce currency can be viewed in WooCommerce > Settings > General tab)
+- Complete the details, using the notes below for guidance.
+
+    | Field | Description |
+    | --- | --- |
+    | Enable/Disable | Enable or Disable the payment terminal. |
+    | Title | This field will appear in the checkout page as the title of the payment terminal. |
+    | Description | This field must contain the message that will appear for the customer in the checkout page and describes the payment terminal. |
+    | Payment action | Make payment authorized or authorized and captured. |
+    | Icon | Select image icon to display on checkout page. |
+    | Is Apple Pay? | Check if the terminal is for Apple Pay payments. |
+    | Apple Pay form label | This controls the label shown on Apple Pay popup window. |
+    | Apple Pay Supported Networks | The payment networks the merchant supports. |
+    | Token Control | Enable Customer Token Control. |
 - Save the changes.
 
 ## Customize the checkout page
@@ -231,13 +240,13 @@ In order to reconcile payments please follow the steps below:
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.1.1
-- WooCommerce min. 3.9.0 – max. 7.4.1
+- WooCommerce min. 3.9.0 – max. 7.5.1
 - PHP 7.2 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.1.1, WooCommerce 7.4.1 and PHP 8.1
+- WordPress 6.1.1, WooCommerce 7.5.1 and PHP 8.1
 
 
 ## Troubleshooting
