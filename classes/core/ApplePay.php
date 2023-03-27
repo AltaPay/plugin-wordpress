@@ -109,7 +109,7 @@ class ApplePay {
 				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
 				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 			}
-		} catch ( Exception $e ) {
+		} catch ( \Exception $e ) {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
