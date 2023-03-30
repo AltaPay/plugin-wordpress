@@ -4,7 +4,7 @@ Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.2
 Requires at least: 5.0
 Tested up to: 6.1.1
-Stable tag: 3.3.7
+Stable tag: 3.3.8
 License: MIT
 WC requires at least: 3.9.0
 WC tested up to: 7.5.1
@@ -37,7 +37,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 == Changelog ==
 
-= 3.3.7 =
+= 3.3.8 =
 * Add support for Apple Pay
 
 = 3.3.6 =

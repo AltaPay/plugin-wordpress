@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.3.7]
+## [3.3.8]
 - Add support for Apple Pay
 
 ## [3.3.6]
