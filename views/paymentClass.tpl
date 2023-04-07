@@ -100,7 +100,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function receipt_page_altapay( $order_id ) {
 		 // Show text
-		if ( $this->is_apple_pay ) {
+		if ( $this->is_apple_pay === 'yes' ) {
 			$order = new WC_Order( $order_id );
 
 			$applepay_obj = array(
@@ -250,12 +250,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		$transactionInfo = $altapayHelpers->transactionInfo();
 
-		// Add orderlines to AltaPay request
-		$orderLines = $utilMethods->createOrderLines( $order );
-		if ( $orderLines instanceof WP_Error ) {
-			return $orderLines; // Some error occurred
-		}
-
 		try {
 			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
 			if ( !$savedCardNumber ) {
@@ -270,19 +264,18 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$auth    = $this->getAuth();
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
-					->setShopOrderId( $order_id )
-					->setAmount( round( $amount, 2 ) )
-					->setCurrency( $currency )
-					->setCustomerInfo( $customerInfo )
-					->setConfig( $config )
-					->setTransactionInfo( $transactionInfo )
-					->setSalesTax( round( $order->get_total_tax(), 2 ) )
-					->setCookie( $cookie )
-					->setCcToken( $ccToken )
-					->setFraudService( null )
-					->setLanguage( $language )
-					->setOrderLines( $orderLines )
-					->setSaleReconciliationIdentifier( wp_generate_uuid4() );
+			        ->setShopOrderId( $order_id )
+			        ->setAmount( round( $amount, 2 ) )
+			        ->setCurrency( $currency )
+			        ->setCustomerInfo( $customerInfo )
+			        ->setConfig( $config )
+			        ->setTransactionInfo( $transactionInfo )
+			        ->setSalesTax( round( $order->get_total_tax(), 2 ) )
+			        ->setCookie( $cookie )
+			        ->setCcToken( $ccToken )
+			        ->setFraudService( null )
+			        ->setLanguage( $language )
+			        ->setSaleReconciliationIdentifier( wp_generate_uuid4() );
 
 			// Check if WooCommerce subscriptions is enabled and contains subscription product
 			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
@@ -296,6 +289,18 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			$request->setType( $payment_type );
+
+			// Add orderlines to AltaPay request
+			$orderLines = $utilMethods->createOrderLines( $order, [], false, in_array( $payment_type, [
+				'subscription',
+				'subscriptionAndCharge'
+			] ) );
+			if ( $orderLines instanceof WP_Error ) {
+				return $orderLines; // Some error occurred
+			}
+
+			$request->setOrderLines( $orderLines );
+
 
 			if ( $request ) {
 				try {
@@ -349,6 +354,19 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$status         = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 			$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
+
+			if ( $type == 'subscription_payment' ) {
+				$query = new WC_Order_Query( array(
+					'limit' => 1,
+					'return' => 'ids',
+					'meta_key'   => '_transaction_id',
+					'meta_value' => $txnId,
+				) );
+				$orders = $query->get_orders();
+				if ( ! empty( $orders ) ) {
+					$order_id = $orders[0];
+				}
+			}
 
 			$order        = new WC_Order( $order_id );
 			$agreement_id = '';
@@ -423,7 +441,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
 					$reconciliation = new Core\AltapayReconciliation();
-					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
+					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
 						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
 					}
 

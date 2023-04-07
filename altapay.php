@@ -5,7 +5,7 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.3.7
+ * Version: 3.3.9
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 7.5.1
@@ -73,6 +73,12 @@ function init_altapay_settings() {
 	if ( empty( $altapayDbVersion ) || $altapayDbVersion !== ALTAPAY_DB_VERSION ) {
 		Core\AltapayPluginInstall::createReconciliationDataTable();
 	}
+
+	$altapay_terminal_classes_refreshed = get_site_option( 'altapay_terminal_classes_refreshed' );
+
+	if ( empty( $altapay_terminal_classes_refreshed ) ) {
+		Core\AltapaySettings::recreateTerminalData($settings);
+	}
 }
 
 /**
@@ -101,8 +107,12 @@ function altapay_add_gateway( $methods ) {
 				if ( $term->key === $terminal ) {
 					$terminalName = $term->name;
 					$natures      = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
+					$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 
-					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) ) {
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
+                         or ( in_array('MobilePayAcquirer', $gateway_methods ) or in_array('MobilePayOnlineAcquirer', $gateway_methods ) )
+                         or in_array('VippsAcquirer', $gateway_methods )
+                    ) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
@@ -269,6 +279,7 @@ function altapay_meta_box( $post ) {
 				$captured = $pay->CapturedAmount;
 				$refunded = $pay->RefundedAmount;
 				$status   = $pay->TransactionStatus;
+				$type     = $pay->AuthType;
 
 				if ( $status === 'released' ) {
 					echo '<br /><b>' . __( 'Payment released', 'altapay' ) . '</b>';
@@ -287,6 +298,8 @@ function altapay_meta_box( $post ) {
 							'refunded'       => $refunded,
 							'order'          => $order,
 							'items_captured' => $itemsCaptured,
+							'transaction_status' => $status,
+							'transaction_type' => $type,
 						)
 					);
 				}
@@ -514,7 +527,7 @@ function altapayCaptureCallback() {
 			wp_send_json_error( array( 'error' => 'Error: ' . $e->getMessage() ) );
 		}
 
-		if ( $response && $response->Result !== 'Success' ) {
+		if ( $response && !in_array($response->Result , ['Success', 'Open']) ) {
 			wp_send_json_error( array( 'error' => __( 'Could not capture reservation' ) ) );
 		}
 
@@ -546,8 +559,12 @@ function altapayCaptureCallback() {
 				$transaction_id = $transaction['TransactionId'];
 			}
 
-			$reconciliation = new Core\AltapayReconciliation();
-			$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction_id, $reconciliationId, 'captured' );
+            if($response->Result === 'Success') {
+	            $reconciliation = new Core\AltapayReconciliation();
+	            foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+		            $reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction_id, $val['Id'], $val['Type'] );
+	            }
+            }
 
 			$reserved = (float) $transaction['ReservedAmount'];
 			$captured = (float) $transaction['CapturedAmount'];
@@ -559,12 +576,13 @@ function altapayCaptureCallback() {
 			$charge = 0.00;
 		}
 
-		foreach ( $selectedProducts['itemQty'] as $itemId => $qty ) {
-			$args = array(
-				'post_type'   => 'altapay_captures',
-				'post_status' => 'captured',
-				'post_parent' => $orderID,
-			);
+        if($response->Result === 'Success') {
+	        foreach ( $selectedProducts['itemQty'] as $itemId => $qty ) {
+		        $args = array(
+			        'post_type'   => 'altapay_captures',
+			        'post_status' => 'captured',
+			        'post_parent' => $orderID,
+		        );
 
 			$post_id = wp_insert_post( $args );
 
@@ -574,9 +592,14 @@ function altapayCaptureCallback() {
 			}
 		}
 
-		update_post_meta( $orderID, '_captured', true );
-		$orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
-		$order->add_order_note( $orderNote );
+            update_post_meta( $orderID, '_captured', true );
+	        $orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
+	        $order->add_order_note( $orderNote );
+        } else if ( $response->Result === 'Open' ) {
+            $orderNote = 'The payment is pending an update from the payment provider.';
+	        $order->update_status( 'on-hold',  $orderNote);
+        }
+
 		$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
 			__(
 				'added on %1$s at %2$s',

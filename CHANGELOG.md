@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.8]
+- Add support for subscriptions via MobilePay & Vipps
+
 ## [3.3.7]
 - Add support for Apple Pay
 

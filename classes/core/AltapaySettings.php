@@ -399,6 +399,7 @@ class AltapaySettings {
 				'key'    => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
 				'name'   => $terminal->Title,
 				'nature' => $terminal->Natures,
+				'methods' => $terminal->Methods,
 			);
 		}
 
@@ -535,4 +536,55 @@ class AltapaySettings {
 
 		register_post_type( 'altapay_captures', $args );
 	}
+
+    static function recreateTerminalData($self){
+
+	    $recreatedTerminals = array();
+	    $auth      = $self->getAuth();
+	    $api       = new Terminals( $auth );
+	    $response  = $api->call();
+
+	    foreach ( $response->Terminals as $terminal ) {
+		    $recreatedTerminals[] = array(
+			    'key'    => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+			    'name'   => $terminal->Title,
+			    'nature' => $terminal->Natures,
+			    'methods' => $terminal->Methods,
+		    );
+	    }
+
+	    update_option( 'altapay_terminals', wp_json_encode( $recreatedTerminals ) );
+
+	    $enabledTerminals  = array();
+	    $terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
+
+	    if ( $terminalsEnabled ) {
+		    $enabledTerminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
+	    }
+	    $terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
+	    $pluginDir = plugin_dir_path( __FILE__ );
+	    // Directory for the terminals
+	    $terminalDir = $pluginDir . '/../../terminals/';
+	    // Temp dir in case the one from above is not writable
+	    $tmpDir = sys_get_temp_dir();
+	    if ( is_array( $terminalInfo ) ) {
+		    foreach ( $terminalInfo as $term ) {
+			    // The key is the terminal name
+			    if ( in_array( $term->key, $enabledTerminals ) ) {
+
+					    $disabledTerminalFileName = $term->key . '.class.php';
+					    $path                     = $terminalDir . $disabledTerminalFileName;
+					    $tmpPath                  = $tmpDir . '/' . $disabledTerminalFileName;
+					    // Check if there is a terminal created, so it can  be removed
+					    if ( file_exists( $path ) ) {
+						    unlink( $path );
+					    } elseif ( file_exists( $tmpPath ) ) {
+						    unlink( $tmpPath );
+					    }
+				    }
+			    }
+	    }
+
+	    update_option( 'altapay_terminal_classes_refreshed', true );
+    }
 }
