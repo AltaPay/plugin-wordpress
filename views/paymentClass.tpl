@@ -388,7 +388,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				if ( $status === 'succeeded' ) {
 					foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
 						if ( $transaction_data['AuthType'] === 'subscription_payment' &&
-						$transaction_data['TransactionStatus'] !== 'captured' ) {
+						! in_array( $transaction_data['TransactionStatus'], ['captured', 'pending'] ) ) {
 							$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
 							wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
 							wp_redirect( wc_get_cart_url() );
@@ -483,7 +483,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
 				// Payment completed
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
-				$order->payment_complete();
+				if ( $transaction_data['AuthType'] === 'subscription_payment' and $transaction_data['TransactionStatus'] === 'pending' ) {
+					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
+				}
+				else {
+					$order->payment_complete();
+				}
 				update_post_meta( $order_id, '_transaction_id', $txnId );
 				update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
