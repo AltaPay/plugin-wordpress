@@ -483,7 +483,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
 				// Payment completed
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
-				if ( $transaction_data['AuthType'] === 'subscription_payment' and $transaction_data['TransactionStatus'] === 'pending' ) {
+				if ( $transaction['AuthType'] === 'subscription_payment' and $transaction['TransactionStatus'] === 'pending' ) {
 					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
 				}
 				else {
