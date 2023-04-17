@@ -100,7 +100,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function receipt_page_altapay( $order_id ) {
 		 // Show text
-		if ( $this->is_apple_pay ) {
+		if ( $this->is_apple_pay === 'yes' ) {
 			$order = new WC_Order( $order_id );
 
 			$applepay_obj = array(
