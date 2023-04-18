@@ -40,7 +40,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 = 3.3.9 =
 * Add support for subscriptions via MobilePay & Vipps
 
-= 3.3.7 =
+= 3.3.8 =
 * Add support for Apple Pay
 
 = 3.3.6 =
