@@ -258,26 +258,26 @@ trait AltapayMaster {
 		$return             = false;
 		$detect_fraud       = get_option( 'altapay_fraud_detection' );
 		$do_action_on_fraud = get_option( 'altapay_fraud_detection_action' );
-		if ( $detect_fraud and $do_action_on_fraud and $fraud_recommendation == 'Deny' ) {
+		if ( $detect_fraud and $do_action_on_fraud and $fraud_recommendation === 'Deny' ) {
 			$return = true;
 			try {
 				$auth = $this->getAuth();
 				if ( $transaction['TransactionStatus'] === 'captured' and ! get_post_meta( $order_id, '_refunded', true ) ) {
-					$reconciliationId = wp_generate_uuid4();
-					$api              = new RefundCapturedReservation( $auth );
-					$api->setReconciliationIdentifier( $reconciliationId );
+					$reconciliation_id = wp_generate_uuid4();
+					$api               = new RefundCapturedReservation( $auth );
+					$api->setReconciliationIdentifier( $reconciliation_id );
 				} elseif ( get_post_meta( $order_id, '_released', true ) ) {
 					$api = new ReleaseReservation( $auth );
 				}
 				$api->setTransaction( $transaction['TransactionId'] );
 				$response = $api->call();
 				if ( $response->Result === 'Success' ) {
-					if ( ! empty( $reconciliationId ) ) {
+					if ( ! empty( $reconciliation_id ) ) {
 						$transaction = json_decode( wp_json_encode( $response->Transactions ), true );
 						$transaction = reset( $transaction );
 
 						$reconciliation = new Core\AltapayReconciliation();
-						$reconciliation->saveReconciliationIdentifier( (int) $order_id, $transaction['TransactionId'], $reconciliationId, 'refunded' );
+						$reconciliation->saveReconciliationIdentifier( (int) $order_id, $transaction['TransactionId'], $reconciliation_id, 'refunded' );
 						update_post_meta( $order_id, '_refunded', true );
 
 						// Release agreement
