@@ -39,6 +39,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.3.9 =
 * Add support for fraud detection service
+* Supports API changes from 20230412
 
 = 3.3.8 =
 * Add support for Apple Pay
