@@ -72,18 +72,18 @@
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'Fraud detection', 'altapay' ); ?></th>
 			<td>
-				<select name="altapay_fraud_detection_service">
+				<select name="altapay_fraud_detection">
 					<option value="0">Disabled</option>
-					<option @if($altapay_fraud_detection_service) selected @endif value="1">Enabled</option>
+					<option @if($altapay_fraud_detection) selected @endif value="1">Enabled</option>
 				</select>
 			</td>
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'Release/Refund on Fraud detection', 'altapay' ); ?></th>
 			<td>
-				<select name="altapay_fraud_detection_service_action">
+				<select name="altapay_fraud_detection_action">
 					<option value="0">No</option>
-					<option @if($altapay_fraud_detection_service_action) selected @endif value="1">Yes</option>
+					<option @if($altapay_fraud_detection_action) selected @endif value="1">Yes</option>
 				</select>
 			</td>
 		</tr>

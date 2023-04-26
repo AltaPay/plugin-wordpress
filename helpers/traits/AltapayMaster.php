@@ -248,31 +248,31 @@ trait AltapayMaster {
 
 	/**
 	 * @param $order_id
-	 * @param $txnId
+	 * @param $txn_id
 	 * @param $transaction
 	 * @param $fraud_recommendation
 	 *
 	 * @return bool
 	 */
-	public function detectFraud( $order_id, $txnId, $transaction, $fraud_recommendation ) {
-		$return = false;
-		$detect_fraud = get_option( 'altapay_fraud_detection_service' );
-		$do_action_on_fraud = get_option( 'altapay_fraud_detection_service_action' );
+	public function detectFraud( $order_id, $txn_id, $transaction, $fraud_recommendation ) {
+		$return             = false;
+		$detect_fraud       = get_option( 'altapay_fraud_detection' );
+		$do_action_on_fraud = get_option( 'altapay_fraud_detection_action' );
 		if ( $detect_fraud and $do_action_on_fraud and $fraud_recommendation == 'Deny' ) {
 			$return = true;
 			try {
-				$auth =  $this->getAuth();
-				if ( $transaction['TransactionStatus'] === 'captured' and ! get_post_meta( $order_id, '_refunded', true )) {
+				$auth = $this->getAuth();
+				if ( $transaction['TransactionStatus'] === 'captured' and ! get_post_meta( $order_id, '_refunded', true ) ) {
 					$reconciliationId = wp_generate_uuid4();
-					$api = new RefundCapturedReservation( $auth );
+					$api              = new RefundCapturedReservation( $auth );
 					$api->setReconciliationIdentifier( $reconciliationId );
-				} else if (get_post_meta( $order_id, '_released', true ) ) {
+				} elseif ( get_post_meta( $order_id, '_released', true ) ) {
 					$api = new ReleaseReservation( $auth );
 				}
 				$api->setTransaction( $transaction['TransactionId'] );
 				$response = $api->call();
 				if ( $response->Result === 'Success' ) {
-					if ( !empty($reconciliationId) ) {
+					if ( ! empty( $reconciliationId ) ) {
 						$transaction = json_decode( wp_json_encode( $response->Transactions ), true );
 						$transaction = reset( $transaction );
 
@@ -281,23 +281,22 @@ trait AltapayMaster {
 						update_post_meta( $order_id, '_refunded', true );
 
 						// Release agreement
-						if ( $txnId != $transaction['TransactionId'] ) {
+						if ( $txn_id != $transaction['TransactionId'] ) {
 							$api = new ReleaseReservation( $auth );
-							$api->setTransaction( $txnId );
+							$api->setTransaction( $txn_id );
 							$response = $api->call();
 							if ( $response->Result !== 'Success' ) {
-								error_log( "altapay_fraud_detection_service_action error releasing agreement: $response->MerchantErrorMessage" );
+								error_log( "altapay_fraud_detection_action error releasing agreement: $response->MerchantErrorMessage" );
 							}
 						}
 					} else {
 						update_post_meta( $order_id, '_released', true );
 					}
 				} else {
-					error_log( "altapay_fraud_detection_service_action error: $response->MerchantErrorMessage" );
+					error_log( "altapay_fraud_detection_action error: $response->MerchantErrorMessage" );
 				}
-
-				} catch ( Exception $e ) {
-					error_log( "altapay_fraud_detection_service_action exception: {$e->getMessage()}" );
+			} catch ( Exception $e ) {
+				error_log( "altapay_fraud_detection_action exception: {$e->getMessage()}" );
 			}
 		}
 		return $return;

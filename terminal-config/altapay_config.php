@@ -94,8 +94,8 @@ update_option('altapay_gateway_url', $url);
 update_option('altapay_terminals_enabled', json_encode($terminals));
 
 // Fraud detection Service
-update_option('altapay_fraud_detection_service', 0);
-update_option('altapay_fraud_detection_service_action', 0);
+update_option('altapay_fraud_detection', 0);
+update_option('altapay_fraud_detection_action', 0);
 
 foreach ($terminals as $terminal) {
     $terminalSettings = array(
