@@ -37,7 +37,7 @@
 		<tr valign="top">
 			<th scope="row"><?php esc_html_e( 'Payment page', 'altapay' ); ?></th>
 			<td>
-				@php // Validate if payment page exists by looping trough the pages
+				@php // Validate if payment page exists by looping through the pages
 					$pages = get_pages();
 					foreach ($pages as $page) {
 						if ($page->post_name === 'altapay-payment-form') {
@@ -61,6 +61,33 @@
 
 			</td>
 		</tr>
+
+
+		<tr valign="top">
+			<th scope="row" colspan="2">
+				<h2 style="background: #006064; color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Fraud detection service', 'altapay' ); ?></h2>
+			</th>
+		</tr>
+
+		<tr valign="top">
+			<th scope="row"><?php esc_html_e( 'Fraud detection', 'altapay' ); ?></th>
+			<td>
+				<select name="altapay_fraud_detection_service">
+					<option value="0">Disabled</option>
+					<option @if($altapay_fraud_detection_service) selected @endif value="1">Enabled</option>
+				</select>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th scope="row"><?php esc_html_e( 'Release/Refund on Fraud detection', 'altapay' ); ?></th>
+			<td>
+				<select name="altapay_fraud_detection_service_action">
+					<option value="0">No</option>
+					<option @if($altapay_fraud_detection_service_action) selected @endif value="1">Yes</option>
+				</select>
+			</td>
+		</tr>
+
 		@if ($terminals)
 			<tr valign="top">
 				<th scope="row" colspan="2">

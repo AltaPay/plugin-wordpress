@@ -231,6 +231,8 @@ class AltapaySettings {
 		register_setting( 'altapay-settings-group', 'altapay_gateway_url' );
 		register_setting( 'altapay-settings-group', 'altapay_username' );
 		register_setting( 'altapay-settings-group', 'altapay_password' );
+		register_setting( 'altapay-settings-group', 'altapay_fraud_detection_service' );
+		register_setting( 'altapay-settings-group', 'altapay_fraud_detection_service_action' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
 		register_setting(
 			'altapay-settings-group',
@@ -270,6 +272,8 @@ class AltapaySettings {
 		$paymentPage       = esc_attr( get_option( 'altapay_payment_page' ) );
 		$terminalDetails   = get_option( 'altapay_terminals' );
 		$terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
+		$altapay_fraud_detection_service  = get_option( 'altapay_fraud_detection_service' );
+		$altapay_fraud_detection_service_action  = get_option( 'altapay_fraud_detection_service_action' );
 
 		if ( $terminalDetails ) {
 			$terminals = json_decode( get_option( 'altapay_terminals' ) );
@@ -327,6 +331,9 @@ class AltapaySettings {
 						'paymentPage'      => $paymentPage,
 						'terminals'        => $terminals,
 						'enabledTerminals' => $enabledTerminals,
+						'altapay_fraud_detection_service' => $altapay_fraud_detection_service,
+						'altapay_fraud_detection_service_action' => $altapay_fraud_detection_service_action,
+
 					)
 				);
 				?>

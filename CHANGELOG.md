@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.9]
+- Add support for fraud detection service
+
 ## [3.3.8]
 - Add support for Apple Pay
 
