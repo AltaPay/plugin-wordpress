@@ -354,6 +354,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$status         = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
 			$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
+			$fraud_recommendation = !empty( $_POST['fraud_recommendation'] ) ? sanitize_text_field( wp_unslash( $_POST['fraud_recommendation'] ) ) : '';
 
 			if ( $type == 'subscription_payment' ) {
 				$query = new WC_Order_Query( array(
@@ -434,9 +435,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 				if ( $status === 'succeeded' ) {
 
-					$order->add_order_note( __( 'Notification completed', 'altapay' ) );
-					$order->payment_complete();
-
 					update_post_meta( $order_id, '_transaction_id', $txnId );
 					update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
@@ -449,6 +447,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 						$objTokenControl = new Core\AltapayTokenControl();
 						$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
 					}
+
+					if ( $this->detectFraud($order_id, $agreement_id, $transaction, $fraud_recommendation) ) {
+						$order->add_order_note( __( "Payment declined due to suspected fraud: {$_POST['fraud_explanation']}." , 'altapay' ) );
+						exit;
+					}
+
+					$order->add_order_note( __( 'Notification completed', 'altapay' ) );
+					$order->payment_complete();
 
 				} elseif ($status === 'error' || $status === 'failed') {
 						$order->update_status( 'failed', 'Payment failed' . $errorMessage );
@@ -481,14 +487,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
-				// Payment completed
-				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
-				if ( $transaction['AuthType'] === 'subscription_payment' and $transaction['TransactionStatus'] === 'pending' ) {
-					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
-				}
-				else {
-					$order->payment_complete();
-				}
+
 				update_post_meta( $order_id, '_transaction_id', $txnId );
 				update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
@@ -501,6 +500,23 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$objTokenControl = new Core\AltapayTokenControl();
 					$objTokenControl->saveCreditCardDetails( $order_id, $lastFourDigits, $ccToken, $paymentScheme, $ccExpiryDate );
 				}
+
+				if ( $this->detectFraud($order_id, $agreement_id, $transaction, $fraud_recommendation) ) {
+					$order->update_status( 'on-hold', "Fraud detected: {$_POST['fraud_explanation']}." );
+					wc_add_notice( __( 'Payment error:', 'altapay' ) . ' Payment Declined', 'error' );
+					wp_redirect( wc_get_cart_url() );
+					exit;
+				}
+
+				// Payment completed
+				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
+				if ( $transaction['AuthType'] === 'subscription_payment' and $transaction['TransactionStatus'] === 'pending' ) {
+					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
+				} else {
+					$order->add_order_note( __( 'Callback completed', 'altapay' ) );
+					$order->payment_complete();
+				}
+
 			}
 
 			// Redirect to Order Confirmation Page

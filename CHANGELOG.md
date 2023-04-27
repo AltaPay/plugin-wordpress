@@ -1,8 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.3.9]
+## [3.3.10]
 - Add support for subscriptions via MobilePay & Vipps
+
+## [3.3.9]
+- Add support for fraud detection service
+- Supports API changes from 20230412
 
 ## [3.3.8]
 - Add support for Apple Pay
