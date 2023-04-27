@@ -78,7 +78,7 @@ class AltapaySettings {
 		} else { // Order wasn't captured and must be captured now.
 			$amount = $pay->ReservedAmount; // Amount to capture.
 
-			$api    = new CaptureReservation( $this->getAuth() );
+			$api = new CaptureReservation( $this->getAuth() );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
 
@@ -231,6 +231,8 @@ class AltapaySettings {
 		register_setting( 'altapay-settings-group', 'altapay_gateway_url' );
 		register_setting( 'altapay-settings-group', 'altapay_username' );
 		register_setting( 'altapay-settings-group', 'altapay_password' );
+		register_setting( 'altapay-settings-group', 'altapay_fraud_detection' );
+		register_setting( 'altapay-settings-group', 'altapay_fraud_detection_action' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
 		register_setting(
 			'altapay-settings-group',
@@ -261,15 +263,17 @@ class AltapaySettings {
 	 * @throws Exception
 	 */
 	public function altapaySettings() {
-		$terminals         = false;
-		$disabledTerminals = array();
-		$enabledTerminals  = array();
-		$gatewayURL        = esc_attr( get_option( 'altapay_gateway_url' ) );
-		$username          = get_option( 'altapay_username' );
-		$password          = get_option( 'altapay_password' );
-		$paymentPage       = esc_attr( get_option( 'altapay_payment_page' ) );
-		$terminalDetails   = get_option( 'altapay_terminals' );
-		$terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
+		$terminals                      = false;
+		$disabledTerminals              = array();
+		$enabledTerminals               = array();
+		$gatewayURL                     = esc_attr( get_option( 'altapay_gateway_url' ) );
+		$username                       = get_option( 'altapay_username' );
+		$password                       = get_option( 'altapay_password' );
+		$paymentPage                    = esc_attr( get_option( 'altapay_payment_page' ) );
+		$terminalDetails                = get_option( 'altapay_terminals' );
+		$terminalsEnabled               = get_option( 'altapay_terminals_enabled' );
+		$altapay_fraud_detection        = get_option( 'altapay_fraud_detection' );
+		$altapay_fraud_detection_action = get_option( 'altapay_fraud_detection_action' );
 
 		if ( $terminalDetails ) {
 			$terminals = json_decode( get_option( 'altapay_terminals' ) );
@@ -321,12 +325,15 @@ class AltapaySettings {
 				echo $blade->loadBladeLibrary()->run(
 					'forms.adminSettings',
 					array(
-						'gatewayURL'       => $gatewayURL,
-						'username'         => $username,
-						'password'         => $password,
-						'paymentPage'      => $paymentPage,
-						'terminals'        => $terminals,
-						'enabledTerminals' => $enabledTerminals,
+						'gatewayURL'                     => $gatewayURL,
+						'username'                       => $username,
+						'password'                       => $password,
+						'paymentPage'                    => $paymentPage,
+						'terminals'                      => $terminals,
+						'enabledTerminals'               => $enabledTerminals,
+						'altapay_fraud_detection'        => $altapay_fraud_detection,
+						'altapay_fraud_detection_action' => $altapay_fraud_detection_action,
+
 					)
 				);
 				?>
