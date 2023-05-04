@@ -88,11 +88,13 @@ To connect to the payment gateway:
 - Click on **Create Page** button **_(mandatory)_**
 - Click on **Save changes** button (in the bottom of the page).
 
-This will populate all the available terminals for the currenct API user.
+This will populate all the available terminals for the current API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
 
 
 ## Configure fraud detection
+
+If you wish to enable fraud detection service and release/refund if fraud is detected then refer to the below screenshot.
  
 ![fraud_detection_service](docs/fraud_detection_service.png)
 
