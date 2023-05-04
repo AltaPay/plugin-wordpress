@@ -91,6 +91,12 @@ To connect to the payment gateway:
 This will populate all the available terminals for the currenct API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
 
+
+## Configure fraud detection
+ 
+![fraud_detection_service](docs/fraud_detection_service.png)
+
+
 ## Synchronize payment methods
 
 1. **Using "Synchronize payment methods" button**
