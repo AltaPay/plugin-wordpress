@@ -109,9 +109,7 @@ function altapay_add_gateway( $methods ) {
 					$natures      = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
 					$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 
-					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
-                         or in_array('VippsAcquirer', $gateway_methods )
-                    ) {
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array('VippsAcquirer', $gateway_methods ) ) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
