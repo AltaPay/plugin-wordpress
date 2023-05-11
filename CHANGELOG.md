@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.3.10]
-- Add support for subscriptions via MobilePay & Vipps
+- Add support for subscriptions via Vipps
 
 ## [3.3.9]
 - Add support for fraud detection service

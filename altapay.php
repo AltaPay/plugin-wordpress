@@ -110,7 +110,6 @@ function altapay_add_gateway( $methods ) {
 					$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
-                         or ( in_array('MobilePayAcquirer', $gateway_methods ) or in_array('MobilePayOnlineAcquirer', $gateway_methods ) )
                          or in_array('VippsAcquirer', $gateway_methods )
                     ) {
 						$subscriptions = true;
