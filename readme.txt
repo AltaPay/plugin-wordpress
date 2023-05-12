@@ -4,10 +4,10 @@ Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.2
 Requires at least: 5.0
 Tested up to: 6.2
-Stable tag: 3.3.10
+Stable tag: 3.4.0
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 7.5.1
+WC tested up to: 7.7.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
@@ -39,8 +39,8 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 == Changelog ==
 
-= 3.3.10 =
-* Add support for subscriptions via MobilePay & Vipps
+= 3.4.0 =
+* Add support for subscriptions via Vipps
 
 = 3.3.9 =
 * Add support for fraud detection service

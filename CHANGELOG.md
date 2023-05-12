@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.3.10]
+## [3.4.0]
 - Add support for subscriptions via Vipps
 
 ## [3.3.9]

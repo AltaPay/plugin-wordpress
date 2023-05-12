@@ -403,9 +403,9 @@ class AltapaySettings {
 
 		foreach ( $response->Terminals as $terminal ) {
 			$terminals[] = array(
-				'key'    => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
-				'name'   => $terminal->Title,
-				'nature' => $terminal->Natures,
+				'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+				'name'    => $terminal->Title,
+				'nature'  => $terminal->Natures,
 				'methods' => $terminal->Methods,
 			);
 		}
@@ -544,23 +544,29 @@ class AltapaySettings {
 		register_post_type( 'altapay_captures', $args );
 	}
 
-    static function recreateTerminalData($self){
+	/**
+	 * Recreate terminal data
+	 *
+	 * @param $self
+	 * @return void
+	 */
+    static function recreateTerminalData($self) {
 
-	    $recreatedTerminals = array();
-	    $auth      = $self->getAuth();
-	    $api       = new Terminals( $auth );
-	    $response  = $api->call();
+	    $recreated_terminals = array();
+	    $auth                = $self->getAuth();
+	    $api                 = new Terminals( $auth );
+	    $response            = $api->call();
 
 	    foreach ( $response->Terminals as $terminal ) {
-		    $recreatedTerminals[] = array(
-			    'key'    => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
-			    'name'   => $terminal->Title,
-			    'nature' => $terminal->Natures,
+		    $recreated_terminals[] = array(
+			    'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+			    'name'    => $terminal->Title,
+			    'nature'  => $terminal->Natures,
 			    'methods' => $terminal->Methods,
 		    );
 	    }
 
-	    update_option( 'altapay_terminals', wp_json_encode( $recreatedTerminals ) );
+	    update_option( 'altapay_terminals', wp_json_encode( $recreated_terminals ) );
 
 	    $enabledTerminals  = array();
 	    $terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
