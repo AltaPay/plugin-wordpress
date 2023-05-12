@@ -590,12 +590,12 @@ function altapayCaptureCallback() {
 			}
 
 			update_post_meta( $orderID, '_captured', true );
-	        $orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
-	        $order->add_order_note( $orderNote );
-        } else if ( $response->Result === 'Open' ) {
-            $orderNote = 'The payment is pending an update from the payment provider.';
-	        $order->update_status( 'on-hold',  $orderNote);
-        }
+			$orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
+			$order->add_order_note( $orderNote );
+		} else if ( $response->Result === 'Open' ) {
+			$orderNote = 'The payment is pending an update from the payment provider.';
+			$order->update_status( 'on-hold', $orderNote );
+		}
 
 		$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
 			__(
