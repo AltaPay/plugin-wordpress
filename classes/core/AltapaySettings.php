@@ -548,6 +548,7 @@ class AltapaySettings {
 	 * Recreate terminal data
 	 *
 	 * @param $self
+	 *
 	 * @return void
 	 */
     static function recreateTerminalData($self) {
