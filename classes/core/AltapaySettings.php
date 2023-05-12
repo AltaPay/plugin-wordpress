@@ -551,7 +551,7 @@ class AltapaySettings {
 	 *
 	 * @return void
 	 */
-    static function recreateTerminalData($self) {
+	static function recreateTerminalData($self) {
 
 	    $recreated_terminals = array();
 	    $auth                = $self->getAuth();
@@ -600,5 +600,5 @@ class AltapaySettings {
 	    }
 
 	    update_option( 'altapay_terminal_classes_refreshed', true );
-    }
+	}
 }
