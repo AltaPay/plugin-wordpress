@@ -5,7 +5,7 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.4.0
+ * Version: 3.4.1
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 7.7.0
@@ -74,9 +74,9 @@ function init_altapay_settings() {
 		Core\AltapayPluginInstall::createReconciliationDataTable();
 	}
 
-	$altapay_terminal_classes_refreshed = get_site_option( 'altapay_terminal_classes_refreshed' );
+	$altapay_terminal_classes_recreated = get_site_option( 'altapay_terminal_classes_recreated' );
 
-	if ( empty( $altapay_terminal_classes_refreshed ) ) {
+	if ( empty( $altapay_terminal_classes_recreated ) ) {
 		Core\AltapaySettings::recreateTerminalData($settings);
 	}
 }
@@ -107,8 +107,10 @@ function altapay_add_gateway( $methods ) {
 				if ( $term->key === $terminal ) {
 					$terminalName    = $term->name;
 					$natures         = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
-					$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
-
+					$gateway_methods = [];
+					if( ! empty( $term->methods ) ) {
+						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
+					}
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array('VippsAcquirer', $gateway_methods ) ) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';

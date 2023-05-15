@@ -50,7 +50,7 @@ try {
             'key'    => $terminals[$key],
             'name'   => $terminal->Title,
             'nature' => $terminal->Natures,
-            'methods' => $terminal->Methods,
+            'methods' => isset( $terminal->Methods ) ? $terminal->Methods : [],
         );
     }
     update_option('altapay_terminals', wp_json_encode($altapayTerminals));

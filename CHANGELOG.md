@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.1]
+- Fix plugin upgrade issue
+
 ## [3.4.0]
 - Add support for subscriptions via Vipps
 
