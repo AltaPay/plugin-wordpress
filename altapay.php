@@ -108,7 +108,7 @@ function altapay_add_gateway( $methods ) {
 					$terminalName    = $term->name;
 					$natures         = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
 					$gateway_methods = [];
-					if(!empty($term->methods)){
+					if( ! empty( $term->methods ) ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array('VippsAcquirer', $gateway_methods ) ) {
