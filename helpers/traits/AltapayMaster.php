@@ -89,11 +89,12 @@ trait AltapayMaster {
 
 					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
 
-					$reconciliation = new Core\AltapayReconciliation();
-					$reconciliation->saveReconciliationIdentifier( $renewal_order->get_id(), $transaction_id, $reconciliationId, 'captured' );
-
 					if ( $response->Result === 'Success' ) {
+						$reconciliation = new Core\AltapayReconciliation();
+						$reconciliation->saveReconciliationIdentifier( $renewal_order->get_id(), $transaction_id, $reconciliationId, 'captured' );
 						$renewal_order->payment_complete();
+					}else if( $response->Result === 'Open' ){
+						$renewal_order->update_status( 'on-hold',  "The payment is pending an update from the payment provider.");
 					} else {
 						$renewal_order->update_status(
 							'failed',

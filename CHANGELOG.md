@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.0]
+- Add support for subscriptions via Vipps
+
 ## [3.3.9]
 - Add support for fraud detection service
 - Supports API changes from 20230412

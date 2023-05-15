@@ -23,7 +23,7 @@ class UtilMethods {
 	 * @param bool                     $wcRefund
 	 * @return array  list of order lines
 	 */
-	public function createOrderLines( $order, $products = array(), $wcRefund = false ) {
+	public function createOrderLines( $order, $products = array(), $wcRefund = false, $isSubscription = false ) {
 		$orderlineDetails         = array();
 		$itemsToCapture           = array();
 		$couponDiscountPercentage = 0; // set initial coupon discount to 0
@@ -52,7 +52,7 @@ class UtilMethods {
 			}
 			$product = wc_get_product( $orderline['product_id'] );
 			// get product details for each orderline
-			$productDetails = $this->getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage );
+			$productDetails = $this->getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage, $isSubscription );
 			if ( $product && 'bundle' === $product->get_type() && $productDetails['product']['unitPrice'] == 0 ) {
 				continue;
 			}
@@ -76,7 +76,8 @@ class UtilMethods {
 		$shippingDetails = $this->getShippingDetails(
 			$order,
 			$products,
-			$wcRefund
+			$wcRefund,
+			$isSubscription
 		);
 
 		$shippingDetails = reset( $shippingDetails );
@@ -155,7 +156,7 @@ class UtilMethods {
 	 * @param float    $couponDiscountPercentage
 	 * @return array
 	 */
-	private function getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage ) {
+	private function getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage, $isSubscription = false ) {
 		$discountPercentage  = 0; // set discount Percent to 0 by default
 		$productCartId       = $orderline->get_id(); // product Cart ID number
 		$singleProduct       = wc_get_product( $orderline['product_id'] ); // Details of each product
@@ -244,7 +245,8 @@ class UtilMethods {
 		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
 		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
 		$orderLine->unitCode   = $unitCode;
-		$orderLine->setGoodsType( 'item' );
+		$goodsType = ( $isSubscription ) ? 'subscription_model' : 'item';
+		$orderLine->setGoodsType( $goodsType );
 		$lineData[] = $orderLine;
 
 		// return array with product and compensation linedata
@@ -287,7 +289,7 @@ class UtilMethods {
 	 * @param bool     $wcRefund
 	 * @return array|bool
 	 */
-	private function getShippingDetails( $order, $products, $wcRefund ) {
+	private function getShippingDetails( $order, $products, $wcRefund, $isSubscription = false ) {
 		// Get the shipping method
 		$orderShippingMethods = $order->get_shipping_methods();
 		$shippingID           = 'NaN';
@@ -324,8 +326,8 @@ class UtilMethods {
 				);
 				$orderLine->taxAmount  = round( $totalShippingTax, 2 );
 				$orderLine->taxPercent = round( ( $totalShippingTax / $totalShipping ) * 100, 2 );
-
-				$orderLine->setGoodsType( 'shipment' );
+				$goodsType = ( $isSubscription ) ? 'subscription_model' : 'shipment';
+				$orderLine->setGoodsType( $goodsType );
 				$shippingDetails[] = $orderLine;
 			}
 		}

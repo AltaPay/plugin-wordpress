@@ -250,12 +250,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		$transactionInfo = $altapayHelpers->transactionInfo();
 
-		// Add orderlines to AltaPay request
-		$orderLines = $utilMethods->createOrderLines( $order );
-		if ( $orderLines instanceof WP_Error ) {
-			return $orderLines; // Some error occurred
-		}
-
 		try {
 			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
 			if ( !$savedCardNumber ) {
@@ -270,19 +264,18 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$auth    = $this->getAuth();
 			$request = new PaymentRequest( $auth );
 			$request->setTerminal( $terminal )
-					->setShopOrderId( $order_id )
-					->setAmount( round( $amount, 2 ) )
-					->setCurrency( $currency )
-					->setCustomerInfo( $customerInfo )
-					->setConfig( $config )
-					->setTransactionInfo( $transactionInfo )
-					->setSalesTax( round( $order->get_total_tax(), 2 ) )
-					->setCookie( $cookie )
-					->setCcToken( $ccToken )
-					->setFraudService( null )
-					->setLanguage( $language )
-					->setOrderLines( $orderLines )
-					->setSaleReconciliationIdentifier( wp_generate_uuid4() );
+			        ->setShopOrderId( $order_id )
+			        ->setAmount( round( $amount, 2 ) )
+			        ->setCurrency( $currency )
+			        ->setCustomerInfo( $customerInfo )
+			        ->setConfig( $config )
+			        ->setTransactionInfo( $transactionInfo )
+			        ->setSalesTax( round( $order->get_total_tax(), 2 ) )
+			        ->setCookie( $cookie )
+			        ->setCcToken( $ccToken )
+			        ->setFraudService( null )
+			        ->setLanguage( $language )
+			        ->setSaleReconciliationIdentifier( wp_generate_uuid4() );
 
 			// Check if WooCommerce subscriptions is enabled and contains subscription product
 			if ( class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order_id ) ) {
@@ -296,6 +289,18 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			$request->setType( $payment_type );
+
+			// Add orderlines to AltaPay request
+			$orderLines = $utilMethods->createOrderLines( $order, [], false, in_array( $payment_type, [
+				'subscription',
+				'subscriptionAndCharge'
+			] ) );
+			if ( $orderLines instanceof WP_Error ) {
+				return $orderLines; // Some error occurred
+			}
+
+			$request->setOrderLines( $orderLines );
+
 
 			if ( $request ) {
 				try {
@@ -351,6 +356,19 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
 			$fraud_recommendation = !empty( $_POST['fraud_recommendation'] ) ? sanitize_text_field( wp_unslash( $_POST['fraud_recommendation'] ) ) : '';
 
+			if ( $type == 'subscription_payment' ) {
+				$query = new WC_Order_Query( array(
+					'limit' => 1,
+					'return' => 'ids',
+					'meta_key'   => '_transaction_id',
+					'meta_value' => $txnId,
+				) );
+				$orders = $query->get_orders();
+				if ( ! empty( $orders ) ) {
+					$order_id = $orders[0];
+				}
+			}
+
 			$order        = new WC_Order( $order_id );
 			$agreement_id = '';
 
@@ -371,7 +389,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				if ( $status === 'succeeded' ) {
 					foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
 						if ( $transaction_data['AuthType'] === 'subscription_payment' &&
-						$transaction_data['TransactionStatus'] !== 'captured' ) {
+						! in_array( $transaction_data['TransactionStatus'], ['captured', 'pending'] ) ) {
 							$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
 							wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
 							wp_redirect( wc_get_cart_url() );
@@ -421,7 +439,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					update_post_meta( $order_id, '_agreement_id', $agreement_id );
 
 					$reconciliation = new Core\AltapayReconciliation();
-					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
+					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
 						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
 					}
 
@@ -492,7 +510,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 				// Payment completed
 				$order->add_order_note( __( 'Callback completed', 'altapay' ) );
-				$order->payment_complete();
+				if ( $transaction['AuthType'] === 'subscription_payment' and $transaction['TransactionStatus'] === 'pending' ) {
+					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
+				} else {
+					$order->add_order_note( __( 'Callback completed', 'altapay' ) );
+					$order->payment_complete();
+				}
 
 			}
 
