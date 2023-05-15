@@ -563,7 +563,7 @@ class AltapaySettings {
 			    'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
 			    'name'    => $terminal->Title,
 			    'nature'  => $terminal->Natures,
-			    'methods' => $terminal->Methods,
+			    'methods' => isset( $terminal->Methods ) ? $terminal->Methods : [],
 		    );
 	    }
 
@@ -599,6 +599,6 @@ class AltapaySettings {
 			    }
 	    }
 
-	    update_option( 'altapay_terminal_classes_refreshed', true );
+	    update_option( 'altapay_terminal_classes_recreated', true );
 	}
 }
