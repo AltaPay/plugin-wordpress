@@ -19,6 +19,10 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 [Configuration](#configuration)
 
+* [Gateway Account Configuration](#gateway-account-configuration)
+
+* [Configure fraud detection](#configure-fraud-detection)
+
 * [Synchronize payment methods](#synchronize-payment-methods)
 
 * [Configure the terminals for the checkout page](#configure-the-terminals-for-the-checkout-page)
@@ -76,7 +80,7 @@ You can configure the plugin to meet your (the merchant's) needs, adding payment
 
 The standard configuration connects the plugin with the test gateway. Take the following steps to connect it with your custom payment gateway.
 
-### Connect the plugin to the custom payment gateway
+### Gateway Account Configuration
 
 To connect to the payment gateway:
 
@@ -92,14 +96,14 @@ This will populate all the available terminals for the current API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
 
 
-## Configure fraud detection
+### Configure fraud detection
 
 If you wish to enable fraud detection service and release/refund if fraud is detected then refer to the below screenshot.
  
 ![fraud_detection_service](docs/fraud_detection_service.png)
 
 
-## Synchronize payment methods
+### Synchronize payment methods
 
 1. **Using "Synchronize payment methods" button**
 
@@ -121,7 +125,7 @@ To select the Terminals:
 - Select the payment terminals which should be shown on the checkout page by checking the checkbox related to each one.
 - Click on the **Save changes** button.
 
-## Configure the terminals for the checkout page
+### Configure the terminals for the checkout page
 
 For the AltaPay payment method to appear in the checkout page:
 
@@ -150,7 +154,7 @@ For the AltaPay payment method to appear in the checkout page:
     | Token Control | Enable Customer Token Control. |
 - Save the changes.
 
-## Customize the checkout page
+### Customize the checkout page
 
 The checkout page is implemented by the following file:
 
@@ -205,7 +209,7 @@ AltaPay plugin is compatible with the [WooCommerce Subscriptions](https://woocom
 
 > Note:
 >
-> Currently, AltaPay plugin supports recurring payments with the credit card terminal only.
+> Currently, AltaPay plugin supports recurring payments with the credit card  and vipps terminal only.
 
 ## Reconcile Orders
 In order to reconcile payments please follow the steps below:
