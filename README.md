@@ -14,7 +14,7 @@ If you are not a developer, please use [AltaPay for WooCommerce](https://wordpre
 | Capture                   | &check;       |
 | Instant Capture           | &check;       |
 | Multi Capture             | &check;       |
-| Recurring / Subscription  | &check;       |
+| Recurring / Unscheduled  | &check;       |
 | Release                   | &check;       |
 | Refund                    | &check;       |
 | Multi Refund              | &check;       |
