@@ -1,4 +1,4 @@
-import Order from '../PageObjects/objects'
+import Order from '../PageObjects/objects.cy'
 
 describe('WooCommerce', function () {
 

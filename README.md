@@ -4,6 +4,39 @@ Integrates your WooCommerce web shop to the AltaPay payments gateway.
 
 If you are not a developer, please use [AltaPay for WooCommerce](https://wordpress.org/plugins/altapay-for-woocommerce/) on WordPress.org.
 
+## Supported Payment Methods & Functionalities
+<table>
+<tr><td>
+
+| Functionalities	        | Support       |
+| :------------------------ | :-----------: |
+| Reservation               | &check;       |
+| Capture                   | &check;       |
+| Instant Capture           | &check;       |
+| Multi Capture             | &check;       |
+| Recurring / Unscheduled  | &check;       |
+| Release                   | &check;       |
+| Refund                    | &check;       |
+| Multi Refund              | &check;       |
+| 3D Secure                 | &check;       |
+| Fraud prevention (other)  | &check;       |
+| Reconciliation            | &check;       |
+| MO/TO                     | &cross;       |
+
+</td><td valign="top">
+
+| Payment Methods	  | Support       |
+| ------------------- | :-----------: |
+| Card                | &check;       |
+| Invoice             | &check;       |
+| ePayments           | &check;       |
+| Bank-to-bank        | &check;       |
+| Interbank           | &check;       |
+| Cash Wallet         | &check;       |
+| Mobile Wallet       | &check;       |
+
+</td></tr> </table>
+
 ## How to Build
 
 If you wish to build your own copy, follow below steps:
