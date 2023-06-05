@@ -555,6 +555,24 @@ class AltapaySettings {
 	static function recreateTerminalData( $self ) {
 
 		$recreated_terminals = array();
+		$gateway_username    = get_option( 'altapay_username' );
+		$gateway_password    = get_option( 'altapay_password' );
+		$gateway_url         = get_option( 'altapay_gateway_url' );
+
+		if ( empty( $gateway_username ) || empty( $gateway_password ) || empty( $gateway_url ) ) {
+			return;
+		}
+
+		$terminals = json_decode( get_option( 'altapay_terminals' ) );
+
+		// return if terminals data already contains methods property
+		if ( $terminals ) {
+			foreach ( $terminals as $terminal ) {
+				if ( isset( $terminal->methods ) ) {
+					return;
+				}
+			}
+		}
 
 		try {
 			$auth     = $self->getAuth();
