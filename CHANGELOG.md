@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.4.2]
 - Update minimum PHP supported version to 7.3
 - Update dependencies to resolve security vulnerabilities
+- Fix: Recreate terminal data issue on new plugin install
 
 ## [3.4.1]
 - Fix plugin upgrade issue
