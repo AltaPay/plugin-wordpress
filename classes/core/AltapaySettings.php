@@ -569,6 +569,7 @@ class AltapaySettings {
 		if ( $terminals ) {
 			foreach ( $terminals as $terminal ) {
 				if ( isset( $terminal->methods ) ) {
+					update_option( 'altapay_terminal_classes_recreated', true );
 					return;
 				}
 			}
