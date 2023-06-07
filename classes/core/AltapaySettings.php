@@ -15,6 +15,7 @@ use Altapay\Api\Others\Terminals;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Payments\CaptureReservation;
 use Exception;
+use GuzzleHttp\Exception\ClientException;
 use WC_Order;
 
 class AltapaySettings {
@@ -551,54 +552,81 @@ class AltapaySettings {
 	 *
 	 * @return void
 	 */
-	static function recreateTerminalData($self) {
+	static function recreateTerminalData( $self ) {
 
-	    $recreated_terminals = array();
-	    $auth                = $self->getAuth();
-	    $api                 = new Terminals( $auth );
-	    $response            = $api->call();
+		$recreated_terminals = array();
+		$gateway_username    = get_option( 'altapay_username' );
+		$gateway_password    = get_option( 'altapay_password' );
+		$gateway_url         = get_option( 'altapay_gateway_url' );
 
-	    foreach ( $response->Terminals as $terminal ) {
-		    $recreated_terminals[] = array(
-			    'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
-			    'name'    => $terminal->Title,
-			    'nature'  => $terminal->Natures,
-			    'methods' => isset( $terminal->Methods ) ? $terminal->Methods : [],
-		    );
-	    }
+		if ( empty( $gateway_username ) || empty( $gateway_password ) || empty( $gateway_url ) ) {
+			return;
+		}
 
-	    update_option( 'altapay_terminals', wp_json_encode( $recreated_terminals ) );
+		$terminals = json_decode( get_option( 'altapay_terminals' ) );
 
-	    $enabledTerminals  = array();
-	    $terminalsEnabled  = get_option( 'altapay_terminals_enabled' );
+		// return if terminals data already contains methods property
+		if ( $terminals ) {
+			foreach ( $terminals as $terminal ) {
+				if ( isset( $terminal->methods ) ) {
+					update_option( 'altapay_terminal_classes_recreated', true );
+					return;
+				}
+			}
+		}
 
-	    if ( $terminalsEnabled ) {
-		    $enabledTerminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
-	    }
-	    $terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
-	    $pluginDir = plugin_dir_path( __FILE__ );
-	    // Directory for the terminals
-	    $terminalDir = $pluginDir . '/../../terminals/';
-	    // Temp dir in case the one from above is not writable
-	    $tmpDir = sys_get_temp_dir();
-	    if ( is_array( $terminalInfo ) ) {
-		    foreach ( $terminalInfo as $term ) {
-			    // The key is the terminal name
-			    if ( in_array( $term->key, $enabledTerminals ) ) {
+		try {
+			$auth     = $self->getAuth();
+			$api      = new Terminals( $auth );
+			$response = $api->call();
 
-					    $disabledTerminalFileName = $term->key . '.class.php';
-					    $path                     = $terminalDir . $disabledTerminalFileName;
-					    $tmpPath                  = $tmpDir . '/' . $disabledTerminalFileName;
-					    // Check if there is a terminal created, so it can  be removed
-					    if ( file_exists( $path ) ) {
-						    unlink( $path );
-					    } elseif ( file_exists( $tmpPath ) ) {
-						    unlink( $tmpPath );
-					    }
-				    }
-			    }
-	    }
+			foreach ( $response->Terminals as $terminal ) {
+				$recreated_terminals[] = array(
+					'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+					'name'    => $terminal->Title,
+					'nature'  => $terminal->Natures,
+					'methods' => isset( $terminal->Methods ) ? $terminal->Methods : array(),
+				);
+			}
 
-	    update_option( 'altapay_terminal_classes_recreated', true );
+			update_option( 'altapay_terminals', wp_json_encode( $recreated_terminals ) );
+
+			$enabledTerminals = array();
+			$terminalsEnabled = get_option( 'altapay_terminals_enabled' );
+
+			if ( $terminalsEnabled ) {
+				$enabledTerminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
+			}
+			$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
+			$pluginDir    = plugin_dir_path( __FILE__ );
+			// Directory for the terminals
+			$terminalDir = $pluginDir . '/../../terminals/';
+			// Temp dir in case the one from above is not writable
+			$tmpDir = sys_get_temp_dir();
+			if ( is_array( $terminalInfo ) ) {
+				foreach ( $terminalInfo as $term ) {
+					// The key is the terminal name
+					if ( in_array( $term->key, $enabledTerminals ) ) {
+
+						$disabledTerminalFileName = $term->key . '.class.php';
+						$path                     = $terminalDir . $disabledTerminalFileName;
+						$tmpPath                  = $tmpDir . '/' . $disabledTerminalFileName;
+						// Check if there is a terminal created, so it can  be removed
+						if ( file_exists( $path ) ) {
+							unlink( $path );
+						} elseif ( file_exists( $tmpPath ) ) {
+							unlink( $tmpPath );
+						}
+					}
+				}
+			}
+
+			update_option( 'altapay_terminal_classes_recreated', true );
+
+		} catch ( ClientException $e ) {
+			error_log( 'Error: ' . $e->getMessage() );
+		} catch ( Exception $e ) {
+			error_log( 'Error: ' . $e->getMessage() );
+		}
 	}
 }

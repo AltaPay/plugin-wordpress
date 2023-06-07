@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.4.1
+ * Version: 3.4.2
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 7.7.0
+ * WC tested up to: 7.7.2
  *
  * @package Altapay
  */

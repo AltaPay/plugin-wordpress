@@ -4,9 +4,9 @@ if [ -z "$1" ]
   then
     echo "No PHP version supplied"
     echo "Usage: ./build.sh <php_version>"
-    echo "./build.sh 7.2"
+    echo "./build.sh 7.3"
     echo "./build.sh 8.1"
-    echo "composer.lock will be updated for php > 7.2"
+    echo "composer.lock will be updated for php > 7.3"
     exit
 fi
 
@@ -33,7 +33,7 @@ then
   exit
 fi
 
-if [ "$1" = "7.2" ]
+if [ "$1" = "7.3" ]
 then
   composer_command="install"
 else
@@ -51,7 +51,7 @@ fi
 mkdir -p dist
 rm -rf vendor
 php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
-zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh README.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
+zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh README.md CHANGELOG.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
 
 if [ -f composer.lock.backup ]; then
     rm -rf composer.lock
