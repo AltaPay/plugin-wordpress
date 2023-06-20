@@ -44,7 +44,7 @@ $formSettings = array(
 		'default'     => '',
 		'desc_tip'    => true,
 	),
-	'secret'         => array(
+	'secret' => array(
 		'title'       => __( 'Secret', 'altapay' ),
 		'type'        => 'text',
 		'description' => __( 'Add the payment method secret as defined in the AltaPay payment gateway.', 'woocommerce' ),

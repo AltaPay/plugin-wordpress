@@ -48,21 +48,21 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 	public function __construct() {
 		// Set default gateway values
-		$this->id				= strtolower('altapay_{key}');
-		$this->has_fields			= false;
-		$this->method_title			= 'AltaPay - {name}';
-		$this->method_description		= __( 'Adds AltaPay Payment Gateway to use with WooCommerce', 'altapay');
-		$this->supports				= $this->supportedFeatures();
-		$this->terminal				= '{name}';
-		$this->enabled				= $this->get_option( 'enabled' );
-		$this->title				= $this->get_option( 'title' );
-		$this->description			= $this->get_option( 'description' );
-		$this->token				= $this->get_option('token');
-		$this->payment_action			= $this->get_option( 'payment_action' );
-		$this->is_apple_pay       		= $this->get_option( 'is_apple_pay' );
-		$this->apple_pay_label    		= $this->get_option( 'apple_pay_label' );
-		$this->apple_pay_supported_networks	= $this->get_option( 'apple_pay_supported_networks' );
-		$this->secret	= $this->get_option( 'secret' );
+		$this->id                           = strtolower( 'altapay_{key}' );
+		$this->has_fields                   = false;
+		$this->method_title                 = 'AltaPay - {name}';
+		$this->method_description           = __( 'Adds AltaPay Payment Gateway to use with WooCommerce', 'altapay' );
+		$this->supports                     = $this->supportedFeatures();
+		$this->terminal                     = '{name}';
+		$this->enabled                      = $this->get_option( 'enabled' );
+		$this->title                        = $this->get_option( 'title' );
+		$this->description                  = $this->get_option( 'description' );
+		$this->token                        = $this->get_option( 'token' );
+		$this->payment_action               = $this->get_option( 'payment_action' );
+		$this->is_apple_pay                 = $this->get_option( 'is_apple_pay' );
+		$this->apple_pay_label              = $this->get_option( 'apple_pay_label' );
+		$this->apple_pay_supported_networks = $this->get_option( 'apple_pay_supported_networks' );
+		$this->secret                       = $this->get_option( 'secret' );
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
