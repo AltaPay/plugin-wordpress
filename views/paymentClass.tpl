@@ -62,6 +62,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->is_apple_pay       		= $this->get_option( 'is_apple_pay' );
 		$this->apple_pay_label    		= $this->get_option( 'apple_pay_label' );
 		$this->apple_pay_supported_networks	= $this->get_option( 'apple_pay_supported_networks' );
+		$this->secret	= $this->get_option( 'secret' );
 
 		if($this->get_option( 'payment_icon' ) !== 'default') {
 			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
@@ -345,6 +346,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		// Check if callback is altapay and the allowed API
 		if ( isset( $_GET['wc-api'] ) && $_GET['wc-api'] === 'WC_Gateway_' . $this->id ) {
 
+			$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
+			$altapay_helper = new Helpers\AltapayHelpers();
+			if ( ! empty( $checksum ) and ! empty( $this->secret ) and $altapay_helper->calculateChecksum( $_POST, $this->secret ) !== $checksum ) {
+                exit;
+			}
+
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
 			$amount         = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
@@ -411,7 +418,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$ccToken        = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
 			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
 			$ccExpiryDate = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
-			$order = new WC_Order( $order_id );
 
 			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
 

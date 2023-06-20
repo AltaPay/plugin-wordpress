@@ -98,4 +98,21 @@ class AltapayHelpers {
 
 		return new bladeone\BladeOne( $views, $cache );
 	}
+
+	public function calculateChecksum( $input_data, $shared_secret ) {
+		$checksum_data = array(
+			'amount'       => sanitize_text_field( wp_unslash( $input_data['amount'] ) ),
+			'currency'     => sanitize_text_field( wp_unslash( $input_data['currency'] ) ),
+			'shop_orderid' => sanitize_text_field( wp_unslash( $input_data['shop_orderid'] ) ),
+			'secret'       => $shared_secret,
+		);
+
+		ksort( $checksum_data );
+		$data = array();
+		foreach ( $checksum_data as $name => $value ) {
+			$data[] = $name . '=' . $value;
+		}
+
+		return md5( join( ',', $data ) );
+	}
 }
