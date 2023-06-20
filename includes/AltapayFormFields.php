@@ -44,13 +44,6 @@ $formSettings = array(
 		'default'     => '',
 		'desc_tip'    => true,
 	),
-	'secret' => array(
-		'title'       => __( 'Secret', 'altapay' ),
-		'type'        => 'text',
-		'description' => __( 'Add the payment method secret as defined in the AltaPay payment gateway.', 'woocommerce' ),
-		'default'     => '',
-		'desc_tip'    => true,
-	),
 	'payment_action' => array(
 		'title'       => __( 'Payment action', 'altapay' ),
 		'description' => __( 'Make payment authorized or authorized and captured', 'altapay' ),
@@ -67,6 +60,13 @@ $formSettings = array(
 		'description' => __( 'Select image icon to display on checkout page', 'altapay' ),
 		'type'        => 'select',
 		'options'     => $files,
+		'default'     => '',
+		'desc_tip'    => true,
+	),
+	'secret' => array(
+		'title'       => __( 'Secret', 'altapay' ),
+		'type'        => 'text',
+		'description' => __( 'Add the payment method secret as defined in the AltaPay payment gateway.', 'woocommerce' ),
 		'default'     => '',
 		'desc_tip'    => true,
 	),
