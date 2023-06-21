@@ -63,6 +63,13 @@ $formSettings = array(
 		'default'     => '',
 		'desc_tip'    => true,
 	),
+	'secret' => array(
+		'title'       => __( 'Secret', 'altapay' ),
+		'type'        => 'text',
+		'description' => __( 'Add the payment method secret as defined in the AltaPay payment gateway.', 'altapay' ),
+		'default'     => '',
+		'desc_tip'    => true,
+	),
 	'is_apple_pay'   => array(
 		'title'    => __( 'Is Apple Pay?', 'altapay' ),
 		'type'     => 'checkbox',

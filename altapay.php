@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.4.2
+ * Version: 3.4.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 7.7.2
+ * WC tested up to: 7.8.0
  *
  * @package Altapay
  */
@@ -883,6 +883,23 @@ function altapayPluginActivation() {
 	Core\AltapayPluginInstall::createPluginTables();
 }
 
+/**
+ * Halt the AltaPay callback form request if checksum not valid
+ */
+function validate_checksum_altapay_callback_form() {
+
+	if ( is_page( get_option( 'altapay_payment_page' ) ) ) {
+		$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
+
+		$altapay_helper = new Helpers\AltapayHelpers();
+		$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
+		if ( ! empty( $checksum ) and ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
+			error_log( 'checksum validation failed' );
+			exit;
+		}
+	}
+}
+
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
 add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
 add_action( 'wp_ajax_altapay_capture', 'altapayCaptureCallback' );
@@ -893,3 +910,4 @@ add_action( 'altapay_checkout_order_review', 'woocommerceOrderReview' );
 add_action( 'wp_ajax_create_altapay_payment_page', 'createAltapayPaymentPageCallback' );
 add_filter( 'template_include', 'altapay_page_template', 99 );
 add_action( 'plugins_loaded', 'init_altapay_settings', 0 );
+add_action( 'template_redirect', 'validate_checksum_altapay_callback_form' );

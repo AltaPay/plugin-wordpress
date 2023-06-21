@@ -137,21 +137,22 @@ For the AltaPay payment method to appear in the checkout page:
 - For each AltaPay payment terminal, there must be a payment method. Refresh the page if you do not see any.
 - Click on the desired payment terminal.
 
-    ![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.png)
+    ![altapay_terminal_woocommerce_checkout_page_settings](docs/altapay_terminal_woocommerce_checkout_page_settings.jpg)
 
-- Complete the details, using the notes below for guidance.
+  - Complete the details, using the notes below for guidance.
 
-    | Field | Description |
-    | --- | --- |
-    | Enable/Disable | Enable or Disable the payment terminal. |
-    | Title | This field will appear in the checkout page as the title of the payment terminal. |
-    | Description | This field must contain the message that will appear for the customer in the checkout page and describes the payment terminal. |
-    | Payment action | Make payment authorized or authorized and captured. |
-    | Icon | Select image icon to display on checkout page. |
-    | Is Apple Pay? | Check if the terminal is for Apple Pay payments. |
-    | Apple Pay form label | This controls the label shown on Apple Pay popup window. |
-    | Apple Pay Supported Networks | The payment networks the merchant supports. |
-    | Token Control | Enable Customer Token Control. |
+      | Field                        | Description                                                                                                                                           |
+      |------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+      | Enable/Disable               | Enable or Disable the payment terminal.                                                                                                               |
+      | Title                        | This field will appear in the checkout page as the title of the payment terminal.                                                                     |
+      | Description                  | This field must contain the message that will appear for the customer in the checkout page and describes the payment terminal.                        |
+      | Payment action               | Make payment authorized or authorized and captured.                                                                                                   |
+      | Icon                         | Select image icon to display on checkout page.                                                                                                        |
+      | Secret                       | Add the payment method secret as defined in the AltaPay payment gateway to enable checksum validation. To disable checksum validation leave it empty. |
+      | Is Apple Pay?                | Check if the terminal is for Apple Pay payments.                                                                                                      |
+      | Apple Pay form label         | This controls the label shown on Apple Pay popup window.                                                                                              |
+      | Apple Pay Supported Networks | The payment networks the merchant supports.                                                                                                           |
+      | Token Control                | Enable Customer Token Control.                                                                                                                        |
 - Save the changes.
 
 ### Customize the checkout page
@@ -252,13 +253,13 @@ In order to reconcile payments please follow the steps below:
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.2.2
-- WooCommerce min. 3.9.0 – max. 7.7.2
+- WooCommerce min. 3.9.0 – max. 7.8.0
 - PHP 7.3 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.2.2, WooCommerce 7.7.2 and PHP 8.1
+- WordPress 6.2.2, WooCommerce 7.8.0 and PHP 8.1
 
 
 ## Troubleshooting
