@@ -883,6 +883,9 @@ function altapayPluginActivation() {
 	Core\AltapayPluginInstall::createPluginTables();
 }
 
+/**
+ * Halt the AltaPay callback form request if checksum not valid
+ */
 function validate_checksum_altapay_callback_form() {
 
 	if ( is_page( get_option( 'altapay_payment_page' ) ) ) {
