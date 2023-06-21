@@ -99,6 +99,12 @@ class AltapayHelpers {
 		return new bladeone\BladeOne( $views, $cache );
 	}
 
+	/**
+	 * @param $input_data
+	 * @param $shared_secret
+	 *
+	 * @return string
+	 */
 	public function calculateChecksum( $input_data, $shared_secret ) {
 		$checksum_data = array(
 			'amount'       => sanitize_text_field( wp_unslash( $input_data['amount'] ) ),

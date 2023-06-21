@@ -907,4 +907,4 @@ add_action( 'altapay_checkout_order_review', 'woocommerceOrderReview' );
 add_action( 'wp_ajax_create_altapay_payment_page', 'createAltapayPaymentPageCallback' );
 add_filter( 'template_include', 'altapay_page_template', 99 );
 add_action( 'plugins_loaded', 'init_altapay_settings', 0 );
-add_action( 'template_redirect', 'validate_checksum_altapay_callback_form', 1 );
+add_action( 'template_redirect', 'validate_checksum_altapay_callback_form' );

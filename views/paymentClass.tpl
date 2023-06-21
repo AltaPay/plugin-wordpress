@@ -349,7 +349,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 			$altapay_helper = new Helpers\AltapayHelpers();
 			if ( ! empty( $checksum ) and ! empty( $this->secret ) and $altapay_helper->calculateChecksum( $_POST, $this->secret ) !== $checksum ) {
-                exit;
+				exit;
 			}
 
 			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
