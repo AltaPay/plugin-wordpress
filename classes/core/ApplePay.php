@@ -178,7 +178,7 @@ class ApplePay {
 			$transaction        = $transactions[ $latest_transaction ];
 			$txn_id             = $transaction['TransactionId'];
 
-			$order->add_order_note( __( "Gateway Order ID: {$transaction_info['ecomOrderId']}", 'altapay' ) );
+			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
 			$order->payment_complete();
 			update_post_meta( $order_id, '_transaction_id', $txn_id );

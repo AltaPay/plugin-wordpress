@@ -326,7 +326,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					return new WP_Error( 'ResponseError', $requestParams['message'] );
 				}
 
-				$order->add_order_note( __( "Gateway Order ID: {$transactionInfo['ecomOrderId']}", 'altapay' ) );
+				$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 				echo '<p>' . __( 'You are now going to be redirected to AltaPay Payment Gateway', 'altapay' ) . '</p>';
 
 				return $requestParams;
