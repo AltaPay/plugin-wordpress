@@ -135,9 +135,10 @@ class ApplePay {
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		$payment_method   = $order->get_payment_method();
 
-		$altapay_helpers  = new Helpers\AltapayHelpers();
-		$utils            = new Util\UtilMethods();
-		$transaction_info = $altapay_helpers->transactionInfo();
+		$altapay_helpers                 = new Helpers\AltapayHelpers();
+		$utils                           = new Util\UtilMethods();
+		$transaction_info                = $altapay_helpers->transactionInfo();
+		$transaction_info['ecomOrderId'] = $order->get_order_number();
 
 		// Add order lines to AltaPay request
 		$order_lines = $utils->createOrderLines( $order );
@@ -177,6 +178,7 @@ class ApplePay {
 			$transaction        = $transactions[ $latest_transaction ];
 			$txn_id             = $transaction['TransactionId'];
 
+			$order->add_order_note( __( "Gateway Order ID: {$transaction_info['ecomOrderId']}", 'altapay' ) );
 			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
 			$order->payment_complete();
 			update_post_meta( $order_id, '_transaction_id', $txn_id );
