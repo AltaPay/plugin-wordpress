@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.4]
+- Add WooCommerce order number in transaction info to make it searchable on Gateway.
+- Show gateway order id in order notes.
+
+
 ## [3.4.3]
 - Add checksum validation functionality
 
