@@ -249,7 +249,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$payment_type = 'paymentAndCapture';
 		}
 
-		$transactionInfo = $altapayHelpers->transactionInfo();
+		$transactionInfo                = $altapayHelpers->transactionInfo();
+		$transactionInfo['ecomOrderId'] = $order->get_order_number();
 
 		try {
 			$savedCardNumber = WC()->session->get( 'cardNumber', 0 );
@@ -325,6 +326,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					return new WP_Error( 'ResponseError', $requestParams['message'] );
 				}
 
+				$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 				echo '<p>' . __( 'You are now going to be redirected to AltaPay Payment Gateway', 'altapay' ) . '</p>';
 
 				return $requestParams;
