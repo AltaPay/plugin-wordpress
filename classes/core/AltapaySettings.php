@@ -407,7 +407,7 @@ class AltapaySettings {
 
 		foreach ( $response->Terminals as $terminal ) {
 			$terminals[] = array(
-				'key'     => preg_replace('/[^a-zA-Z0-9]/', '_', $terminal->Title),
+				'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
 				'name'    => $terminal->Title,
 				'nature'  => $terminal->Natures,
 				'methods' => $terminal->Methods,
@@ -479,7 +479,7 @@ class AltapaySettings {
 				continue;
 			}
 
-			$terminalTitle = preg_replace('/[^a-zA-Z0-9]/', '_', $terminal->Title);
+			$terminalTitle = preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title );
 			$terminals[]   = $terminalTitle;
 
 			$terminalSettings = array(
@@ -585,7 +585,7 @@ class AltapaySettings {
 
 			foreach ( $response->Terminals as $terminal ) {
 				$recreated_terminals[] = array(
-					'key'     => preg_replace('/[^a-zA-Z0-9]/', '_', $terminal->Title),
+					'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
 					'name'    => $terminal->Title,
 					'nature'  => $terminal->Natures,
 					'methods' => isset( $terminal->Methods ) ? $terminal->Methods : array(),
