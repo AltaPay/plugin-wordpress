@@ -235,6 +235,7 @@ class AltapaySettings {
 		register_setting( 'altapay-settings-group', 'altapay_fraud_detection' );
 		register_setting( 'altapay-settings-group', 'altapay_fraud_detection_action' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
+		register_setting( 'altapay-settings-group', 'altapay_cc_form_styling' );
 		register_setting(
 			'altapay-settings-group',
 			'altapay_terminals_enabled',
@@ -275,6 +276,7 @@ class AltapaySettings {
 		$terminalsEnabled               = get_option( 'altapay_terminals_enabled' );
 		$altapay_fraud_detection        = get_option( 'altapay_fraud_detection' );
 		$altapay_fraud_detection_action = get_option( 'altapay_fraud_detection_action' );
+		$cc_form_styling                = get_option( 'altapay_cc_form_styling' );
 
 		if ( $terminalDetails ) {
 			$terminals = json_decode( get_option( 'altapay_terminals' ) );
@@ -334,6 +336,7 @@ class AltapaySettings {
 						'enabledTerminals'               => $enabledTerminals,
 						'altapay_fraud_detection'        => $altapay_fraud_detection,
 						'altapay_fraud_detection_action' => $altapay_fraud_detection_action,
+						'cc_form_styling'                => $cc_form_styling,
 
 					)
 				);
@@ -404,7 +407,7 @@ class AltapaySettings {
 
 		foreach ( $response->Terminals as $terminal ) {
 			$terminals[] = array(
-				'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+				'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
 				'name'    => $terminal->Title,
 				'nature'  => $terminal->Natures,
 				'methods' => $terminal->Methods,
@@ -476,7 +479,7 @@ class AltapaySettings {
 				continue;
 			}
 
-			$terminalTitle = str_replace( array( ' ', '-' ), '_', $terminal->Title );
+			$terminalTitle = preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title );
 			$terminals[]   = $terminalTitle;
 
 			$terminalSettings = array(
@@ -582,7 +585,7 @@ class AltapaySettings {
 
 			foreach ( $response->Terminals as $terminal ) {
 				$recreated_terminals[] = array(
-					'key'     => str_replace( array( ' ', '-' ), '_', $terminal->Title ),
+					'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
 					'name'    => $terminal->Title,
 					'nature'  => $terminal->Natures,
 					'methods' => isset( $terminal->Methods ) ? $terminal->Methods : array(),

@@ -21,6 +21,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 * [Gateway Account Configuration](#gateway-account-configuration)
 
+* [Credit Card form styling](#credit-card-form-styling)
+
 * [Configure fraud detection](#configure-fraud-detection)
 
 * [Synchronize payment methods](#synchronize-payment-methods)
@@ -95,6 +97,15 @@ To connect to the payment gateway:
 This will populate all the available terminals for the current API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
 
+### Credit Card form styling
+
+Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+
+- `Legacy` Choose this default option if legacy form is enabled from the gateway side.
+- `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+- `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
+
+>  Follow [Customize the checkout page](#customize-the-checkout-page) section for more information on payment page styling.
 
 ### Configure fraud detection
 
