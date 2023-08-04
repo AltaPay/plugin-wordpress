@@ -63,6 +63,12 @@ class AltapayPluginInstall {
 
 	}
 
+	/**
+	 * Set the checkout design of the Credit Card form.
+	 *
+	 * @return void
+	 */
+
 	public static function setDefaultCheckoutFormStyle() {
 
 		if ( empty( trim( get_option( 'altapay_username' ) ) ) and empty( trim( get_option( 'altapay_cc_form_styling' ) ) ) ) {

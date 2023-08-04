@@ -31,7 +31,7 @@ if ( $cc_form_styling == 'custom' ) {
 	 $container_class = 'altapay_content';
 	?>
 .altapay_page_main{
-    width: 100%;
+	width: 100%;
 }
 .altapay_content {
 	text-align: left;
@@ -357,9 +357,9 @@ div.PensioMultiformContainer form {
 		align-items: flex-start;
 		padding-top: 50px;
 	}
-    .theme-storefront .altapay-page-wrapper {
-        padding-top: 0;
-    }
+	.theme-storefront .altapay-page-wrapper {
+		padding-top: 0;
+	}
 	.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
 		flex: 1;
 	}
