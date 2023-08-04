@@ -7,7 +7,7 @@ Tested up to: 6.2.2
 Stable tag: 3.4.6
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 7.8.2
+WC tested up to: 7.9.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
