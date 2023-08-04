@@ -62,5 +62,13 @@ class AltapayPluginInstall {
 		update_option( 'altapay_db_version', ALTAPAY_DB_VERSION );
 
 	}
+
+	public static function setDefaultCheckoutFormStyle() {
+
+		if ( empty( trim( get_option( 'altapay_username' ) ) ) and empty( trim( get_option( 'altapay_cc_form_styling' ) ) ) ) {
+			update_option( 'altapay_cc_form_styling', 'checkout' );
+		}
+
+	}
 }
 

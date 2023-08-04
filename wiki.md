@@ -101,8 +101,16 @@ If you face any issue click on **Refresh connection** button, this will fetch th
 
 Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
 
-- `Legacy` Choose this default option if legacy form is enabled from the gateway side.
+![altpay_cc_form_style_settings.png](docs/altpay_cc_form_style_settings.png)
+
+- `Legacy` Choose this option if legacy form is enabled from the gateway side.
+ 
+![altapay_cc_legacy_form.png](docs/altapay_cc_legacy_form.png)
+
 - `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+
+![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
 >  Follow [Customize the checkout page](#customize-the-checkout-page) section for more information on payment page styling.
