@@ -30,7 +30,9 @@ if ( $cc_form_styling == 'custom' ) {
 } elseif ( $cc_form_styling == 'checkout' ) {
 	 $container_class = 'altapay_content';
 	?>
-
+.altapay_page_main{
+	width: 100%;
+}
 .altapay_content {
 	text-align: left;
 	margin-left: auto;
@@ -355,6 +357,9 @@ div.PensioMultiformContainer form {
 		align-items: flex-start;
 		padding-top: 50px;
 	}
+	.theme-storefront .altapay-page-wrapper {
+		padding-top: 0;
+	}
 	.altapay-page-wrapper .altapay-payment-form-cnt, .altapay-page-wrapper .altapay-order-details {
 		flex: 1;
 	}
@@ -412,7 +417,7 @@ div.PensioMultiformContainer form {
 	}
 <?php } ?>
 </style>
-<main id="main" class="site-main woocommerce-page" role="main">
+<main id="main" class="site-main woocommerce-page altapay_page_main" role="main">
 	<div class="container">
 		<div class="row">
 			<div class="altapay-page-wrapper">

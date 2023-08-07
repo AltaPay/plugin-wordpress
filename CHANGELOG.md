@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.6]
+- Set the **checkout** design of the Credit Card form by default for new installations.
+
 ## [3.4.5]
 - Add new design option with modern look for Credit Card form.
 

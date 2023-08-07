@@ -101,8 +101,17 @@ If you face any issue click on **Refresh connection** button, this will fetch th
 
 Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
 
-- `Legacy` Choose this default option if legacy form is enabled from the gateway side.
+![altpay_cc_form_style_settings.png](docs/altpay_cc_form_style_settings.png)
+
+- `Legacy` Choose this option if legacy form is enabled from the gateway side.
+<br><br>
+    ![altapay_cc_legacy_form.png](docs/altapay_cc_legacy_form.png)
+<br><br>
 - `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+<br><br>
+
+    ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+<br><br>
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
 >  Follow [Customize the checkout page](#customize-the-checkout-page) section for more information on payment page styling.
@@ -264,13 +273,13 @@ In order to reconcile payments please follow the steps below:
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.2.2
-- WooCommerce min. 3.9.0 – max. 7.8.2
+- WooCommerce min. 3.9.0 – max. 7.9.0
 - PHP 7.3 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.2.2, WooCommerce 7.8.2 and PHP 8.1
+- WordPress 6.2.2, WooCommerce 7.9.0 and PHP 8.1
 
 
 ## Troubleshooting
