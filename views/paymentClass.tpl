@@ -19,6 +19,7 @@ use Altapay\Exceptions\ClientException;
 use Altapay\Exceptions\ResponseHeaderException;
 use Altapay\Exceptions\ResponseMessageException;
 use Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Payments\RefundCapturedReservation;
 use Altapay\Api\Payments\ReleaseReservation;
 
 class WC_Gateway_{key} extends WC_Payment_Gateway {
@@ -430,7 +431,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			if (! empty( $transaction_id ) && $transaction_id != $txnId ) {
 				// Release duplicate transaction from the gateway side
 				if ( $status === 'succeeded' ) {
-					$api = new ReleaseReservation( $this->getAuth() );
+                    $auth = $this->getAuth();
+					if ( in_array( $transaction['TransactionStatus'], ['captured', 'bank_payment_finalized'], true ) ) {
+						$api = new RefundCapturedReservation( $auth );
+					} else {
+						$api = new ReleaseReservation( $auth );
+					}
 					$api->setTransaction( $txnId );
 					$api->call();
 				}

@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.7]
+- Fix: Refund duplicate payments against the same order in case auto-capture is enabled. 
+
 ## [3.4.6]
 - Set the **checkout** design of the Credit Card form by default for new installations.
 
