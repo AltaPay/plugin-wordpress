@@ -98,6 +98,9 @@ update_option('altapay_terminals_enabled', json_encode($terminals));
 update_option('altapay_fraud_detection', 0);
 update_option('altapay_fraud_detection_action', 0);
 
+// Legacy CC form styling for integration tests
+update_option( 'altapay_cc_form_styling', 'legacy' );
+
 foreach ($terminals as $terminal) {
     $terminalSettings = array(
         "enabled"        => "yes",

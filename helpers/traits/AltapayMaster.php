@@ -93,8 +93,8 @@ trait AltapayMaster {
 						$reconciliation = new Core\AltapayReconciliation();
 						$reconciliation->saveReconciliationIdentifier( $renewal_order->get_id(), $transaction_id, $reconciliationId, 'captured' );
 						$renewal_order->payment_complete();
-					}else if( $response->Result === 'Open' ){
-						$renewal_order->update_status( 'on-hold',  "The payment is pending an update from the payment provider.");
+					} elseif ( $response->Result === 'Open' ) {
+						$renewal_order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
 					} else {
 						$renewal_order->update_status(
 							'failed',
@@ -263,7 +263,7 @@ trait AltapayMaster {
 			$return = true;
 			try {
 				$auth = $this->getAuth();
-				if ( $transaction['TransactionStatus'] === 'captured' and ! get_post_meta( $order_id, '_refunded', true ) ) {
+				if ( in_array( $transaction['TransactionStatus'], array( 'captured', 'bank_payment_finalized' ), true ) and ! get_post_meta( $order_id, '_refunded', true ) ) {
 					$reconciliation_id = wp_generate_uuid4();
 					$api               = new RefundCapturedReservation( $auth );
 					$api->setReconciliationIdentifier( $reconciliation_id );
