@@ -291,7 +291,7 @@ input[type="submit"].AltaPaySubmitButton:disabled:hover{
 }
 
 input#showKlarnaPage {
-    margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 /*errors*/
@@ -372,57 +372,57 @@ div.PensioMultiformContainer form {
 .altapay-payment-form-cnt input#enableAccount,
 .altapay-payment-form-cnt input#acceptTerms,
 .altapay-payment-form-cnt input#phoneNumber {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .altapay-payment-form-cnt div.PensioMultiformContainer form {
-    position: relative;
-    border: none;
-    background-color: white;
-    padding: 0;
-    margin: 0;
-    border-radius: 0;
-    top: 0;
-    width: 100%;
+	position: relative;
+	border: none;
+	background-color: white;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	top: 0;
+	width: 100%;
 }
 
 .altapay-payment-form-cnt input#CreditCardButton {
-    left: 0px;
+	left: 0px;
 }
 
 .altapay-payment-form-cnt input#GiftCardButton {
-    left: 100px;
+	left: 100px;
 }
 
 .altapay-payment-form-cnt div.PensioMultiformContainer .FormTypeButton {
-    position: absolute;
-    top: -40px;
-    height: 40px;
-    margin-left: 25px;
-    border: 1px solid rgba(0, 0, 0, 0.16);
+	position: absolute;
+	top: -40px;
+	height: 40px;
+	margin-left: 25px;
+	border: 1px solid rgba(0, 0, 0, 0.16);
 }
 
 .altapay-payment-form-cnt div.PensioMultiformContainer {
-    position: initial;
+	position: initial;
 }
 
 input#giftcard_account_identifier {
-    background-color: white;
-    border-radius: 3px;
-    color: #666;
-    border: 1px solid rgba(0, 0, 0, 0.16);
+	background-color: white;
+	border-radius: 3px;
+	color: #666;
+	border: 1px solid rgba(0, 0, 0, 0.16);
 }
 
 .altapay-payment-form-cnt #Invoice td.pensio_payment_form_label_cell {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .PensioMultiformContainer input#giftcard_account_identifier {
-    width: 100%;
+	width: 100%;
 }
 
 .altapay-payment-form-cnt table.pensio_payment_form_table {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 @media screen and (min-width:992px){
