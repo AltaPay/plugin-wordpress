@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.8]
+- Make the checkout form style option available to all payment forms.
+
 ## [3.4.7]
 - Fix: Refund duplicate payments against the same order in case auto-capture is enabled. 
 
