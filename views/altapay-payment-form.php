@@ -239,7 +239,7 @@ input[type=tel]:focus {
 	font-size: 16px
 }
 
-.expiry_row, .cardnumber_row {
+.expiry_row {
 	margin-top: 10px;
 }
 
