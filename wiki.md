@@ -99,9 +99,9 @@ If you face any issue click on **Refresh connection** button, this will fetch th
 
 ### Credit Card form styling
 
-Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+Choose one of the below options from `Checkout form style` dropdown to change the styling of Credit Card form on the checkout page.
 
-![altpay_cc_form_style_settings.png](docs/altpay_cc_form_style_settings.png)
+![altpay_checkout_form_style_settings.jpg](docs/altpay_checkout_form_style_settings.jpg)
 
 - `Legacy` Choose this option if legacy form is enabled from the gateway side.
 <br><br>
