@@ -67,7 +67,8 @@ form {
 	margin-top: 4px;
 }
 
-.pensio_payment_form_card-number input, .pensio_payment_form_cardholder input {
+.pensio_payment_form_card-number input, .pensio_payment_form_cardholder input,
+.altapay-payment-form-cnt input#organisationNumber {
 	padding: 12px 14px;
 	width: 100%;
 	border-radius: 3px;
@@ -89,26 +90,40 @@ input[type=tel]:focus {
 	color: #666;
 }
 
-.pensio_payment_form_month select, .pensio_payment_form_year select, #idealIssuer {
-	margin-top: 4px;
-	padding: 12px 14px;
-	width: 100%;
-	border-radius: 3px;
-	border: 1px solid rgba(0, 0, 0, 0.16);
-	cursor: pointer;
-	font-size: 16px;
+.pensio_payment_form_month select,
+.pensio_payment_form_year select,
+#idealIssuer,
+.altapay-payment-form-cnt select#birthdateDay,
+.altapay-payment-form-cnt select#birthdateMonth,
+.altapay-payment-form-cnt select#birthdateYear{
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	background-image: linear-gradient(45deg, transparent 50%, black 50%),
 	linear-gradient(135deg, black 50%, transparent 50%);
 	background-position: calc(100% - 20px) calc(20px + 2px),
-	calc(100% - 15px) calc(20px + 2px),
-	100% 0;
-	background-size: 5px 5px,
-	5px 5px,
-	40px 40px;
+	calc(100% - 15px) calc(20px + 2px), 100% 0;
+	background-size: 5px 5px, 5px 5px, 40px 40px;
 	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+.pensio_payment_form_month select,
+.pensio_payment_form_year select,
+#idealIssuer,
+.altapay-payment-form-cnt select#birthdateDay,
+.altapay-payment-form-cnt select#birthdateMonth,
+.altapay-payment-form-cnt input#cancelPayment,
+.altapay-payment-form-cnt input#enableAccount,
+.altapay-payment-form-cnt input#acceptTerms,
+.altapay-payment-form-cnt input#phoneNumber,
+.altapay-payment-form-cnt select#birthdateYear{
+	margin-top: 4px;
+	padding: 12px 14px;
+	width: 100%;
+	border-radius: 3px;
+	border: 1px solid rgba(0, 0, 0, 0.16);
 	background-color: white;
+	font-size: 16px;
 }
 
 .pensio_payment_form-cvc-input input {
@@ -224,7 +239,7 @@ input[type=tel]:focus {
 	font-size: 16px
 }
 
-.expiry_row, .cardnumber_row {
+.expiry_row {
 	margin-top: 10px;
 }
 
@@ -242,9 +257,9 @@ input[type=tel]:focus {
 	margin-top: 20px;
 }
 
-input[type="submit"].AltaPaySubmitButton {
+input[type="submit"].AltaPaySubmitButton,
+input#submitbutton {
 	outline: none;
-	background-color: #31C37E !important;
 	padding: 15px 16px;
 	color: white;
 	border-radius: 3px;
@@ -254,24 +269,19 @@ input[type="submit"].AltaPaySubmitButton {
 	box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
 	font-weight: bold;
 	font-size: 17px;
+}
+
+input[type="submit"].AltaPaySubmitButton {
+	background-color: #31C37E !important;
 }
 
 input[type="submit"].AltaPaySubmitButton:hover {
 	background-color: #16b36e !important;
 }
 
-input[type="submit"].AltaPaySubmitButton:disabled {
+input[type="submit"].AltaPaySubmitButton:disabled,
+input#submitbutton {
 	background-color: black !important;
-	outline: none;
-	padding: 15px 16px;
-	color: white;
-	border-radius: 3px;
-	width: 100%;
-	border: none;
-	cursor: pointer;
-	box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
-	font-weight: bold;
-	font-size: 17px;
 	opacity: 1 !important;
 }
 
@@ -279,6 +289,11 @@ input[type="submit"].AltaPaySubmitButton:disabled:hover{
 	background-color: black !important;
 	color: white;
 }
+
+input#showKlarnaPage {
+	margin-bottom: 15px;
+}
+
 /*errors*/
 
 .pensio_required_field_indicator, #invalid_amex_cvc, #invalid_cvc, #invalid_cardholdername {
@@ -350,6 +365,66 @@ div.PensioMultiformContainer form {
 .altapay-page-wrapper .altapay-order-details {
 	padding: 15px 0;
 }
+
+.altapay-payment-form-cnt select#birthdateDay,
+.altapay-payment-form-cnt select#birthdateMonth,
+.altapay-payment-form-cnt input#cancelPayment,
+.altapay-payment-form-cnt input#enableAccount,
+.altapay-payment-form-cnt input#acceptTerms,
+.altapay-payment-form-cnt input#phoneNumber {
+	margin-bottom: 10px;
+}
+
+.altapay-payment-form-cnt div.PensioMultiformContainer form {
+	position: relative;
+	border: none;
+	background-color: white;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+	top: 0;
+	width: 100%;
+}
+
+.altapay-payment-form-cnt input#CreditCardButton {
+	left: 0px;
+}
+
+.altapay-payment-form-cnt input#GiftCardButton {
+	left: 100px;
+}
+
+.altapay-payment-form-cnt div.PensioMultiformContainer .FormTypeButton {
+	position: absolute;
+	top: -40px;
+	height: 40px;
+	margin-left: 25px;
+	border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.altapay-payment-form-cnt div.PensioMultiformContainer {
+	position: initial;
+}
+
+input#giftcard_account_identifier {
+	background-color: white;
+	border-radius: 3px;
+	color: #666;
+	border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.altapay-payment-form-cnt #Invoice td.pensio_payment_form_label_cell {
+	vertical-align: middle;
+}
+
+.PensioMultiformContainer input#giftcard_account_identifier {
+	width: 100%;
+}
+
+.altapay-payment-form-cnt table.pensio_payment_form_table {
+	margin-bottom: 0;
+}
+
 @media screen and (min-width:992px){
 	.altapay-page-wrapper {
 		display: flex;
@@ -422,21 +497,11 @@ div.PensioMultiformContainer form {
 		<div class="row">
 			<div class="altapay-page-wrapper">
 				<div class="altapay-payment-form-cnt <?php echo $container_class; ?>">
-					<?php
-					$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
-					if ( $cc_form_styling == 'checkout' ) {
-						$order = wc_get_order( $order_id );
-						?>
-						<p class="payment-headline"> <?php echo __( 'You are about to pay', 'altapay' ); ?>
-							<strong><span id="PensioTotal"><?php echo $order->get_total(); ?> </span> <?php echo $order->get_currency(); ?></strong>
-							<?php echo __( 'for the order identified as', 'altapay' ); ?>
-							<strong><?php echo $order_id; ?></strong>
-						</p>
-					<?php } ?>
 					<form id="PensioPaymentForm"></form>
 				</div>
 				<div class="altapay-order-details woocommerce">
 				<?php
+					$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
 					woocommerce_order_details_table( $order_id );
 				?>
 				</div>

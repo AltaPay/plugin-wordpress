@@ -21,7 +21,7 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 * [Gateway Account Configuration](#gateway-account-configuration)
 
-* [Credit Card form styling](#credit-card-form-styling)
+* [Checkout form styling](#checkout-form-styling)
 
 * [Configure fraud detection](#configure-fraud-detection)
 
@@ -97,11 +97,11 @@ To connect to the payment gateway:
 This will populate all the available terminals for the current API user.
 If you face any issue click on **Refresh connection** button, this will fetch the terminals again and populate the list.
 
-### Credit Card form styling
+### Checkout form styling
 
-Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+Choose one of the below options from `Checkout form style` dropdown to change the styling of Credit Card form on the checkout page.
 
-![altpay_cc_form_style_settings.png](docs/altpay_cc_form_style_settings.png)
+![altpay_checkout_form_style_settings.jpg](docs/altpay_checkout_form_style_settings.jpg)
 
 - `Legacy` Choose this option if legacy form is enabled from the gateway side.
 <br><br>
@@ -272,14 +272,14 @@ In order to reconcile payments please follow the steps below:
 ## Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.3
-- WooCommerce min. 3.9.0 – max. 8.0.2
+- WordPress min. 5.0 – max. 6.3.1
+- WooCommerce min. 3.9.0 – max. 8.1.1
 - PHP 7.3 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.3, WooCommerce 8.0.2 and PHP 8.1
+- WordPress 6.3.1, WooCommerce 8.1.1 and PHP 8.1
 
 
 ## Troubleshooting

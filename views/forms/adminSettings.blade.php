@@ -63,7 +63,7 @@
 		</tr>
 
 		<tr valign="top">
-			<th scope="row"><?php esc_html_e( 'Credit Card form style', 'altapay' ); ?></th>
+			<th scope="row"><?php esc_html_e( 'Checkout form style', 'altapay' ); ?></th>
 			<td>
 				<select name="altapay_cc_form_styling">
 					<option @if($cc_form_styling == 'legacy') selected @endif value="legacy">Legacy</option>
