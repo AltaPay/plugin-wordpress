@@ -365,7 +365,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
 			$fraud_recommendation = !empty( $_POST['fraud_recommendation'] ) ? sanitize_text_field( wp_unslash( $_POST['fraud_recommendation'] ) ) : '';
-            $callback_type =  isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+			$callback_type =  isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
 
 			if ( $type == 'subscription_payment' ) {
 				$query = new WC_Order_Query( array(
@@ -535,7 +535,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			// Redirect to Order Confirmation Page
-			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' and $callback_type == 'ok' ) {
+			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' && $callback_type == 'ok' ) {
 				$login = $this->altapayApiLogin();
 				if ( ! $login || is_wp_error( $login ) ) {
 					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
