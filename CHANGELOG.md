@@ -2,7 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.4.9]
-- Add logo for Bancontact.
+- Add terminal logos for Bancontact & Bank payments.
+- Add Klarna's new main logo (pink).
+- Add horizontal variation for MobilePay & Swish terminal logos.
+- Updated and resized the checkout terminal logos.
 - Fix: AltaPay order grid missing due to cache.
 
 ## [3.4.8]
