@@ -570,7 +570,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					);
 				} else {
 					foreach ( $identifier as $val ) {
-						error_log( print_r( $val, true ) );
 						$reconciliation->saveReconciliationIdentifier(
 							$order_id,
 							$txnId,
