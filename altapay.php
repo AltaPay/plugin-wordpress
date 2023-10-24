@@ -753,6 +753,12 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 
 				$reconciliation = new Core\AltapayReconciliation();
 				$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction['TransactionId'], $reconciliationId, 'refunded' );
+			} elseif ( strtolower( $response->Result ) === 'open' ) {
+				$order->add_order_note( __( 'Payment refund is in progress.', 'altapay' ) );
+				return array(
+					'message' => 'Payment refund is in progress.',
+					'success' => true,
+				);
 			} else {
 				$error = $response->MerchantErrorMessage;
 			}
@@ -826,6 +832,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			'refunded'   => $refunded,
 			'chargeable' => round( $charge, 2 ),
 			'note'       => $noteHtml,
+			'message'    => __( 'Payment refunded.', 'altapay' ),
 			'success'    => true,
 		);
 	}
