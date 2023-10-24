@@ -68,7 +68,7 @@ class UtilMethods {
 			}
 
 			// check if compensation exists to bind it in orderline details
-			if ( !$wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
+			if ( ! $wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 		}
@@ -80,8 +80,8 @@ class UtilMethods {
 			$isSubscription
 		);
 
-		$shippingDetails = reset( $shippingDetails );
 		if ( $shippingDetails ) {
+			$shippingDetails     = reset( $shippingDetails );
 			$orderlineDetails [] = $shippingDetails;
 		}
 
@@ -245,7 +245,7 @@ class UtilMethods {
 		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
 		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
 		$orderLine->unitCode   = $unitCode;
-		$goodsType = ( $isSubscription ) ? 'subscription_model' : 'item';
+		$goodsType             = ( $isSubscription ) ? 'subscription_model' : 'item';
 		$orderLine->setGoodsType( $goodsType );
 		$lineData[] = $orderLine;
 
@@ -326,7 +326,7 @@ class UtilMethods {
 				);
 				$orderLine->taxAmount  = round( $totalShippingTax, 2 );
 				$orderLine->taxPercent = round( ( $totalShippingTax / $totalShipping ) * 100, 2 );
-				$goodsType = ( $isSubscription ) ? 'subscription_model' : 'shipment';
+				$goodsType             = ( $isSubscription ) ? 'subscription_model' : 'shipment';
 				$orderLine->setGoodsType( $goodsType );
 				$shippingDetails[] = $orderLine;
 			}
