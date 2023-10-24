@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69c867dd0ba20bb9fd9598912b82f717",
+    "content-hash": "ebf63c3112c20aa2196d2656e5af3275",
     "packages": [
         {
             "name": "altapay/api-php",
@@ -2799,7 +2799,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^5.6 || ^7.0 || ^8.0"
+        "php": "^7.4 || ^8.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
