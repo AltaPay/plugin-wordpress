@@ -146,6 +146,11 @@ class AltapayTokenControl {
 	 * @return string|void
 	 */
 	public function filterSaveCreditCardDetailsButton( $text, $order ) {
+
+		if ( ! $order ) {
+			return;
+		}
+
 		// Get payment methods
 		$paymentMethods = WC()->payment_gateways->get_available_payment_gateways();
 

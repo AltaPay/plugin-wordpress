@@ -534,6 +534,53 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			}
 
+			if ( $status === 'succeeded' && $payment_status === 'bank_payment_refunded' && $transaction_id == $txnId ) {
+
+				$amount = $transaction['RefundedAmount'];
+
+				$refund = wc_create_refund(
+					array(
+						'amount'         => $amount,
+						'reason'         => null,
+						'order_id'       => $order_id,
+						'line_items'     => array(),
+						'refund_payment' => false,
+						'restock_items'  => true,
+					)
+				);
+
+				if ( $refund instanceof WP_Error ) {
+					$order->add_order_note( __( $refund->get_error_message(), 'altapay' ) );
+				} else {
+					$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
+				}
+
+				update_post_meta( $order_id, '_refunded', true );
+
+				$reconciliation = new Core\AltapayReconciliation();
+
+				$identifier = $transaction['ReconciliationIdentifiers']['ReconciliationIdentifier'];
+
+				if ( count( $identifier ) == count( $identifier, COUNT_RECURSIVE ) ) {
+					$reconciliation->saveReconciliationIdentifier(
+						$order_id,
+						$txnId,
+						$identifier['Id'],
+						$identifier['Type']
+					);
+				} else {
+					foreach ( $identifier as $val ) {
+						$reconciliation->saveReconciliationIdentifier(
+							$order_id,
+							$txnId,
+							$val['Id'],
+							$val['Type']
+						);
+					}
+				}
+				exit();
+			}
+
 			// Redirect to Order Confirmation Page
 			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' && $callback_type == 'ok' ) {
 				$login = $this->altapayApiLogin();

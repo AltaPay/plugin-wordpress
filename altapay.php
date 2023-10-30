@@ -5,7 +5,7 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.4.9
+ * Version: 3.5.0
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 8.1.1
@@ -77,7 +77,7 @@ function init_altapay_settings() {
 	$altapay_terminal_classes_recreated = get_site_option( 'altapay_terminal_classes_recreated' );
 
 	if ( empty( $altapay_terminal_classes_recreated ) ) {
-		Core\AltapaySettings::recreateTerminalData($settings);
+		Core\AltapaySettings::recreateTerminalData( $settings );
 	}
 }
 
@@ -107,11 +107,11 @@ function altapay_add_gateway( $methods ) {
 				if ( $term->key === $terminal ) {
 					$terminalName    = $term->name;
 					$natures         = array_column( json_decode( json_encode( $term->nature ), true ), 'Nature' );
-					$gateway_methods = [];
-					if( ! empty( $term->methods ) ) {
+					$gateway_methods = array();
+					if ( ! empty( $term->methods ) ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
-					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array('VippsAcquirer', $gateway_methods ) ) {
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array( 'VippsAcquirer', $gateway_methods ) ) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
@@ -526,7 +526,7 @@ function altapayCaptureCallback() {
 			wp_send_json_error( array( 'error' => 'Error: ' . $e->getMessage() ) );
 		}
 
-		if ( $response && !in_array($response->Result , ['Success', 'Open'], true) ) {
+		if ( $response && ! in_array( $response->Result, array( 'Success', 'Open' ), true ) ) {
 			wp_send_json_error( array( 'error' => __( 'Could not capture reservation' ) ) );
 		}
 
@@ -560,8 +560,25 @@ function altapayCaptureCallback() {
 
 			if ( $response->Result === 'Success' ) {
 				$reconciliation = new Core\AltapayReconciliation();
-				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
-					$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction_id, $val['Id'], $val['Type'] );
+
+				$identifier = $transaction['ReconciliationIdentifiers']['ReconciliationIdentifier'];
+
+				if ( count( $identifier ) == count( $identifier, COUNT_RECURSIVE ) ) {
+					$reconciliation->saveReconciliationIdentifier(
+						(int) $orderID,
+						$transaction_id,
+						$identifier['Id'],
+						$identifier['Type']
+					);
+				} else {
+					foreach ( $identifier as $val ) {
+						$reconciliation->saveReconciliationIdentifier(
+							(int) $orderID,
+							$transaction_id,
+							$val['Id'],
+							$val['Type']
+						);
+					}
 				}
 			}
 
@@ -594,7 +611,7 @@ function altapayCaptureCallback() {
 			update_post_meta( $orderID, '_captured', true );
 			$orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
 			$order->add_order_note( $orderNote );
-		} else if ( $response->Result === 'Open' ) {
+		} elseif ( $response->Result === 'Open' ) {
 			$orderNote = 'The payment is pending an update from the payment provider.';
 			$order->update_status( 'on-hold', $orderNote );
 		}
@@ -736,6 +753,12 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 
 				$reconciliation = new Core\AltapayReconciliation();
 				$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction['TransactionId'], $reconciliationId, 'refunded' );
+			} elseif ( strtolower( $response->Result ) === 'open' ) {
+				$order->add_order_note( __( 'Payment refund is in progress.', 'altapay' ) );
+				return array(
+					'message' => 'Payment refund is in progress.',
+					'success' => true,
+				);
 			} else {
 				$error = $response->MerchantErrorMessage;
 			}
@@ -809,6 +832,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			'refunded'   => $refunded,
 			'chargeable' => round( $charge, 2 ),
 			'note'       => $noteHtml,
+			'message'    => __( 'Payment refunded.', 'altapay' ),
 			'success'    => true,
 		);
 	}
@@ -890,7 +914,7 @@ function altapayPluginActivation() {
 function validate_checksum_altapay_callback_form() {
 
 	if ( is_page( get_option( 'altapay_payment_page' ) ) ) {
-		$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
+		$checksum = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 
 		$altapay_helper = new Helpers\AltapayHelpers();
 		$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.0]
+- Add support for Open Banking (Using Finshark).
+- Update minimum PHP supported version to 7.4
+
 ## [3.4.9]
 - Add terminal logos for Bancontact & Bank payments.
 - Add Klarna's new main logo (pink).
