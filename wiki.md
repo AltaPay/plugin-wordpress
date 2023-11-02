@@ -230,7 +230,7 @@ AltaPay plugin is compatible with the [WooCommerce Subscriptions](https://woocom
 
 > Note:
 >
-> Currently, AltaPay plugin supports recurring payments with the credit card  and vipps terminal only.
+> Currently, AltaPay plugin supports recurring payments with the `Credit Card`, `MobilePay` and `Vipps` terminal only.
 
 ## Reconcile Orders
 In order to reconcile payments please follow the steps below:

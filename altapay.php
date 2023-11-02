@@ -5,7 +5,7 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.5.0
+ * Version: 3.5.1
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 8.1.1
@@ -111,7 +111,10 @@ function altapay_add_gateway( $methods ) {
 					if ( ! empty( $term->methods ) ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
-					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) ) or in_array( 'VippsAcquirer', $gateway_methods ) ) {
+					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
+                         or ( in_array('MobilePayAcquirer', $gateway_methods ) or in_array('MobilePayOnlineAcquirer', $gateway_methods ) )
+                         or in_array('VippsAcquirer', $gateway_methods )
+                    ) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
