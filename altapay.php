@@ -8,7 +8,7 @@
  * Version: 3.5.1
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 8.1.1
+ * WC tested up to: 8.2.2
  *
  * @package Altapay
  */
