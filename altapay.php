@@ -194,7 +194,7 @@ function altapay_page_template( $template ) {
 /**
  * Register meta box for order details page
  *
- * @return bool
+ * @return void
  */
 function altapayAddMetaBoxes() {
 	$screen = wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
