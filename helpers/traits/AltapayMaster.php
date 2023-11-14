@@ -55,8 +55,8 @@ trait AltapayMaster {
 			}
 
 			foreach ( $subscriptions as $subscription ) {
-				$parent_order_id = $subscription->get_parent_id();
-				$agreement_id    = get_post_meta( $parent_order_id, '_agreement_id', true );
+				$parent_order = $subscription->get_parent();
+				$agreement_id = $parent_order->get_meta( '_agreement_id' );
 
 				if ( ! $agreement_id ) {
 					// Set subscription payment as failure
@@ -87,7 +87,8 @@ trait AltapayMaster {
 					$transaction        = $jsonToArray[ $latest_transaction ];
 					$transaction_id     = $transaction['TransactionId'];
 
-					update_post_meta( $renewal_order->get_id(), '_transaction_id', $transaction_id );
+					$renewal_order->update_meta_data( '_transaction_id', $transaction_id );
+					$renewal_order->save();
 
 					if ( $response->Result === 'Success' ) {
 						$reconciliation = new Core\AltapayReconciliation();
@@ -105,7 +106,8 @@ trait AltapayMaster {
 					$renewal_order->payment_complete();
 				}
 
-				update_post_meta( $renewal_order->get_id(), '_agreement_id', $agreement_id );
+				$renewal_order->update_meta_data( '_agreement_id', $agreement_id );
+				$renewal_order->save();
 			}
 		} catch ( Exception $e ) {
 			$renewal_order->update_status(
@@ -259,6 +261,7 @@ trait AltapayMaster {
 		$return             = false;
 		$detect_fraud       = get_option( 'altapay_fraud_detection' );
 		$do_action_on_fraud = get_option( 'altapay_fraud_detection_action' );
+		$order              = wc_get_order( $order_id );
 		if ( $detect_fraud and $do_action_on_fraud and $fraud_recommendation === 'Deny' ) {
 			$return = true;
 			try {
@@ -279,7 +282,8 @@ trait AltapayMaster {
 
 						$reconciliation = new Core\AltapayReconciliation();
 						$reconciliation->saveReconciliationIdentifier( (int) $order_id, $transaction['TransactionId'], $reconciliation_id, 'refunded' );
-						update_post_meta( $order_id, '_refunded', true );
+						$order->update_meta_data( '_refunded', true );
+						$order->save();
 
 						// Release agreement
 						if ( $txn_id != $transaction['TransactionId'] ) {
@@ -291,7 +295,8 @@ trait AltapayMaster {
 							}
 						}
 					} else {
-						update_post_meta( $order_id, '_released', true );
+						$order->update_meta_data( '_released', true );
+						$order->save();
 					}
 				} else {
 					error_log( "altapay_fraud_detection_action error: $response->MerchantErrorMessage" );
