@@ -117,14 +117,25 @@
         @endforeach
 
         <tr class="ap-orderlines-capture">
-            <td style="display:none"><input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$shipping_id}}"/></td>
+            @php
+                $capturableQty = $items_captured[$shipping_id] == 1 ? 0 : 1;
+            @endphp
+            <td style="display:none">
+                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID"
+                       type="text" value="{{$shipping_id}}"/>
+            </td>
             <td class="pv3 pr3 bb b--black-20">{{$order->get_shipping_method()}}</td>
             <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$totalIncTax}}</td>
             <td class="pv3 pr3 bb b--black-20">{{$excTax}}</td>
             <td class="ap-orderline-capture-max-quantity pv3 pr3 bb b--black-20">1</td>
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercentage}}</td>
-            <td class="pv3 pr3 bb b--black-20"><input class="form-control ap-order-capture-modify" name="qty" value="1" type="number"/></td>
-            <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20"><span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span></td>
+            <td class="pv3 pr3 bb b--black-20">
+                <input class="form-control ap-order-capture-modify" name="qty"
+                       value="{{$capturableQty}}" type="number" {{ $capturableQty === 0 ? 'disabled' : '' }} />
+            </td>
+            <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20">
+                <span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span>
+            </td>
         </tr>
     @endif
 

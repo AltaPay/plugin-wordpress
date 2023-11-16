@@ -237,8 +237,7 @@ function altapay_meta_box( $post_or_order_object ) {
 		return;
 	}
 
-	$txnID = $order->get_transaction_id();
-
+	$txnID        = $order->get_transaction_id();
 	$agreement_id = $order->get_meta( '_agreement_id' );
 
 	if ( $txnID || $agreement_id ) {
@@ -274,7 +273,8 @@ function altapay_meta_box( $post_or_order_object ) {
 				),
 				array(
 					'key'     => 'wc_order_id',
-					'compare' => $order->get_id(),
+					'value'   => $order->get_id(),
+					'compare' => '=',
 				),
 			),
 		);
