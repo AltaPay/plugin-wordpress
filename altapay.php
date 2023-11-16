@@ -966,7 +966,7 @@ add_action(
 );
 
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
-add_action( 'add_meta_boxes', 'altapayAddMetaBoxes', 10, 2 );
+add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
 add_action( 'wp_ajax_altapay_capture', 'altapayCaptureCallback' );
 add_action( 'wp_ajax_altapay_refund', 'altapayRefundCallback' );
 add_action( 'wp_ajax_altapay_release_payment', 'altapayReleasePayment' );
