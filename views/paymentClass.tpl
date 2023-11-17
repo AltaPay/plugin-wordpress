@@ -203,6 +203,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$language = $languages[get_locale()];
 		}
 
+		$wpml_language = $order->get_meta( 'wpml_language' );
+
+		if ( ! empty( $wpml_language ) ) {
+			$language = $wpml_language;
+		}
+
 		// Get chosen page from AltaPay's settings
 		$form_page_id = esc_attr( get_option('altapay_payment_page') );
 		$configUrl = array(
