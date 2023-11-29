@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.2]
+- Add support for WooCommerce High Performance Order Storage (HPOS).
+- Add support for WPML multilingual plugin.
+
 ## [3.5.1]
 - Add support for subscriptions via MobilePay
 

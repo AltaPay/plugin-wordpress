@@ -41,6 +41,7 @@ class AltapaySettings {
 		add_action( 'admin_notices', array( $this, 'loginError' ) );
 		add_action( 'admin_notices', array( $this, 'captureFailed' ) );
 		add_action( 'admin_notices', array( $this, 'captureWarning' ) );
+		add_action( 'admin_notices', array( $this, 'terminals_directory_error' ) );
 	}
 
 	/**
@@ -98,8 +99,9 @@ class AltapaySettings {
 				return;
 			}
 
-			update_post_meta( $orderID, '_captured', true );
+			$order->update_meta_data( '_captured', true );
 			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
+			$order->save();
 		}
 	}
 
@@ -183,6 +185,30 @@ class AltapaySettings {
 	 */
 	public function captureWarning() {
 		$this->showUserMessage( 'altapay_capture_warning', 'update-nag' );
+	}
+
+	/**
+	 * Displays error message for terminals directory
+	 *
+	 * @return void
+	 */
+	public function terminals_directory_error() {
+
+		$transient_value = get_transient( 'terminals_directory_error' );
+
+		if ( 'show' === $transient_value ) {
+
+			$plugin_data = get_plugin_data( ALTAPAY_PLUGIN_FILE );
+			$plugin_name = $plugin_data['Name'];
+
+			echo '<div class="error">';
+			echo '<p>';
+			echo __( '<strong>' . $plugin_name . ' </strong>: Unable to save the file to <strong>terminals</strong> directory. Check the terminals folder has the right permission', 'altapay' );
+			echo '</p>';
+			echo '</div>';
+
+			delete_transient( 'terminals_directory_error' );
+		}
 	}
 
 	/**

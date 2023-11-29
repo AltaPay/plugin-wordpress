@@ -15,6 +15,18 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
+$order_id      = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
+$order         = wc_get_order( $order_id );
+$wpml_language = $order->get_meta( 'wpml_language' );
+if ( ! empty( $wpml_language ) ) {
+	global $sitepress;
+	// Check if the WPML plugin is active
+	if ( defined( 'ICL_SITEPRESS_VERSION' ) && is_object( $sitepress ) ) {
+		// Switch the language
+		$sitepress->switch_lang( $wpml_language );
+	}
+}
 get_header();
 ?>
 <style>
@@ -501,7 +513,6 @@ input#giftcard_account_identifier {
 				</div>
 				<div class="altapay-order-details woocommerce">
 				<?php
-					$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
 					woocommerce_order_details_table( $order_id );
 				?>
 				</div>

@@ -86,8 +86,9 @@ class AltapayOrderStatus {
 				if ( $response->Result === 'Success' ) {
 					$order->update_status( $orderStatus );
 					if ( $orderStatus === 'cancelled' ) {
-						update_post_meta( $orderID, '_released', true );
+						$order->update_meta_data( '_released', true );
 						$order->add_order_note( __( 'Order released: "The order has been released"', 'altapay' ) );
+						$order->save();
 					}
 				} else {
 					$order->add_order_note( __( 'Release failed: ' . $response->MerchantErrorMessage, 'altapay' ) );
@@ -111,8 +112,9 @@ class AltapayOrderStatus {
 
 					$response = $api->call();
 					if ( isset( $response->Result ) && $response->Result === 'Success' ) {
-						update_post_meta( $orderID, '_captured', true );
+						$order->update_meta_data( '_captured', true );
 						$order->add_order_note( __( 'Order captured: "The order has been fully captured"', 'altapay' ) );
+						$order->save();
 					}
 				}
 			} catch ( Exception $e ) {

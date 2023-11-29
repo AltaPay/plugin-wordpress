@@ -203,6 +203,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$language = $languages[get_locale()];
 		}
 
+		$wpml_language = $order->get_meta( 'wpml_language' );
+
+		if ( ! empty( $wpml_language ) ) {
+			$language = $wpml_language;
+		}
+
 		// Get chosen page from AltaPay's settings
 		$form_page_id = esc_attr( get_option('altapay_payment_page') );
 		$configUrl = array(
@@ -380,7 +386,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			$order        = new WC_Order( $order_id );
+			$order        = wc_get_order( $order_id );
 			$agreement_id = '';
 
 			$xmlResponse = wp_unslash( $_POST['xml'] );
@@ -423,7 +429,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
 			$ccExpiryDate = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 
-			$transaction_id = get_post_meta( $order_id, '_transaction_id', true );
+			$transaction_id = $order->get_transaction_id();
 
 			/*
 			Exit if payment already completed against the same order and 
@@ -450,8 +456,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 				if ( $status === 'succeeded' ) {
 
-					update_post_meta( $order_id, '_transaction_id', $txnId );
-					update_post_meta( $order_id, '_agreement_id', $agreement_id );
+					$order->update_meta_data( '_agreement_id', $agreement_id );
+					$order->save();
+					$order->set_transaction_id( $txnId );
 
 					$reconciliation = new Core\AltapayReconciliation();
 					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
@@ -503,8 +510,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
 
-				update_post_meta( $order_id, '_transaction_id', $txnId );
-				update_post_meta( $order_id, '_agreement_id', $agreement_id );
+				$order->set_transaction_id( $txnId );
+				$order->update_meta_data( '_agreement_id', $agreement_id );
 
 				$reconciliation = new Core\AltapayReconciliation();
 				foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
@@ -555,7 +562,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
 				}
 
-				update_post_meta( $order_id, '_refunded', true );
+				$order->update_meta_data( '_refunded', true );
+				$order->save();
 
 				$reconciliation = new Core\AltapayReconciliation();
 

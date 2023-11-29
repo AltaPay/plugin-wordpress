@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.5.1
+ * Version: 3.5.2
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 8.1.1
+ * WC tested up to: 8.2.2
  *
  * @package Altapay
  */
@@ -23,6 +23,7 @@ use Altapay\Api\Payments\ReleaseReservation;
 use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Subscription\ChargeSubscription;
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -34,6 +35,10 @@ if ( ! defined( 'ALTAPAY_PLUGIN_FILE' ) ) {
 
 if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 	define( 'ALTAPAY_DB_VERSION', '336' );
+}
+
+if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.5.2' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -112,9 +117,9 @@ function altapay_add_gateway( $methods ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
-                         or ( in_array('MobilePayAcquirer', $gateway_methods ) or in_array('MobilePayOnlineAcquirer', $gateway_methods ) )
-                         or in_array('VippsAcquirer', $gateway_methods )
-                    ) {
+						 or ( in_array( 'MobilePayAcquirer', $gateway_methods ) or in_array( 'MobilePayOnlineAcquirer', $gateway_methods ) )
+						 or in_array( 'VippsAcquirer', $gateway_methods )
+					) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
@@ -124,27 +129,38 @@ function altapay_add_gateway( $methods ) {
 			}
 
 			// Check if file exists
-			$path    = $terminalDir . $terminal . '.class.php';
-			$tmpPath = $tmpDir . '/' . $terminal . '.class.php';
+			$terminal_class_file     = $terminalDir . $terminal . '.class.php';
+			$terminal_class_file_tmp = $tmpDir . '/' . $terminal . ALTAPAY_PLUGIN_VERSION . '.class.php';
 
-			if ( file_exists( $path ) ) {
-				require_once $path;
+			if ( file_exists( $terminal_class_file ) ) {
+				require_once $terminal_class_file;
 				$methods[] = 'WC_Gateway_' . $terminal;
-			} elseif ( file_exists( $tmpPath ) ) {
-				require_once $tmpPath;
+			} elseif ( file_exists( $terminal_class_file_tmp ) ) {
+				require_once $terminal_class_file_tmp;
 				$methods[] = 'WC_Gateway_' . $terminal;
+
+				if ( is_writable( $terminalDir ) ) {
+					// Create file
+					$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
+					// Replace patterns
+					$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
+
+					file_put_contents( $terminal_class_file, $content );
+				} else {
+					set_transient( 'terminals_directory_error', 'show' );
+				}
 			} else {
 				// Create file
 				$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
-				$filename = $terminalDir . $terminal . '.class.php';
 				// Check if terminals folder is writable or use tmp as fallback
 				if ( ! is_writable( $terminalDir ) ) {
-					$filename = $tmpDir . '/' . $terminal . '.class.php';
+					$terminal_class_file = $terminal_class_file_tmp;
+					set_transient( 'terminals_directory_error', 'show' );
 				}
 				// Replace patterns
 				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
-				file_put_contents( $filename, $content );
+				file_put_contents( $terminal_class_file, $content );
 			}
 		}
 	}
@@ -178,38 +194,28 @@ function altapay_page_template( $template ) {
 /**
  * Register meta box for order details page
  *
- * @return bool
+ * @return void
  */
 function altapayAddMetaBoxes() {
-	global $post;
+	$screen = wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled()
+		? wc_get_page_screen_id( 'shop-order' )
+		: 'shop_order';
 
-	if ( $post->post_type !== 'shop_order' ) {
-		return true;
-	}
-	// Load order
-	$order         = new WC_Order( $post->ID );
-	$paymentMethod = $order->get_payment_method();
+	add_meta_box(
+		'altapay-actions',
+		__( 'AltaPay actions', 'altapay' ),
+		'altapay_meta_box',
+		$screen,
+		'normal'
+	);
 
-	// Only show on AltaPay orders
-	if ( strpos( $paymentMethod, 'altapay' ) !== false || strpos( $paymentMethod, 'valitor' ) !== false ) {
-		add_meta_box(
-			'altapay-actions',
-			__( 'AltaPay actions', 'altapay' ),
-			'altapay_meta_box',
-			'shop_order',
-			'normal'
-		);
-
-		add_meta_box(
-			'altapay-order-reconciliation-identifier',
-			__( 'Reconciliation Details', 'altapay' ),
-			'altapay_order_reconciliation_identifier_meta_box',
-			'shop_order',
-			'normal'
-		);
-	}
-
-	return true;
+	add_meta_box(
+		'altapay-order-reconciliation-identifier',
+		__( 'Reconciliation Details', 'altapay' ),
+		'altapay_order_reconciliation_identifier_meta_box',
+		$screen,
+		'normal'
+	);
 }
 
 /**
@@ -218,11 +224,21 @@ function altapayAddMetaBoxes() {
  * @param WP_Post $post Current post object.
  * @return void
  */
-function altapay_meta_box( $post ) {
-	// Load order
-	$order        = new WC_Order( $post->ID );
+function altapay_meta_box( $post_or_order_object ) {
+	$order = ( $post_or_order_object instanceof WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+
+	if ( ! $order ) {
+		return;
+	}
+
+	$paymentMethod = $order->get_payment_method();
+
+	if ( strpos( $paymentMethod, 'altapay' ) === false && strpos( $paymentMethod, 'valitor' ) === false ) {
+		return;
+	}
+
 	$txnID        = $order->get_transaction_id();
-	$agreement_id = get_post_meta( $post->ID, '_agreement_id', true );
+	$agreement_id = $order->get_meta( '_agreement_id' );
 
 	if ( $txnID || $agreement_id ) {
 		$settings = new Core\AltapaySettings();
@@ -246,7 +262,6 @@ function altapay_meta_box( $post ) {
 			'posts_per_page' => -1,
 			'post_type'      => 'altapay_captures',
 			'post_status'    => 'captured',
-			'post_parent'    => $order->get_id(),
 			'meta_query'     => array(
 				array(
 					'key'     => 'qty_captured',
@@ -255,6 +270,11 @@ function altapay_meta_box( $post ) {
 				array(
 					'key'     => 'item_id',
 					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => 'wc_order_id',
+					'value'   => $order->get_id(),
+					'compare' => '=',
 				),
 			),
 		);
@@ -318,16 +338,21 @@ function altapay_meta_box( $post ) {
  * @param WP_Post $post Current post object.
  * @return void
  */
-function altapay_order_reconciliation_identifier_meta_box( $post ) {
+function altapay_order_reconciliation_identifier_meta_box( $post_or_order_object ) {
+	$order = ( $post_or_order_object instanceof WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
-	$postID = $post->ID;
+	if ( ! $order ) {
+		return;
+	}
 
-	if ( $post->post_type === 'altapay_captures' ) {
-		$postID = wp_get_post_parent_id( $postID );
+	$paymentMethod = $order->get_payment_method();
+
+	if ( strpos( $paymentMethod, 'altapay' ) === false && strpos( $paymentMethod, 'valitor' ) === false ) {
+		return;
 	}
 
 	$reconciliation             = new Core\AltapayReconciliation();
-	$reconciliation_identifiers = $reconciliation->getReconciliationData( (int) $postID );
+	$reconciliation_identifiers = $reconciliation->getReconciliationData( (int) $order->get_id() );
 
 	if ( ! empty( $reconciliation_identifiers ) ) {
 		?>
@@ -361,19 +386,16 @@ function altapay_order_reconciliation_identifier_meta_box( $post ) {
  * @return void
  */
 function altapayActionJavascript() {
-	global $post;
-	if ( isset( $post->ID ) ) {
-		$postID = $post->ID;
+	$screen    = get_current_screen();
+	$screen_id = $screen ? $screen->id : '';
 
 		// Check if WooCommerce order
-		if ( $post->post_type === 'shop_order' || $post->post_type === 'altapay_captures' ) {
-
-			if ( $post->post_type === 'altapay_captures' ) {
-				$postID = wp_get_post_parent_id( $postID );
-			}
-			?>
+	if ( $screen_id === wc_get_page_screen_id( 'shop-order' ) ) {
+		$order   = wc_get_order();
+		$post_id = ! empty( $order ) ? $order->get_id() : '';
+		?>
 			<script type="text/javascript">
-				let Globals = <?php echo wp_json_encode( array( 'postId' => $postID ) ); ?>;
+				let Globals = <?php echo wp_json_encode( array( 'postId' => $post_id ) ); ?>;
 			</script>
 			<?php
 			wp_enqueue_script(
@@ -405,7 +427,6 @@ function altapayActionJavascript() {
 				'1.1.0',
 				true
 			);
-		}
 	}
 }
 
@@ -467,12 +488,12 @@ function altapayCaptureCallback() {
 	}
 
 	// Load order
-	$order            = new WC_Order( $orderID );
+	$order            = wc_get_order( $orderID );
 	$txnID            = $order->get_transaction_id();
 	$reconciliationId = wp_generate_uuid4();
 
 	if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
-		$txnID        = get_post_meta( $orderID, '_agreement_id', true );
+		$txnID        = $order->get_meta( '_agreement_id' );
 		$subscription = true;
 	}
 
@@ -554,7 +575,7 @@ function altapayCaptureCallback() {
 				$latest_transaction = $settings->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
 				$transaction        = $jsonToArray['Transaction'][ $latest_transaction ];
 				$transaction_id     = $transaction['TransactionId'];
-				update_post_meta( $orderID, '_transaction_id', $transaction_id );
+				$order->set_transaction_id( $transaction_id );
 			} else {
 				$xmlToJson      = wp_json_encode( $xml->Body->Transactions->Transaction );
 				$transaction    = json_decode( $xmlToJson, true );
@@ -600,7 +621,9 @@ function altapayCaptureCallback() {
 				$args = array(
 					'post_type'   => 'altapay_captures',
 					'post_status' => 'captured',
-					'post_parent' => $orderID,
+					'meta_input'  => array(
+						'wc_order_id' => $orderID,
+					),
 				);
 
 				$post_id = wp_insert_post( $args );
@@ -611,7 +634,8 @@ function altapayCaptureCallback() {
 				}
 			}
 
-			update_post_meta( $orderID, '_captured', true );
+			$order->update_meta_data( '_captured', true );
+			$order->save();
 			$orderNote = __( 'Order captured: amount: ' . $amount, 'Altapay' );
 			$order->add_order_note( $orderNote );
 		} elseif ( $response->Result === 'Open' ) {
@@ -682,7 +706,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 	}
 
 	// Load order
-	$order = new WC_Order( $orderID );
+	$order = wc_get_order( $orderID );
 	$txnID = $order->get_transaction_id();
 	if ( ! $txnID ) {
 		return array( 'error' => 'Invalid order' );
@@ -718,7 +742,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 	$error            = '';
 	$reconciliationId = wp_generate_uuid4();
 
-	if ( get_post_meta( $orderID, '_captured', true ) || get_post_meta( $orderID, '_refunded', true ) || $order->get_remaining_refund_amount() > 0 ) {
+	if ( $order->get_meta( '_captured' ) || $order->get_meta( '_refunded' ) || $order->get_remaining_refund_amount() > 0 ) {
 		$api = new RefundCapturedReservation( $auth );
 		$api->setAmount( round( $amount, 2 ) );
 		$api->setOrderLines( $orderLines );
@@ -748,7 +772,8 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 						$order->add_order_note( __( 'Refunded products have been re-added to the inventory', 'altapay' ) );
 					}
 				}
-				update_post_meta( $orderID, '_refunded', true );
+				$order->update_meta_data( '_refunded', true );
+				$order->save();
 				$refundFlag = true;
 
 				$transaction = json_decode( wp_json_encode( $response->Transactions ), true );
@@ -780,7 +805,8 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			if ( $response->Result === 'Success' ) {
 				$releaseFlag = true;
 				$refundFlag  = true;
-				update_post_meta( $orderID, '_released', true );
+				$order->update_meta_data( '_released', true );
+				$order->save();
 			} else {
 				$error = $response->MerchantErrorMessage;
 			}
@@ -889,8 +915,9 @@ function altapayReleasePayment() {
 		if ( $response->Result === 'Success' ) {
 			$order->update_status( $orderStatus );
 			if ( $orderStatus === 'cancelled' ) {
-				update_post_meta( $orderID, '_released', true );
+				$order->update_meta_data( '_released', true );
 				$order->add_order_note( __( 'Order released: "The order has been released"', 'altapay' ) );
+				$order->save();
 				wp_send_json_success( array( 'message' => 'Payment Released' ) );
 			}
 		} else {
@@ -928,12 +955,22 @@ function validate_checksum_altapay_callback_form() {
 	}
 }
 
+// Declare plugin compatibility with WooCommerce High Performance Order Storage (HPOS)
+add_action(
+	'before_woocommerce_init',
+	function() {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
 add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
 add_action( 'wp_ajax_altapay_capture', 'altapayCaptureCallback' );
 add_action( 'wp_ajax_altapay_refund', 'altapayRefundCallback' );
 add_action( 'wp_ajax_altapay_release_payment', 'altapayReleasePayment' );
-add_action( 'admin_footer', 'altapayActionJavascript' );
+add_action( 'admin_enqueue_scripts', 'altapayActionJavascript' );
 add_action( 'altapay_checkout_order_review', 'woocommerceOrderReview' );
 add_action( 'wp_ajax_create_altapay_payment_page', 'createAltapayPaymentPageCallback' );
 add_filter( 'template_include', 'altapay_page_template', 99 );
