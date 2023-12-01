@@ -16,8 +16,8 @@ class Order {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click()
-        cy.get('.woocommerce-message > .button').click()
-        cy.get('.checkout-button').click()
+        cy.get('.wc-block-components-notice-banner__content > .button').click().wait(3000)
+        cy.contains('Proceed to Checkout').click().wait(3000)
 
     }
 
