@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.3]
+- Fix duplicate transactions issue with WPML plugin.
+
 ## [3.5.2]
 - Add support for WooCommerce High Performance Order Storage (HPOS).
 - Add support for WPML multilingual plugin.
