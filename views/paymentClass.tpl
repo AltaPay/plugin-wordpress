@@ -73,6 +73,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->init_settings();
 
 		// Add actions
+		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_api_wc_gateway_' . $this->id, array( $this, 'checkAltapayResponse' ) );
 
 		// Subscription actions

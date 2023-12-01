@@ -6,7 +6,7 @@ jQuery(function ($) {
 		return false;
 	}
 
-	jQuery('form.checkout').on('checkout_place_order_' + altapay_applepay_obj.applepay_payment_method, function (event, wc_checkout_form) {
+	$('form.checkout').on('checkout_place_order_' + altapay_applepay_obj.applepay_payment_method, function (event, wc_checkout_form) {
 			var $form = $( 'form.checkout' );
 			$form.addClass( 'processing' );
 
@@ -97,7 +97,7 @@ jQuery(function ($) {
 			return false;
 	});
 
-	jQuery(document).on("click", "#place_order", function(){
+	$(document).on("click", "#place_order", function(){
 		if ($('#payment_method_' + altapay_applepay_obj.applepay_payment_method).is(':checked')) {
 			onApplePayButtonClicked(altapay_applepay_obj, true, false);
 		}
