@@ -182,7 +182,7 @@ class ApplePay {
 			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
 			$order->payment_complete();
-			$order->update_meta_data( '_transaction_id', $txn_id );
+			$order->set_transaction_id( $txn_id );
 			$order->save();
 
 			if ( $response->Result === 'Success' ) {
@@ -227,9 +227,9 @@ class ApplePay {
 				$applepay_obj = array(
 					'ajax_url' => admin_url('admin-ajax.php'),
 					'nonce' => wp_create_nonce('apple-pay'),
-					'currency' => $payment_gateway->settings['currency'],
+					'currency' => get_woocommerce_currency(),
 					'country' => get_option('woocommerce_default_country'),
-					'subtotal' => WC()->cart->total,
+					'subtotal' => WC()->cart->get_total( 'edit' ),
 					'terminal' => $payment_gateway->terminal,
 					'apply_pay_label' => $payment_gateway->apple_pay_label,
 					'apple_pay_supported_networks' => $payment_gateway->get_option('apple_pay_supported_networks'),
