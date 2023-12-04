@@ -17,6 +17,7 @@ use Altapay\Api\Payments\CaptureReservation;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use WC_Order;
+use Altapay\Classes\Core;
 
 class AltapaySettings {
 
@@ -102,6 +103,16 @@ class AltapaySettings {
 			$order->update_meta_data( '_captured', true );
 			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
 			$order->save();
+		
+			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
+			$latest_transaction = $this->getLatestTransaction( $transactions, 'payment' );
+			$transaction        = $transactions[ $latest_transaction ];
+			$txn_id             = $transaction['TransactionId'];
+
+			$reconciliation = new Core\AltapayReconciliation();
+			foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+				$reconciliation->saveReconciliationIdentifier( $orderID, $txn_id, $val['Id'], $val['Type'] );
+			}
 		}
 	}
 
@@ -184,7 +195,7 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function captureWarning() {
-		$this->showUserMessage( 'altapay_capture_warning', 'update-nag' );
+		$this->showUserMessage( 'altapay_capture_warning', 'notice-warning' );
 	}
 
 	/**
