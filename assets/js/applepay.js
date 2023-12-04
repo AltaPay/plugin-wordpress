@@ -1,7 +1,5 @@
 jQuery(function ($) {
-
 	let session = '';
-
 	if ( typeof altapay_applepay_obj === 'undefined' ) {
 		return false;
 	}
