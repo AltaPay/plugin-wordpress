@@ -130,7 +130,7 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 		session = new ApplePaySession( 3, request );
 	}
 
-	session.onvalidatemerchant = event => {
+	session.onvalidatemerchant = async event => {
 		jQuery.post(
 			applepay_obj.ajax_url,
 			{
