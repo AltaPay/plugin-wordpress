@@ -32,6 +32,7 @@ class ApplePay {
 		add_action( 'wp_ajax_card_wallet_authorize', array( $this, 'applepay_card_wallet_authorize' ) );
 		add_action( 'wp_ajax_nopriv_card_wallet_authorize', array( $this, 'applepay_card_wallet_authorize' ) );
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'filter_apple_pay_for_non_safari_browser' ), 10, 2 );
+		add_filter( 'woocommerce_after_checkout_form', array( $this, 'applepay_woocommerce_after_checkout_form' ) );
 	}
 
 	/**
@@ -181,7 +182,7 @@ class ApplePay {
 			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
 			$order->payment_complete();
-			$order->update_meta_data( '_transaction_id', $txn_id );
+			$order->set_transaction_id( $txn_id );
 			$order->save();
 
 			if ( $response->Result === 'Success' ) {
@@ -207,5 +208,40 @@ class ApplePay {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
+	}
+
+	/**
+	 * @param $checkout
+	 * @return void
+	 */
+	public function applepay_woocommerce_after_checkout_form($checkout) {
+
+		$payment_gateways = WC()->payment_gateways()->payment_gateways();
+
+		$applepay_obj = array(
+			'applepay_payment_method' => ''
+		);
+
+		foreach ($payment_gateways as $key => $payment_gateway) {
+			if (isset($payment_gateway->settings['is_apple_pay']) && $payment_gateway->settings['is_apple_pay'] === 'yes') {
+				$applepay_obj = array(
+					'ajax_url' => admin_url('admin-ajax.php'),
+					'nonce' => wp_create_nonce('apple-pay'),
+					'currency' => get_woocommerce_currency(),
+					'country' => get_option('woocommerce_default_country'),
+					'subtotal' => WC()->cart->get_total( 'edit' ),
+					'terminal' => $payment_gateway->terminal,
+					'apply_pay_label' => $payment_gateway->apple_pay_label,
+					'apple_pay_supported_networks' => $payment_gateway->get_option('apple_pay_supported_networks'),
+					'applepay_payment_method' => $payment_gateway->id
+				);
+				break;
+			}
+		}
+		?>
+		<script>
+			var altapay_applepay_obj = <?php echo json_encode($applepay_obj); ?>;
+		</script>
+		<?php
 	}
 }

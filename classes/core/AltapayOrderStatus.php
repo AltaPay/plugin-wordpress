@@ -29,16 +29,16 @@ class AltapayOrderStatus {
 	}
 
 	/**
-	 * Trigger when the order status is changed - Cancelled order scenario is handled
+	 * Trigger when the order status is changed - Cancelled/Completed order scenario is handled
 	 *
 	 * @param int      $orderID
-	 * @param string   $currentStatus
-	 * @param string   $nextStatus
+	 * @param string   $previousStatus
+	 * @param string   $newStatus
 	 * @param WC_Order $order
 	 *
 	 * @return void|WP_Error
 	 */
-	public function orderStatusChanged( $orderID, $currentStatus, $nextStatus, $order ) {
+	public function orderStatusChanged( $orderID, $previousStatus, $newStatus, $order ) {
 		$txnID    = $order->get_transaction_id();
 		$captured = 0;
 		$reserved = 0;
@@ -67,7 +67,7 @@ class AltapayOrderStatus {
 			}
 		}
 
-		if ( $currentStatus === 'cancelled' ) {
+		if ( $newStatus === 'cancelled' ) {
 			try {
 				if ( $status === 'released' ) {
 					return;
@@ -102,7 +102,7 @@ class AltapayOrderStatus {
 			} catch ( ResponseHeaderException $e ) {
 				error_log( 'Exception: ' . $e->getMessage() );
 			}
-		} elseif ( $currentStatus === 'completed' ) {
+		} elseif ( $newStatus === 'completed' ) {
 			try {
 				if ( $status === 'captured' ) {
 					return;

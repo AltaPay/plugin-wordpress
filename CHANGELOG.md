@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.3]
+- Fix: Duplicate transactions sent to the gateway with the WPML plugin.
+- Fix: Order not releasing on "canceled" status change.
+- Fix: Purchase summary shows 2 Apple Pay buttons with a multi-currency site.
+- Save reconciliation identifier when order is captured via status change.
+
 ## [3.5.2]
 - Add support for WooCommerce High Performance Order Storage (HPOS).
 - Add support for WPML multilingual plugin.

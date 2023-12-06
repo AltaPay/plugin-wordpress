@@ -74,7 +74,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		// Add actions
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'receipt_page_altapay' ) );
 		add_action( 'woocommerce_api_wc_gateway_' . $this->id, array( $this, 'checkAltapayResponse' ) );
 
 		// Subscription actions
@@ -95,53 +94,29 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * @param int $order_id
+	 * Process the payment and return the result.
 	 *
-	 * @return void
+	 * @param int $order_id Order ID.
+	 * @return array
 	 * @throws Exception
 	 */
-	public function receipt_page_altapay( $order_id ) {
-		 // Show text
+   public function process_payment( $order_id ) {
 		if ( $this->is_apple_pay === 'yes' ) {
-			$order = new WC_Order( $order_id );
-
-			$applepay_obj = array(
-				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
-				'nonce'                        => wp_create_nonce( 'apple-pay' ),
-				'currency'                     => $order->get_currency(),
-				'country'                      => get_option( 'woocommerce_default_country' ),
-				'subtotal'                     => $order->get_total(),
-				'terminal'                     => $this->terminal,
-				'order_id'                     => $order_id,
-				'apply_pay_label'              => $this->apple_pay_label,
-				'apple_pay_supported_networks' => $this->apple_pay_supported_networks,
-			);
-			?>
-			<style>
-				apple-pay-button {
-					--apple-pay-button-width: 200px;
-					--apple-pay-button-height: 50px;
-					--apple-pay-button-border-radius: 0px;
-					--apple-pay-button-padding: 5px 0px;
-					--apple-pay-button-box-sizing: border-box;
-				}
-			</style>
-			<apple-pay-button buttonstyle="black" type="pay" locale="en" id="apple-pay-button" style="float: right;"></apple-pay-button>
-			<script>
-				jQuery( document ).ready(function($) {
-					var applepay_obj= <?php echo json_encode( $applepay_obj ); ?>;
-					$('#apple-pay-button').click(function() {
-						onApplePayButtonClicked(applepay_obj);
-					});
-				});
-			</script>
-			<?php
-		} else {
-			$requestParams = $this->createPaymentRequest( $order_id );
-			if ( is_wp_error( $requestParams ) ) {
-				echo '<p>' . $requestParams->get_error_message() . '</p>';
+			$order = wc_get_order( $order_id );
+			return [
+				'result'   => 'success',
+				'redirect' => $order->get_checkout_order_received_url(),
+			];
+		}else{
+			$payment_request = $this->createPaymentRequest( $order_id );
+			if ( is_wp_error( $payment_request ) ) {
+				wc_add_notice($payment_request->get_error_message(), 'error');
 			} else {
-				echo '<script type="text/javascript">window.location.href = "' . $requestParams['formurl'] . '"</script>';
+				// Perform redirect
+				return [
+					'result'   => 'success',
+					'redirect' => $payment_request['formurl'],
+				];
 			}
 		}
 	}
@@ -334,7 +309,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 
 				$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
-				echo '<p>' . __( 'You are now going to be redirected to AltaPay Payment Gateway', 'altapay' ) . '</p>';
 
 				return $requestParams;
 			}

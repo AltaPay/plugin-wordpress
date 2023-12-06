@@ -16,8 +16,8 @@ class Order {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click()
-        cy.get('.woocommerce-message > .button').click()
-        cy.get('.checkout-button').click()
+        cy.get('.wc-block-components-notice-banner__content > .button').click().wait(3000)
+        cy.contains('Proceed to Checkout').click().wait(3000)
 
     }
 
@@ -40,8 +40,8 @@ class Order {
         cy.get('#billing_email').clear().type('customer@email.dk')
         cy.get('#place_order').click()
         cy.get('[id=creditCardNumberInput]').type('4111111111111111')
-        cy.get('#emonth').type('01')
-        cy.get('#eyear').type('2023')
+        cy.get('#emonth').select('12')
+        cy.get('#eyear').select('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(2000)

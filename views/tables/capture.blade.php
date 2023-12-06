@@ -118,7 +118,7 @@
 
         <tr class="ap-orderlines-capture">
             @php
-                $capturableQty = $items_captured[$shipping_id] == 1 ? 0 : 1;
+                $capturableQty = ( isset( $items_captured[$shipping_id] ) && $items_captured[$shipping_id]  == 1 ) ? 0 : 1;
             @endphp
             <td style="display:none">
                 <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID"
