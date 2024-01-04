@@ -27,7 +27,6 @@ class UtilMethods {
 		$orderlineDetails         = array();
 		$itemsToCapture           = array();
 		$couponDiscountPercentage = 0; // set initial coupon discount to 0
-		$taxConfiguration         = $this->getTaxConfiguration(); // get CMS tax configuration settings
 		$cartItems                = $order->get_items(); // get cart items
 
 		// If capture request is triggered
@@ -44,24 +43,25 @@ class UtilMethods {
 		if ( ! $cartItems ) {
 			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
-		// generate Orderlines product by product
-		foreach ( $cartItems as $orderlineKey => $orderline ) {
-			$appliedCouponItems = $order->get_items( 'coupon' ); // get items with coupon discount
-			if ( $appliedCouponItems ) {
-				$couponDiscountPercentage = $this->getCouponDiscount( $appliedCouponItems, $orderline );
-			}
-			$product = wc_get_product( $orderline['product_id'] );
-			// get product details for each orderline
-			$productDetails = $this->getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage, $isSubscription );
-			if ( $product && 'bundle' === $product->get_type() && $productDetails['product']['unitPrice'] == 0 ) {
+		// generate order lines product by product
+		foreach ( $cartItems as $key => $item ) {
+
+			if ( $item->get_total() == 0 ) {
 				continue;
 			}
 
+			$appliedCouponItems = $order->get_items( 'coupon' ); // get items with coupon discount
+			if ( $appliedCouponItems ) {
+				$couponDiscountPercentage = $this->getCouponDiscount( $appliedCouponItems, $item );
+			}
+			// get product details for each order line
+			$productDetails = $this->getProductDetails( $item, $couponDiscountPercentage, $isSubscription );
+
 			if ( $wcRefund ) {
-				$orderlineDetails[ $orderlineKey ] = array(
-					'qty'          => $products['itemQty'][ $orderlineKey ],
-					'refund_total' => ( $orderline['line_total'] / $orderline->get_quantity() ) * $products['itemQty'][ $orderlineKey ],
-					'refund_tax'   => ( $orderline->get_total_tax() / $orderline->get_quantity() ) * $products['itemQty'][ $orderlineKey ],
+				$orderlineDetails[ $key ] = array(
+					'qty'          => $products['itemQty'][ $key ],
+					'refund_total' => ( $item['line_total'] / $item->get_quantity() ) * $products['itemQty'][ $key ],
+					'refund_tax'   => ( $item->get_total_tax() / $item->get_quantity() ) * $products['itemQty'][ $key ],
 				);
 			} else {
 				$orderlineDetails[] = $productDetails['product'];
@@ -86,18 +86,6 @@ class UtilMethods {
 		}
 
 		return $orderlineDetails;
-	}
-
-	/**
-	 * Returns the current tax configuration settings from WooCommerce settings
-	 *
-	 * @return string  list of order lines
-	 */
-	private function getTaxConfiguration() {
-		if ( wc_prices_include_tax() ) {
-			return 'taxIncluded';
-		}
-		return 'taxExcluded';
 	}
 
 	/**
@@ -152,25 +140,19 @@ class UtilMethods {
 	 * Returns product Details based on product type and tax configuration settings
 	 *
 	 * @param object[] $orderline
-	 * @param string   $taxConfiguration
 	 * @param float    $couponDiscountPercentage
 	 * @return array
 	 */
-	private function getProductDetails( $orderline, $taxConfiguration, $couponDiscountPercentage, $isSubscription = false ) {
+	private function getProductDetails( $orderline, $couponDiscountPercentage, $isSubscription = false ) {
 		$discountPercentage  = 0; // set discount Percent to 0 by default
 		$productCartId       = $orderline->get_id(); // product Cart ID number
 		$singleProduct       = wc_get_product( $orderline['product_id'] ); // Details of each product
 		$productQuantity     = $orderline['qty']; // get ordered number of quantity for each orderline
 		$productRegularPrice = $singleProduct->get_regular_price();
 		$productSalePrice    = $singleProduct->get_sale_price();
-		$unitCode            = 'unit';
 
-		if ( $productQuantity > 1 ) {
-			$unitCode = 'units';
-		}
-
-		// Get and set tax rate using orderline
-		$orderlineTax = array_sum( $orderline['taxes']['total'] ) / $orderline['subtotal'];
+		// Get and set tax rate using order line
+		$orderlineTax = $orderline['subtotal'] > 0 ? array_sum( $orderline['taxes']['total'] ) / $orderline['subtotal'] : 0;
 		$taxRate      = $orderlineTax;
 
 		// Calculate total generated from WooCommerce after calculations
@@ -191,47 +173,38 @@ class UtilMethods {
 			$productSalePrice    = $variablePrices['sale_price'][ $variationID ]; // get regular price from variation prices array
 		}
 
-		// calculate discount if catalogue rule is applied on orderline i.e. product sale price is set
+		// calculate discount if catalogue rule is applied on order line i.e. product sale price is set
 		if ( $singleProduct->is_on_sale() ) {
 			$productDiscountAmount = $productRegularPrice - $productSalePrice; // calculate discount amount
 			// convert discount amount into percentage
 			$discountPercentage = round( ( $productDiscountAmount / $productRegularPrice ) * 100, 2 );
 		}
 
-		$taxAmount    = 0;
-		$productPrice = 0;
-
-		// conditional switch for calculations based on discount and tax configuration settings
-		switch ( array( $singleProduct->is_on_sale(), $taxConfiguration, $couponDiscountPercentage ) ) {
-			// calculate product price if discount is applied either catalogue or cart with tax included configurations
-			case ( array( $singleProduct->is_on_sale(), 'taxIncluded', $couponDiscountPercentage ) ):
-				$taxRate = 1 + $orderlineTax;
-				if ( $couponDiscountPercentage > 0 ) {
-					$discountPercentage = $couponDiscountPercentage;
-					$totalCMS           = $orderline['total'] + $orderline['total_tax'];
-				}
-				$productPrice = round( $productRegularPrice / $taxRate, 2 );
-				$taxAmount    = $productRegularPrice - $productPrice;
-				break;
-			// calculate product price if discount is applied either catalogue or cart with tax excluded configurations
-			case ( array( $singleProduct->is_on_sale(), 'taxExcluded', $couponDiscountPercentage ) ):
-				if ( $couponDiscountPercentage > 0 ) {
-					$discountPercentage = $couponDiscountPercentage;
-					$taxRate            = array_sum( $orderline['taxes']['subtotal'] ) / $orderline['subtotal'];
-					$totalCMS           = $orderline['total'] + $orderline['total_tax'];
-				}
-				$productPrice = $productRegularPrice;
-				$taxAmount    = $productPrice * $taxRate;
-				break;
+		if ( wc_prices_include_tax() ) {
+			$taxRate = 1 + $orderlineTax;
+			if ( $couponDiscountPercentage > 0 ) {
+				$discountPercentage = $couponDiscountPercentage;
+				$totalCMS           = $orderline['total'] + $orderline['total_tax'];
+			}
+			$productPrice = round( $productRegularPrice / $taxRate, 2 );
+			$taxAmount    = $productRegularPrice - $productPrice;
+		} else {
+			if ( $couponDiscountPercentage > 0 ) {
+				$discountPercentage = $couponDiscountPercentage;
+				$taxRate            = array_sum( $orderline['taxes']['subtotal'] ) / $orderline['subtotal'];
+				$totalCMS           = $orderline['total'] + $orderline['total_tax'];
+			}
+			$productPrice = $productRegularPrice;
+			$taxAmount    = $productPrice * $taxRate;
 		}
 
-		// calculate total generated from orderlines generated after calculation
+		// calculate total generated from order lines generated after calculation
 		$totalOrderlines = ( ( $productPrice + $taxAmount ) - ( ( $productPrice + $taxAmount ) * ( $discountPercentage / 100 ) ) ) * $productQuantity;
 		// calculate compensation amount between total generated from woocommerce and total generated from orderlines
 		$compensationAmount = $totalCMS - $totalOrderlines;
-		// generate compensation amount orderline using product id and amount
+		// generate compensation amount order line using product id and amount
 		$compensationOrderline = $this->compensationAmountOrderline( $productId, $compensationAmount );
-		// generate linedate with all the calculated parameters
+		// generate line date with all the calculated parameters
 		$orderLine = new OrderLine(
 			$orderline['name'],
 			$productId,
@@ -241,15 +214,15 @@ class UtilMethods {
 
 		$orderLine->discount   = round( $discountPercentage, 2 );
 		$orderLine->taxAmount  = round( $taxAmount * $productQuantity, 2 );
-		$orderLine->taxPercent = round( ( $taxAmount / $productPrice ) * 100, 2 );
+		$orderLine->taxPercent = $productPrice > 0 ? round( ( $taxAmount / $productPrice ) * 100, 2 ) : 0;
 		$orderLine->productUrl = get_permalink( $singleProduct->get_id() );
 		$orderLine->imageUrl   = wp_get_attachment_url( get_post_thumbnail_id( $singleProduct->get_id() ) );
-		$orderLine->unitCode   = $unitCode;
+		$orderLine->unitCode   = $productQuantity > 1 ? 'units' : 'unit';
 		$goodsType             = ( $isSubscription ) ? 'subscription_model' : 'item';
 		$orderLine->setGoodsType( $goodsType );
 		$lineData[] = $orderLine;
 
-		// return array with product and compensation linedata
+		// return array with product and compensation line data
 		return array(
 			'product'      => reset( $lineData ),
 			'compensation' => reset( $compensationOrderline ),

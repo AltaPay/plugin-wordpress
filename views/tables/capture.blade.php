@@ -30,6 +30,9 @@
     @endphp
     @foreach($order->get_items() as $itemData)
 
+        @if($itemData->get_total() == 0)
+            @continue;
+        @endif
         @php
             $productID = $itemData->get_id();
             $product = wc_get_product($itemData['product_id']);
