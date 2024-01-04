@@ -139,24 +139,24 @@ class UtilMethods {
 	/**
 	 * Returns product Details based on product type and tax configuration settings
 	 *
-	 * @param object[] $orderline
+	 * @param object[] $item
 	 * @param float    $couponDiscountPercentage
 	 * @return array
 	 */
-	private function getProductDetails( $orderline, $couponDiscountPercentage, $isSubscription = false ) {
+	private function getProductDetails( $item, $couponDiscountPercentage, $isSubscription = false ) {
 		$discountPercentage  = 0; // set discount Percent to 0 by default
-		$productCartId       = $orderline->get_id(); // product Cart ID number
-		$singleProduct       = wc_get_product( $orderline['product_id'] ); // Details of each product
-		$productQuantity     = $orderline['qty']; // get ordered number of quantity for each orderline
+		$productCartId       = $item->get_id(); // product Cart ID number
+		$singleProduct       = wc_get_product( $item['product_id'] ); // Details of each product
+		$productQuantity     = $item['qty']; // get ordered number of quantity for each orderline
 		$productRegularPrice = $singleProduct->get_regular_price();
 		$productSalePrice    = $singleProduct->get_sale_price();
 
 		// Get and set tax rate using order line
-		$orderlineTax = $orderline['subtotal'] > 0 ? array_sum( $orderline['taxes']['total'] ) / $orderline['subtotal'] : 0;
+		$orderlineTax = $item['subtotal'] > 0 ? array_sum( $item['taxes']['subtotal'] ) / $item['subtotal'] : 0;
 		$taxRate      = $orderlineTax;
 
-		// Calculate total generated from WooCommerce after calculations
-		$totalCMS = round( $orderline['subtotal'] + $orderline['subtotal_tax'], 2 );
+		// CMS total
+		$totalCMS = $item->get_total() + $item->get_total_tax();
 
 		// set product ID based on the sku provided
 		if ( $singleProduct->get_sku() ) {
@@ -168,7 +168,7 @@ class UtilMethods {
 		// get and set product details in case of variable product
 		if ( $singleProduct->get_type() === 'variable' ) {
 			$variablePrices      = $singleProduct->get_variation_prices(); // get all the variation prices i.e regular and sale
-			$variationID         = $orderline['variation_id']; // get variation id of ordered orderline
+			$variationID         = $item['variation_id']; // get variation id of ordered orderline
 			$productRegularPrice = $variablePrices['regular_price'][ $variationID ]; // get regular price from variation prices array
 			$productSalePrice    = $variablePrices['sale_price'][ $variationID ]; // get regular price from variation prices array
 		}
@@ -180,20 +180,15 @@ class UtilMethods {
 			$discountPercentage = round( ( $productDiscountAmount / $productRegularPrice ) * 100, 2 );
 		}
 
+		if ( $couponDiscountPercentage > 0 ) {
+			$discountPercentage = $couponDiscountPercentage;
+		}
+
 		if ( wc_prices_include_tax() ) {
-			$taxRate = 1 + $orderlineTax;
-			if ( $couponDiscountPercentage > 0 ) {
-				$discountPercentage = $couponDiscountPercentage;
-				$totalCMS           = $orderline['total'] + $orderline['total_tax'];
-			}
+			$taxRate      = 1 + $orderlineTax;
 			$productPrice = round( $productRegularPrice / $taxRate, 2 );
 			$taxAmount    = $productRegularPrice - $productPrice;
 		} else {
-			if ( $couponDiscountPercentage > 0 ) {
-				$discountPercentage = $couponDiscountPercentage;
-				$taxRate            = array_sum( $orderline['taxes']['subtotal'] ) / $orderline['subtotal'];
-				$totalCMS           = $orderline['total'] + $orderline['total_tax'];
-			}
 			$productPrice = $productRegularPrice;
 			$taxAmount    = $productPrice * $taxRate;
 		}
@@ -206,7 +201,7 @@ class UtilMethods {
 		$compensationOrderline = $this->compensationAmountOrderline( $productId, $compensationAmount );
 		// generate line date with all the calculated parameters
 		$orderLine = new OrderLine(
-			$orderline['name'],
+			$item['name'],
 			$productId,
 			$productQuantity,
 			round( $productPrice, 2 )
