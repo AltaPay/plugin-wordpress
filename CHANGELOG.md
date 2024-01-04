@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.4]
+- Add support for WooCommerce Composite Products
+- Add support for WooCommerce Product Bundles
+
 ## [3.5.3]
 - Fix: Duplicate transactions sent to the gateway with the WPML plugin.
 - Fix: Order not releasing on "canceled" status change.

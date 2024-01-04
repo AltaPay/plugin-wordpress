@@ -272,14 +272,14 @@ In order to reconcile payments please follow the steps below:
 ## Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.4.1
-- WooCommerce min. 3.9.0 – max. 8.3.1
+- WordPress min. 5.0 – max. 6.4.2
+- WooCommerce min. 3.9.0 – max. 8.4.0
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.4.1, WooCommerce 8.3.1 and PHP 8.1
+- WordPress 6.4.2, WooCommerce 8.4.0 and PHP 8.1
 
 
 ## Troubleshooting
