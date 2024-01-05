@@ -28,9 +28,9 @@ jobs:
      
      - name: Install woocommerce plugin
        run: |
-         wget https://github.com/woocommerce/woocommerce/releases/latest/download/woocommerce.zip
-         unzip woocommerce.zip 
-         rm woocommerce.zip
+         wget https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip
+         unzip woocommerce.latest-stable.zip 
+         rm woocommerce.latest-stable.zip
        working-directory: wordpress/wp-content/plugins
 
      - name: Install woocommerce-subscriptions plugin
