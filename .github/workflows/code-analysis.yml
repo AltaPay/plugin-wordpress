@@ -28,7 +28,7 @@ jobs:
      
      - name: Install woocommerce plugin
        run: |
-         curl -O https://github.com/woocommerce/woocommerce/releases/latest/download/woocommerce.zip
+         wget https://github.com/woocommerce/woocommerce/releases/latest/download/woocommerce.zip
          unzip woocommerce.zip 
          rm woocommerce.zip
        working-directory: wordpress/wp-content/plugins
