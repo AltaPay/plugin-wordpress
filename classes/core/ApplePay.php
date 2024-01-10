@@ -33,6 +33,7 @@ class ApplePay {
 		add_action( 'wp_ajax_nopriv_card_wallet_authorize', array( $this, 'applepay_card_wallet_authorize' ) );
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'filter_apple_pay_for_non_safari_browser' ), 10, 2 );
 		add_filter( 'woocommerce_after_checkout_form', array( $this, 'applepay_woocommerce_after_checkout_form' ) );
+		add_filter( 'woocommerce_payment_successful_result', array( $this, 'func_woocommerce_payment_successful_result' ), 10, 2 );
 	}
 
 	/**
@@ -243,5 +244,20 @@ class ApplePay {
 			var altapay_applepay_obj = <?php echo json_encode($applepay_obj); ?>;
 		</script>
 		<?php
+	}
+
+	/**
+	 * Return Order total to be used for Apple Pay js
+	 * 
+	 * @param int $order_id
+	 * @param array $result
+	 * @return void
+	 */
+	public function func_woocommerce_payment_successful_result($result, $order_id) {
+		
+		$order = wc_get_order( $order_id );
+		$result['order_total'] = $order->get_total();
+
+		return $result;
 	}
 }
