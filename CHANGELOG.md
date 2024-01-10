@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.5]
+- Fix: Apple Pay payment mismatch issue with multi-shipping case.
+
 ## [3.5.4]
 - Add support for WooCommerce Composite Products
 - Add support for WooCommerce Product Bundles
