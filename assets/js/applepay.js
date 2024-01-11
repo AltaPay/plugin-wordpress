@@ -53,6 +53,9 @@ jQuery(function ($) {
 
 					try {
 						if ( 'success' === result.result && $form.triggerHandler( 'checkout_place_order_success', [ result, wc_checkout_form ] ) !== false ) {
+							if(result.order_total){
+								altapay_applepay_obj.subtotal = result.order_total;
+							}
 							onApplePayButtonClicked( altapay_applepay_obj, false, wc_checkout_form, result.order_id );
 						} else if ( 'failure' === result.result ) {
 							console.log( 'failure' );

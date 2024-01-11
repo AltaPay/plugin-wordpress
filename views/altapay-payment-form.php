@@ -503,6 +503,11 @@ input#giftcard_account_identifier {
 		}
 	}
 <?php } ?>
+
+/* Hide 'Show Klarna Page' button if hidden attribute exists */
+input#showKlarnaPage[hidden] {
+	display: none;
+}
 </style>
 <main id="main" class="site-main woocommerce-page altapay_page_main" role="main">
 	<div class="container">
