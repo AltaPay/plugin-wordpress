@@ -1,10 +1,11 @@
 parameters:
     paths:
         - %currentWorkingDirectory%/
-    excludes_analyse:
+    excludePaths:
         - %currentWorkingDirectory%/vendor/
         - %currentWorkingDirectory%/assets/
 #        - %currentWorkingDirectory%/tests/
+        - %currentWorkingDirectory%/scoper.inc.php
     scanDirectories:
         - ../woocommerce/
         - ../../../wp-includes/
