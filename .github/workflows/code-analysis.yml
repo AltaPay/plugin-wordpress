@@ -52,7 +52,7 @@ jobs:
        run: |
          composer install --no-interaction
          composer prefix-dependencies
-         vendor/bin/phpstan analyze
+         php ./vendor/bin/phpstan analyze
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
      
      - name: Install PHP 7.4
