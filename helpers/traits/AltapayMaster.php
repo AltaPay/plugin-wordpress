@@ -9,15 +9,15 @@
 
 namespace Altapay\Helpers\Traits;
 
-use Altapay\Api\Payments\RefundCapturedReservation;
-use Altapay\Api\Payments\ReleaseReservation;
+use AltaPayVendor\Altapay\Api\Payments\RefundCapturedReservation;
+use AltaPayVendor\Altapay\Api\Payments\ReleaseReservation;
 use Exception;
 use WC_Order;
 use WP_Error;
-use Altapay\Authentication;
-use Altapay\Api\Test\TestAuthentication;
-use GuzzleHttp\Exception\ClientException;
-use Altapay\Api\Subscription\ChargeSubscription;
+use AltaPayVendor\Altapay\Authentication;
+use AltaPayVendor\Altapay\Api\Test\TestAuthentication;
+use AltaPayVendor\GuzzleHttp\Exception\ClientException;
+use AltaPayVendor\Altapay\Api\Subscription\ChargeSubscription;
 use Altapay\Classes\Core;
 
 trait AltapayMaster {

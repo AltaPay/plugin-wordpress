@@ -1,9 +1,9 @@
 <?php
 
-use Altapay\Api\Others\Terminals;
-use Altapay\Api\Test\TestAuthentication;
-use GuzzleHttp\Exception\ClientException;
-use Altapay\Authentication;
+use AltaPayVendor\Altapay\Api\Others\Terminals;
+use AltaPayVendor\Altapay\Api\Test\TestAuthentication;
+use AltaPayVendor\GuzzleHttp\Exception\ClientException;
+use AltaPayVendor\Altapay\Authentication;
 
 define('WP_USE_THEMES', false);
 require('./wp-load.php');

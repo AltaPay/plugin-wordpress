@@ -11,7 +11,7 @@ namespace Altapay\Classes\Util;
 
 use WC_Coupon;
 use WP_Error;
-use Altapay\Request\OrderLine;
+use AltaPayVendor\Altapay\Request\OrderLine;
 
 class UtilMethods {
 

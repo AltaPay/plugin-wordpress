@@ -24,7 +24,8 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "altapay/api-php":"^3.0",
-        "eftec/bladeone":"^4.4"
+        "eftec/bladeone":"^4.4",
+        "humbug/php-scoper": "0.17.5"
     },
     "require-dev": {
         "phpstan/extension-installer": "^1.0",

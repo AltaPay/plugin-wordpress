@@ -16,13 +16,13 @@
 use Altapay\Classes\Core;
 use Altapay\Classes\Util;
 use Altapay\Helpers;
-use Altapay\Api\Payments\CaptureReservation;
-use Altapay\Exceptions\ResponseHeaderException;
-use Altapay\Api\Payments\RefundCapturedReservation;
-use Altapay\Api\Payments\ReleaseReservation;
-use Altapay\Response\ReleaseReservationResponse;
-use Altapay\Api\Others\Payments;
-use Altapay\Api\Subscription\ChargeSubscription;
+use AltaPayVendor\Altapay\Api\Payments\CaptureReservation;
+use AltaPayVendor\Altapay\Exceptions\ResponseHeaderException;
+use AltaPayVendor\Altapay\Api\Payments\RefundCapturedReservation;
+use AltaPayVendor\Altapay\Api\Payments\ReleaseReservation;
+use AltaPayVendor\Altapay\Response\ReleaseReservationResponse;
+use AltaPayVendor\Altapay\Api\Others\Payments;
+use AltaPayVendor\Altapay\Api\Subscription\ChargeSubscription;
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
 if ( ! defined( 'ABSPATH' ) ) {
