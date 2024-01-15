@@ -43,6 +43,7 @@
             "vendor/bin/php-scoper add-prefix",
             "rm -rf vendor",
             "mv build/vendor vendor",
+            "rm -rf build",
             "composer dump-autoload --working-dir ./"
         ]
     }
