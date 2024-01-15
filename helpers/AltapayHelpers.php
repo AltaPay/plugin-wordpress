@@ -10,7 +10,7 @@
 namespace Altapay\Helpers;
 
 use DateTime;
-use eftec\bladeone;
+use AltaPayVendor\eftec\bladeone;
 use WP_Error;
 
 class AltapayHelpers {
