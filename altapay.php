@@ -475,7 +475,7 @@ function createAltapayPaymentPageCallback() {
 /**
  * Method for handling capture action and call back
  *
- * @return WP_Error
+ * @return void
  */
 function altapayCaptureCallback() {
 	$utilMethods  = new Util\UtilMethods();
