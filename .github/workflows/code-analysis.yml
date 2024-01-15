@@ -51,6 +51,7 @@ jobs:
      - name: Install and run PhpStan
        run: |
          composer install --no-interaction
+         composer prefix-dependencies
          vendor/bin/phpstan analyze
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
      
