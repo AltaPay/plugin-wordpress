@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
 
-if ( ! $order_id ) {
+if ( $order_id ) {
 	$order         = wc_get_order( $order_id );
 	$wpml_language = $order->get_meta( 'wpml_language' );
 	if ( ! empty( $wpml_language ) ) {
