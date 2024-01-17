@@ -16,10 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
-
-if ( $order_id ) {
-	$order         = wc_get_order( $order_id );
+$order_id      = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
+$order         = wc_get_order( $order_id );
+if ( $order ) {
 	$wpml_language = $order->get_meta( 'wpml_language' );
 	if ( ! empty( $wpml_language ) ) {
 		global $sitepress;

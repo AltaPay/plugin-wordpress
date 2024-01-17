@@ -41,7 +41,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.5.6 =
 * Isolate vendor dependencies to resolve conflicts with other plugins.
-* Fix: Check if the order exists before loading the order object on the payment page.
+* Fix: Error on the payment page due to an invalid order.
 
 = 3.5.5 =
 * Fix: Apple Pay payment mismatch issue with multi-shipping case.
