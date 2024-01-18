@@ -10,14 +10,14 @@
 use Altapay\Helpers\Traits\AltapayMaster;
 use Altapay\Classes\Util;
 use Altapay\Helpers;
-use AltaPayVendor\Altapay\Api\Ecommerce\PaymentRequest;
-use AltaPayVendor\Altapay\Request\Address;
-use AltaPayVendor\Altapay\Request\Customer;
-use AltaPayVendor\Altapay\Request\Config;
-use AltaPayVendor\Altapay\Exceptions\ClientException;
-use AltaPayVendor\Altapay\Exceptions\ResponseHeaderException;
-use AltaPayVendor\Altapay\Exceptions\ResponseMessageException;
-use AltaPayVendor\Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Request\Address;
+use Altapay\Request\Customer;
+use Altapay\Request\Config;
+use Altapay\Exceptions\ClientException;
+use Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Exceptions\ResponseMessageException;
+use Altapay\Api\Payments\CaptureReservation;
 
 class WC_Gateway_Altapay_Test_Terminal extends WC_Payment_Gateway {
 

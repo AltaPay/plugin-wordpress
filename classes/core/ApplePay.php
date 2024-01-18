@@ -9,8 +9,8 @@
 
 namespace Altapay\Classes\Core;
 
-use AltaPayVendor\Altapay\Api\Payments\CardWalletSession;
-use AltaPayVendor\Altapay\Api\Payments\CardWalletAuthorize;
+use Altapay\Api\Payments\CardWalletSession;
+use Altapay\Api\Payments\CardWalletAuthorize;
 use Altapay\Helpers\Traits\AltapayMaster;
 use Altapay\Helpers;
 use Altapay\Classes\Util;

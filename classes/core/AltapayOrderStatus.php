@@ -11,10 +11,10 @@ namespace Altapay\Classes\Core;
 
 use WP_Error;
 use Altapay\Classes\Core;
-use AltaPayVendor\Altapay\Api\Others\Payments;
-use AltaPayVendor\Altapay\Api\Payments\CaptureReservation;
-use AltaPayVendor\Altapay\Api\Payments\ReleaseReservation;
-use AltaPayVendor\Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Api\Others\Payments;
+use Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Payments\ReleaseReservation;
+use Altapay\Exceptions\ResponseHeaderException;
 use Exception;
 
 class AltapayOrderStatus {

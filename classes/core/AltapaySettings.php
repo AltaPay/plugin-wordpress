@@ -11,9 +11,9 @@ namespace Altapay\Classes\Core;
 
 use Altapay\Helpers;
 use Altapay\Helpers\Traits\AltapayMaster;
-use AltaPayVendor\Altapay\Api\Others\Terminals;
-use AltaPayVendor\Altapay\Api\Others\Payments;
-use AltaPayVendor\Altapay\Api\Payments\CaptureReservation;
+use Altapay\Api\Others\Terminals;
+use Altapay\Api\Others\Payments;
+use Altapay\Api\Payments\CaptureReservation;
 use Exception;
 use AltaPayVendor\GuzzleHttp\Exception\ClientException;
 use WC_Order;
