@@ -16,7 +16,7 @@ use WC_Order;
 use WP_Error;
 use Altapay\Authentication;
 use Altapay\Api\Test\TestAuthentication;
-use GuzzleHttp\Exception\ClientException;
+use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use Altapay\Api\Subscription\ChargeSubscription;
 use Altapay\Classes\Core;
 

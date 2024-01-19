@@ -49,6 +49,8 @@ If you wish to build your own copy, follow below steps:
 - Install all the necessary dependencies.
         
         composer install --no-dev
+        composer prefix-dependencies
+
 - Finally, Activate the plugin from the plugins page.
 
 ## How to run cypress tests

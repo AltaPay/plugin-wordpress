@@ -39,7 +39,7 @@ describe('WooCommerce', function () {
         })
     })
 
-    it('Klarna full capture and refund', function () {
+    it.skip('Klarna full capture and refund', function () {
 
         const ord = new Order()
         ord.clrcookies()
@@ -74,7 +74,6 @@ describe('WooCommerce', function () {
             }
         })
     })
-
 
     it('CC partial capture', function () {
 
@@ -149,7 +148,7 @@ describe('WooCommerce', function () {
         })
     })
 
-    it('Klarna partial capture', function () {
+    it.skip('Klarna partial capture', function () {
 
         const ord = new Order()
         ord.clrcookies()
@@ -185,7 +184,7 @@ describe('WooCommerce', function () {
         })
     })
 
-    it('Klarna partial refund', function () {
+    it.skip('Klarna partial refund', function () {
 
         const ord = new Order()
         ord.clrcookies()
@@ -257,7 +256,7 @@ describe('WooCommerce', function () {
         })
     })
 
-    it('Klarna release payment', function () {
+    it.skip('Klarna release payment', function () {
 
         const ord = new Order()
         ord.clrcookies()

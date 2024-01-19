@@ -51,7 +51,8 @@ jobs:
      - name: Install and run PhpStan
        run: |
          composer install --no-interaction
-         vendor/bin/phpstan analyze
+         composer prefix-dependencies
+         php ./vendor/bin/phpstan analyze
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
      
      - name: Install PHP 7.4

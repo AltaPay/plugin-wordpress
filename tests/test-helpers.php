@@ -1,6 +1,6 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+use AltaPay\vendor\PHPUnit\Framework\TestCase;
 use Altapay\Helpers;
 
 class AltapayHelpersTest extends TestCase {

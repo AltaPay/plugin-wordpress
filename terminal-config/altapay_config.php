@@ -2,7 +2,7 @@
 
 use Altapay\Api\Others\Terminals;
 use Altapay\Api\Test\TestAuthentication;
-use GuzzleHttp\Exception\ClientException;
+use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use Altapay\Authentication;
 
 define('WP_USE_THEMES', false);

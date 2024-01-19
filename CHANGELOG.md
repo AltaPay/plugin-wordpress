@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.6]
+- Isolate vendor dependencies to resolve conflicts with other plugins.
+- Fix: Error on the payment page due to an invalid order.
+
 ## [3.5.5]
 - Fix: Apple Pay payment mismatch issue with multi-shipping case.
 

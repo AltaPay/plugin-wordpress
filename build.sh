@@ -49,9 +49,12 @@ else
 fi
 
 mkdir -p dist
-rm -rf vendor
+rm -rf vendor build
 php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
-zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh README.md CHANGELOG.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
+yes | php$1 vendor/bin/php-scoper add-prefix
+rsync -a build/vendor/* vendor/ && rm -rf build/
+php$1 $(command -v composer) dump-autoload --working-dir ./ --classmap-authoritative
+zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh scoper.inc.php README.md CHANGELOG.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
 
 if [ -f composer.lock.backup ]; then
     rm -rf composer.lock

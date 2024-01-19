@@ -15,7 +15,7 @@ use Altapay\Api\Others\Terminals;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Payments\CaptureReservation;
 use Exception;
-use GuzzleHttp\Exception\ClientException;
+use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use WC_Order;
 use Altapay\Classes\Core;
 
