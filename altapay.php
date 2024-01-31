@@ -24,6 +24,7 @@ use Altapay\Response\ReleaseReservationResponse;
 use Altapay\Api\Others\Payments;
 use Altapay\Api\Subscription\ChargeSubscription;
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -56,10 +57,6 @@ function init_altapay_settings() {
 	}
 
 	$settings = new Core\AltapaySettings();
-	// Add Gateway to WooCommerce if enabled
-	if ( json_decode( get_option( 'altapay_terminals_enabled' ) ) ) {
-		add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );
-	}
 
 	$objTokenControl = new Core\AltapayTokenControl();
 	$objTokenControl->registerHooks();
@@ -94,13 +91,21 @@ function init_altapay_settings() {
  * @return array<int, string>
  */
 function altapay_add_gateway( $methods ) {
+
+	// error_log('altapay_add_gateway');
+
+	// Get enabled terminals
+	$terminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
+
+	if ( empty( $terminals ) ) {
+		return $methods;
+	}
+
 	$pluginDir = plugin_dir_path( __FILE__ );
 	// Directory for the terminals
 	$terminalDir = $pluginDir . 'terminals/';
 	// Temp dir in case the one from above is not writable
 	$tmpDir = sys_get_temp_dir();
-	// Get enabled terminals
-	$terminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
 	// Load Terminal information
 	$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
 	if ( $terminals ) {
@@ -129,8 +134,37 @@ function altapay_add_gateway( $methods ) {
 			}
 
 			// Check if file exists
-			$terminal_class_file     = $terminalDir . $terminal . '.class.php';
-			$terminal_class_file_tmp = $tmpDir . '/' . $terminal . ALTAPAY_PLUGIN_VERSION . '.class.php';
+			$terminal_class_file        = $terminalDir . $terminal . '.class.php';
+			$terminal_class_file_blocks = $terminalDir . $terminal . '.blocks.class.php';
+			$terminal_js_file_blocks    = $terminalDir . strtolower( $terminal ) . '.blocks.js';
+			$terminal_class_file_tmp    = $tmpDir . '/' . $terminal . ALTAPAY_PLUGIN_VERSION . '.class.php';
+
+			if ( ! file_exists( $terminal_class_file_blocks ) ) {
+				// Create file
+				$template = file_get_contents( $pluginDir . 'views/paymentClassBlocks.tpl' );
+				// Replace patterns
+				$content = str_replace( array( '{key}', '{terminal_id}' ), array( $terminal, strtolower( $terminal ) ), $template );
+
+				$ok = @\file_put_contents( $terminal_class_file_blocks, $content );
+
+				if ( $ok === \false ) {
+					set_transient( 'terminals_directory_error', 'show' );
+				}
+			}
+
+			if ( ! file_exists( $terminal_class_file_blocks ) ) {
+
+				// Create file
+				$template = file_get_contents( $pluginDir . 'views/blocksJs.tpl' );
+				// Replace patterns
+				$content = str_replace( array( '{key}', '{name}', '{terminal_id}' ), array( $terminal, $terminalName, strtolower( $terminal ) ), $template );
+
+				$ok = @\file_put_contents( $terminal_js_file_blocks, $content );
+
+				if ( $ok === \false ) {
+					set_transient( 'terminals_directory_error', 'show' );
+				}
+			}
 
 			if ( file_exists( $terminal_class_file ) ) {
 				require_once $terminal_class_file;
@@ -138,29 +172,28 @@ function altapay_add_gateway( $methods ) {
 			} elseif ( file_exists( $terminal_class_file_tmp ) ) {
 				require_once $terminal_class_file_tmp;
 				$methods[] = 'WC_Gateway_' . $terminal;
+				// Create file
+				$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
+				// Replace patterns
+				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
-				if ( is_writable( $terminalDir ) ) {
-					// Create file
-					$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
-					// Replace patterns
-					$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
-
-					file_put_contents( $terminal_class_file, $content );
-				} else {
+				$ok = @\file_put_contents( $terminal_class_file, $content );
+				if ( $ok === \false ) {
 					set_transient( 'terminals_directory_error', 'show' );
 				}
 			} else {
 				// Create file
 				$template = file_get_contents( $pluginDir . 'views/paymentClass.tpl' );
-				// Check if terminals folder is writable or use tmp as fallback
-				if ( ! is_writable( $terminalDir ) ) {
-					$terminal_class_file = $terminal_class_file_tmp;
-					set_transient( 'terminals_directory_error', 'show' );
-				}
 				// Replace patterns
 				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
-				file_put_contents( $terminal_class_file, $content );
+				$ok = @\file_put_contents( $terminal_class_file, $content );
+				// Check if terminals folder is writable or use tmp as fallback
+				if ( $ok === \false ) {
+					set_transient( 'terminals_directory_error', 'show' );
+				} else {
+					file_put_contents( $terminal_class_file_tmp, $content );
+				}
 			}
 		}
 	}
@@ -409,14 +442,6 @@ function altapayActionJavascript() {
 				'1.1.0',
 				true
 			);
-			wp_register_script(
-				'jQuery',
-				'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js',
-				array(),
-				'2.1.3',
-				true
-			);
-			wp_enqueue_script( 'jQuery' );
 			wp_enqueue_script(
 				'refundScript',
 				plugin_dir_url( __FILE__ ) . 'assets/js/refund.js',
@@ -971,6 +996,47 @@ add_action(
 	}
 );
 
+/**
+ * Registers WooCommerce Blocks integration.
+ */
+function woocommerce_gateway_altapay_woocommerce_block_support() {
+
+	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+		// Get enabled terminals
+		$terminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
+
+		if ( empty( $terminals ) ) {
+			return;
+		}
+
+		$pluginDir = plugin_dir_path( __FILE__ );
+		// Directory for the terminals
+		$terminalDir = $pluginDir . 'terminals/';
+		// Temp dir in case the one from above is not writable
+		$tmpDir = sys_get_temp_dir();
+		// Load Terminal information
+		$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
+		if ( $terminals ) {
+			foreach ( $terminals as $terminal ) {
+				$terminal_class_file_blocks = $terminalDir . $terminal . '.blocks.class.php';
+
+				if ( file_exists( $terminal_class_file_blocks ) ) {
+					require_once $terminal_class_file_blocks;
+					add_action(
+						'woocommerce_blocks_payment_method_type_registration',
+						function( PaymentMethodRegistry $payment_method_registry ) use ( $terminal ) {
+							$terminal_class_name = 'WC_Gateway_' . $terminal . '_Blocks_Support';
+							$payment_method_registry->register( new $terminal_class_name() );
+						}
+					);
+				}
+			}
+		}
+	}
+}
+
+add_action( 'woocommerce_blocks_loaded', 'woocommerce_gateway_altapay_woocommerce_block_support' );
+add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
 add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
 add_action( 'wp_ajax_altapay_capture', 'altapayCaptureCallback' );
