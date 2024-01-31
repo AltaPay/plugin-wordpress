@@ -54,9 +54,14 @@ class AltapayOrderStatus {
 		}
 
 		$auth = $settings->getAuth();
-		$api  = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
+		try {
+			$api = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
+		} catch ( Exception $e ) {
+			echo '<p><b>' . __( 'Could not fetch Payments from AltaPay!', 'altapay' ) . '</b></p>';
+			return;
+		}
 
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {

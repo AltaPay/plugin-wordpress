@@ -147,7 +147,7 @@ function altapay_add_gateway( $methods ) {
 
 					file_put_contents( $terminal_class_file, $content );
 				} else {
-					set_transient( 'terminals_directory_error', 'show' );
+					set_transient( 'terminals_directory_error', 'show', 30 );
 				}
 			} else {
 				// Create file
@@ -155,7 +155,7 @@ function altapay_add_gateway( $methods ) {
 				// Check if terminals folder is writable or use tmp as fallback
 				if ( ! is_writable( $terminalDir ) ) {
 					$terminal_class_file = $terminal_class_file_tmp;
-					set_transient( 'terminals_directory_error', 'show' );
+					set_transient( 'terminals_directory_error', 'show', 30 );
 				}
 				// Replace patterns
 				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
@@ -254,10 +254,14 @@ function altapay_meta_box( $post_or_order_object ) {
 		}
 
 		$auth = $settings->getAuth();
-		$api  = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
-
+		try {
+			$api = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
+		} catch ( Exception $e ) {
+			echo '<p><b>' . __( 'Could not fetch Payments from AltaPay!', 'altapay' ) . '</b></p>';
+			return;
+        }
 		$args     = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'altapay_captures',
@@ -822,10 +826,13 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 		$reserved = 0;
 		$captured = 0;
 		$refunded = 0;
-		$api      = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
-
+		try {
+			$api = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
+		} catch ( Exception $e ) {
+			return array( 'error' => 'Response exception ' . $e->getMessage() );
+	    }
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved += $pay->ReservedAmount;
@@ -887,12 +894,11 @@ function altapayReleasePayment() {
 	} elseif ( is_wp_error( $login ) ) {
 		wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
 	}
-
-	$auth = $settings->getAuth();
-	$api  = new Payments( $auth );
-	$api->setTransaction( $txnID );
-
 	try {
+        $auth = $settings->getAuth();
+        $api  = new Payments( $auth );
+        $api->setTransaction( $txnID );
+
 		$payments = $api->call();
 		foreach ( $payments as $pay ) {
 			$reserved += $pay->ReservedAmount;
