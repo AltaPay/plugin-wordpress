@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.5.6
+ * Version: 3.5.7
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 8.5.1
+ * WC tested up to: 8.5.2
  *
  * @package Altapay
  */
@@ -38,7 +38,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.5.6' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.5.7' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -254,10 +254,14 @@ function altapay_meta_box( $post_or_order_object ) {
 		}
 
 		$auth = $settings->getAuth();
-		$api  = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
-
+		try {
+			$api = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
+		} catch ( Exception $e ) {
+			echo '<p><b>' . __( 'Could not fetch Payments from AltaPay!', 'altapay' ) . '</b></p>';
+			return;
+		}
 		$args     = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'altapay_captures',
@@ -822,10 +826,13 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 		$reserved = 0;
 		$captured = 0;
 		$refunded = 0;
-		$api      = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
-
+		try {
+			$api = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
+		} catch ( Exception $e ) {
+			return array( 'error' => 'Response exception ' . $e->getMessage() );
+		}
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved += $pay->ReservedAmount;
@@ -887,12 +894,11 @@ function altapayReleasePayment() {
 	} elseif ( is_wp_error( $login ) ) {
 		wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
 	}
-
-	$auth = $settings->getAuth();
-	$api  = new Payments( $auth );
-	$api->setTransaction( $txnID );
-
 	try {
+		$auth = $settings->getAuth();
+		$api  = new Payments( $auth );
+		$api->setTransaction( $txnID );
+
 		$payments = $api->call();
 		foreach ( $payments as $pay ) {
 			$reserved += $pay->ReservedAmount;

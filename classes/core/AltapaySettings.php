@@ -50,7 +50,6 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function altapayOrderStatusCompleted( $orderID ) {
-		$this->startSession();
 		// Load order
 		$order = new WC_Order( $orderID );
 		$txnID = $order->get_transaction_id();
@@ -66,15 +65,21 @@ class AltapaySettings {
 			return;
 		}
 
-		$auth = $this->getAuth();
-		$api  = new Payments( $auth );
-		$api->setTransaction( $txnID );
-		$payments = $api->call();
+		try {
+			$auth = $this->getAuth();
+			$api  = new Payments( $auth );
+			$api->setTransaction( $txnID );
+			$payments = $api->call();
 
-		if ( ! $payments ) {
+			if ( ! $payments ) {
+				return;
+			}
+		} catch ( Exception $e ) {
+			$this->saveCaptureFailedMessage(
+				'Capture failed for order ' . $orderID . ': ' . $e->getMessage()
+			);
 			return;
 		}
-
 		$pay = $payments[0];
 		if ( $pay->CapturedAmount > 0 ) {
 			$this->saveCaptureWarning( 'This order was already fully or partially captured: ' . $orderID );
@@ -132,12 +137,12 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function saveCaptureFailedMessage( $newMessage ) {
-		$message = '';
-		if ( isset( $_SESSION['altapay_capture_failed'] ) ) {
-			$message = $_SESSION['altapay_capture_failed'] . '<br/>';
+		$message = get_transient( 'altapay_capture_failed' );
+		if ( $message ) {
+			$message .= '<br/>';
 		}
 
-		$_SESSION['altapay_capture_failed'] = $message . $newMessage;
+		set_transient( 'altapay_capture_failed', $message . $newMessage, 30 );
 	}
 
 	/**
@@ -145,12 +150,12 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function saveCaptureWarning( $newMessage ) {
-		$message = '';
-		if ( isset( $_SESSION['altapay_capture_warning'] ) ) {
-			$message = $_SESSION['altapay_capture_warning'] . '<br/>';
+		$message = get_transient( 'altapay_capture_warning' );
+		if ( $message ) {
+			$message .= '<br/>';
 		}
 
-		$_SESSION['altapay_capture_warning'] = $message . $newMessage;
+		set_transient( 'altapay_capture_warning', $message . $newMessage, 30 );
 	}
 
 	/**
@@ -169,15 +174,15 @@ class AltapaySettings {
 	 * @return void
 	 */
 	public function showUserMessage( $field, $type, $message = '' ) {
-		$this->startSession();
 
-		if ( ! isset( $_SESSION[ $field ] ) ) {
+		$msg = get_transient( $field );
+		if ( ! $msg ) {
 			return;
 		}
 
-		echo "<div class='$type notice'> <p>$message $_SESSION[$field]</p> </div>";
+		echo "<div class='$type notice'> <p>$message $msg</p> </div>";
 
-		unset( $_SESSION[ $field ] );
+		delete_transient( $field );
 	}
 
 	/**
@@ -540,7 +545,7 @@ class AltapaySettings {
 			add_option( 'altapay_terminals_enabled', $terminals );
 		}
 
-		$_SESSION['altapay_sync_terminals'] = 'Payment methods synchronized successfully!';
+		set_transient( 'altapay_sync_terminals', 'Payment methods synchronized successfully!', 30 );
 		wp_redirect( admin_url( 'admin.php?page=altapay-settings' ) );
 		exit;
 	}

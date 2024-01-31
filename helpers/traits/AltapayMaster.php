@@ -140,14 +140,14 @@ trait AltapayMaster {
 			$api      = new TestAuthentication( $this->getAuth() );
 			$response = $api->call();
 			if ( ! $response ) {
-				$_SESSION['altapay_login_error'] = 'Could not login to the Merchant API';
+				set_transient( 'altapay_login_error', 'Could not login to the Merchant API', 30 );
 				return false;
 			}
 		} catch ( ClientException $e ) {
-			$_SESSION['altapay_login_error'] = wp_kses_post( $e->getMessage() );
+			set_transient( 'altapay_login_error', wp_kses_post( $e->getMessage() ), 30 );
 			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		} catch ( Exception $e ) {
-			$_SESSION['altapay_login_error'] = wp_kses_post( $e->getMessage() );
+			set_transient( 'altapay_login_error', wp_kses_post( $e->getMessage() ), 30 );
 			return new WP_Error( 'error', 'Could not login to the Merchant API: ' . $e->getMessage() );
 		}
 
