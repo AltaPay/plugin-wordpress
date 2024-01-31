@@ -53,6 +53,8 @@ rm -rf vendor build
 php$1 $(command -v composer) $composer_command --no-dev -o --no-interaction
 yes | php$1 vendor/bin/php-scoper add-prefix
 rsync -a build/vendor/* vendor/ && rm -rf build/
+php$1 $(command -v composer) remove humbug/php-scoper
+php$1 $(command -v composer) remove phpstan/extension-installer phpunit/phpunit szepeviktor/phpstan-wordpress --dev
 php$1 $(command -v composer) dump-autoload --working-dir ./ --classmap-authoritative
 zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh scoper.inc.php README.md CHANGELOG.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
 
