@@ -62,7 +62,7 @@ class AltapaySettings {
 		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 
-			return;
+            return;
 		}
 
 		try {
