@@ -62,7 +62,7 @@ class AltapaySettings {
 		if ( ! $login || is_wp_error( $login ) ) {
 			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 
-            return;
+			return;
 		}
 
 		try {
@@ -78,7 +78,7 @@ class AltapaySettings {
 			$this->saveCaptureFailedMessage(
 				'Capture failed for order ' . $orderID . ': ' . $e->getMessage()
 			);
-            return;
+			return;
 		}
 		$pay = $payments[0];
 		if ( $pay->CapturedAmount > 0 ) {
