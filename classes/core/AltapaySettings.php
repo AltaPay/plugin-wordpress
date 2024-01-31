@@ -79,7 +79,7 @@ class AltapaySettings {
 				'Capture failed for order ' . $orderID . ': ' . $e->getMessage()
 			);
             return;
-        }
+		}
 		$pay = $payments[0];
 		if ( $pay->CapturedAmount > 0 ) {
 			$this->saveCaptureWarning( 'This order was already fully or partially captured: ' . $orderID );
@@ -142,7 +142,7 @@ class AltapaySettings {
 			$message .= '<br/>';
 		}
 
-        set_transient( 'altapay_capture_failed', $message . $newMessage, 30 );
+		set_transient( 'altapay_capture_failed', $message . $newMessage, 30 );
 	}
 
 	/**

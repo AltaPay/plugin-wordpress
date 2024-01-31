@@ -261,7 +261,7 @@ function altapay_meta_box( $post_or_order_object ) {
 		} catch ( Exception $e ) {
 			echo '<p><b>' . __( 'Could not fetch Payments from AltaPay!', 'altapay' ) . '</b></p>';
 			return;
-        }
+		}
 		$args     = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'altapay_captures',
@@ -832,7 +832,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			$payments = $api->call();
 		} catch ( Exception $e ) {
 			return array( 'error' => 'Response exception ' . $e->getMessage() );
-	    }
+		}
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved += $pay->ReservedAmount;
@@ -895,9 +895,9 @@ function altapayReleasePayment() {
 		wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
 	}
 	try {
-        $auth = $settings->getAuth();
-        $api  = new Payments( $auth );
-        $api->setTransaction( $txnID );
+		$auth = $settings->getAuth();
+		$api  = new Payments( $auth );
+		$api->setTransaction( $txnID );
 
 		$payments = $api->call();
 		foreach ( $payments as $pay ) {
