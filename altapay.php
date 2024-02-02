@@ -122,8 +122,8 @@ function altapay_add_gateway( $methods ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
-						 or ( in_array( 'MobilePayAcquirer', $gateway_methods ) or in_array( 'MobilePayOnlineAcquirer', $gateway_methods ) )
-						 or in_array( 'VippsAcquirer', $gateway_methods )
+						or ( in_array( 'MobilePayAcquirer', $gateway_methods ) or in_array( 'MobilePayOnlineAcquirer', $gateway_methods ) )
+						or in_array( 'VippsAcquirer', $gateway_methods )
 					) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
@@ -152,7 +152,7 @@ function altapay_add_gateway( $methods ) {
 				}
 			}
 
-			if ( ! file_exists( $terminal_class_file_blocks ) ) {
+			if ( ! file_exists( $terminal_js_file_blocks ) ) {
 
 				// Create file
 				$template = file_get_contents( $pluginDir . 'views/blocksJs.tpl' );
@@ -394,23 +394,23 @@ function altapay_order_reconciliation_identifier_meta_box( $post_or_order_object
 	if ( ! empty( $reconciliation_identifiers ) ) {
 		?>
 		<table width="100%" cellspacing="0" cellpadding="10">
-		   <thead>
-		   <tr>
-			   <th align="left" width="40%">Reconciliation Identifier</th>
-			   <th align="left" width="60%">Type</th>
-		   </tr>
-		   </thead>
+			<thead>
+			<tr>
+				<th align="left" width="40%">Reconciliation Identifier</th>
+				<th align="left" width="60%">Type</th>
+			</tr>
+			</thead>
 			<tbody>
-				<?php
-				foreach ( $reconciliation_identifiers  as $identifier ) {
-					?>
-						<tr>
-							<td><?php echo $identifier['identifier']; ?></td>
-							<td><?php echo $identifier['transactionType']; ?></td>
-						</tr>
-						<?php
-				}
+			<?php
+			foreach ( $reconciliation_identifiers  as $identifier ) {
 				?>
+				<tr>
+					<td><?php echo $identifier['identifier']; ?></td>
+					<td><?php echo $identifier['transactionType']; ?></td>
+				</tr>
+				<?php
+			}
+			?>
 			</tbody>
 		</table>
 		<?php
@@ -426,36 +426,36 @@ function altapayActionJavascript() {
 	$screen    = get_current_screen();
 	$screen_id = $screen ? $screen->id : '';
 
-		// Check if WooCommerce order
+	// Check if WooCommerce order
 	if ( $screen_id === wc_get_page_screen_id( 'shop-order' ) ) {
 		$order   = wc_get_order();
 		$post_id = ! empty( $order ) ? $order->get_id() : '';
 		?>
-			<script type="text/javascript">
-				let Globals = <?php echo wp_json_encode( array( 'postId' => $post_id ) ); ?>;
-			</script>
-			<?php
-			wp_enqueue_script(
-				'captureScript',
-				plugin_dir_url( __FILE__ ) . 'assets/js/capture.js',
-				array( 'jquery' ),
-				'1.1.0',
-				true
-			);
-			wp_enqueue_script(
-				'refundScript',
-				plugin_dir_url( __FILE__ ) . 'assets/js/refund.js',
-				array( 'jquery' ),
-				'1.1.0',
-				true
-			);
-			wp_enqueue_script(
-				'releaseScript',
-				plugin_dir_url( __FILE__ ) . 'assets/js/release.js',
-				array( 'jquery' ),
-				'1.1.0',
-				true
-			);
+		<script type="text/javascript">
+			let Globals = <?php echo wp_json_encode( array( 'postId' => $post_id ) ); ?>;
+		</script>
+		<?php
+		wp_enqueue_script(
+			'captureScript',
+			plugin_dir_url( __FILE__ ) . 'assets/js/capture.js',
+			array( 'jquery' ),
+			'1.1.0',
+			true
+		);
+		wp_enqueue_script(
+			'refundScript',
+			plugin_dir_url( __FILE__ ) . 'assets/js/refund.js',
+			array( 'jquery' ),
+			'1.1.0',
+			true
+		);
+		wp_enqueue_script(
+			'releaseScript',
+			plugin_dir_url( __FILE__ ) . 'assets/js/release.js',
+			array( 'jquery' ),
+			'1.1.0',
+			true
+		);
 	}
 }
 
@@ -999,7 +999,7 @@ add_action(
 /**
  * Registers WooCommerce Blocks integration.
  */
-function woocommerce_gateway_altapay_woocommerce_block_support() {
+function altapay_wc_checkout_block_support() {
 
 	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 		// Get enabled terminals
@@ -1009,33 +1009,24 @@ function woocommerce_gateway_altapay_woocommerce_block_support() {
 			return;
 		}
 
-		$pluginDir = plugin_dir_path( __FILE__ );
-		// Directory for the terminals
-		$terminalDir = $pluginDir . 'terminals/';
-		// Temp dir in case the one from above is not writable
-		$tmpDir = sys_get_temp_dir();
-		// Load Terminal information
-		$terminalInfo = json_decode( get_option( 'altapay_terminals' ) );
-		if ( $terminals ) {
-			foreach ( $terminals as $terminal ) {
-				$terminal_class_file_blocks = $terminalDir . $terminal . '.blocks.class.php';
+		foreach ( $terminals as $terminal ) {
+			$terminal_class_file_blocks = plugin_dir_path( __FILE__ ) . 'terminals/' . $terminal . '.blocks.class.php';
 
-				if ( file_exists( $terminal_class_file_blocks ) ) {
-					require_once $terminal_class_file_blocks;
-					add_action(
-						'woocommerce_blocks_payment_method_type_registration',
-						function( PaymentMethodRegistry $payment_method_registry ) use ( $terminal ) {
-							$terminal_class_name = 'WC_Gateway_' . $terminal . '_Blocks_Support';
-							$payment_method_registry->register( new $terminal_class_name() );
-						}
-					);
-				}
+			if ( file_exists( $terminal_class_file_blocks ) ) {
+				require_once $terminal_class_file_blocks;
+				add_action(
+					'woocommerce_blocks_payment_method_type_registration',
+					function( PaymentMethodRegistry $payment_method_registry ) use ( $terminal ) {
+						$terminal_class_name = 'WC_Gateway_' . $terminal . '_Blocks_Support';
+						$payment_method_registry->register( new $terminal_class_name() );
+					}
+				);
 			}
 		}
 	}
 }
 
-add_action( 'woocommerce_blocks_loaded', 'woocommerce_gateway_altapay_woocommerce_block_support' );
+add_action( 'woocommerce_blocks_loaded', 'altapay_wc_checkout_block_support' );
 add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
 add_action( 'add_meta_boxes', 'altapayAddMetaBoxes' );
