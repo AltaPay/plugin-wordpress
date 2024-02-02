@@ -91,9 +91,6 @@ function init_altapay_settings() {
  * @return array<int, string>
  */
 function altapay_add_gateway( $methods ) {
-
-	// error_log('altapay_add_gateway');
-
 	// Get enabled terminals
 	$terminals = json_decode( get_option( 'altapay_terminals_enabled' ) );
 
@@ -122,8 +119,8 @@ function altapay_add_gateway( $methods ) {
 						$gateway_methods = array_column( json_decode( json_encode( $term->methods ), true ), 'Method' );
 					}
 					if ( ! count( array_diff( $natures, array( 'CreditCard' ) ) )
-						or ( in_array( 'MobilePayAcquirer', $gateway_methods ) or in_array( 'MobilePayOnlineAcquirer', $gateway_methods ) )
-						or in_array( 'VippsAcquirer', $gateway_methods )
+						 or ( in_array( 'MobilePayAcquirer', $gateway_methods ) or in_array( 'MobilePayOnlineAcquirer', $gateway_methods ) )
+						 or in_array( 'VippsAcquirer', $gateway_methods )
 					) {
 						$subscriptions = true;
 						$tokenStatus   = 'CreditCard';
