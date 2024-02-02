@@ -394,23 +394,23 @@ function altapay_order_reconciliation_identifier_meta_box( $post_or_order_object
 	if ( ! empty( $reconciliation_identifiers ) ) {
 		?>
 		<table width="100%" cellspacing="0" cellpadding="10">
-			<thead>
-			<tr>
-				<th align="left" width="40%">Reconciliation Identifier</th>
-				<th align="left" width="60%">Type</th>
-			</tr>
-			</thead>
+		   <thead>
+		   <tr>
+			   <th align="left" width="40%">Reconciliation Identifier</th>
+			   <th align="left" width="60%">Type</th>
+		   </tr>
+		   </thead>
 			<tbody>
-			<?php
-			foreach ( $reconciliation_identifiers  as $identifier ) {
-				?>
-				<tr>
-					<td><?php echo $identifier['identifier']; ?></td>
-					<td><?php echo $identifier['transactionType']; ?></td>
-				</tr>
 				<?php
-			}
-			?>
+				foreach ( $reconciliation_identifiers  as $identifier ) {
+					?>
+						<tr>
+							<td><?php echo $identifier['identifier']; ?></td>
+							<td><?php echo $identifier['transactionType']; ?></td>
+						</tr>
+						<?php
+				}
+				?>
 			</tbody>
 		</table>
 		<?php
@@ -431,31 +431,31 @@ function altapayActionJavascript() {
 		$order   = wc_get_order();
 		$post_id = ! empty( $order ) ? $order->get_id() : '';
 		?>
-		<script type="text/javascript">
-			let Globals = <?php echo wp_json_encode( array( 'postId' => $post_id ) ); ?>;
-		</script>
-		<?php
-		wp_enqueue_script(
-			'captureScript',
-			plugin_dir_url( __FILE__ ) . 'assets/js/capture.js',
-			array( 'jquery' ),
-			'1.1.0',
-			true
-		);
-		wp_enqueue_script(
-			'refundScript',
-			plugin_dir_url( __FILE__ ) . 'assets/js/refund.js',
-			array( 'jquery' ),
-			'1.1.0',
-			true
-		);
-		wp_enqueue_script(
-			'releaseScript',
-			plugin_dir_url( __FILE__ ) . 'assets/js/release.js',
-			array( 'jquery' ),
-			'1.1.0',
-			true
-		);
+			<script type="text/javascript">
+				let Globals = <?php echo wp_json_encode( array( 'postId' => $post_id ) ); ?>;
+			</script>
+			<?php
+			wp_enqueue_script(
+				'captureScript',
+				plugin_dir_url( __FILE__ ) . 'assets/js/capture.js',
+				array( 'jquery' ),
+				'1.1.0',
+				true
+			);
+			wp_enqueue_script(
+				'refundScript',
+				plugin_dir_url( __FILE__ ) . 'assets/js/refund.js',
+				array( 'jquery' ),
+				'1.1.0',
+				true
+			);
+			wp_enqueue_script(
+				'releaseScript',
+				plugin_dir_url( __FILE__ ) . 'assets/js/release.js',
+				array( 'jquery' ),
+				'1.1.0',
+				true
+			);
 	}
 }
 
