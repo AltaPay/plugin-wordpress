@@ -1,0 +1,8 @@
+span.altapay-payment-method {
+    width: 100%;
+    display: block;
+    padding-right: 1em;
+}
+span.altapay-payment-method img {
+    float: right;
+}

@@ -1023,6 +1023,13 @@ function altapay_wc_checkout_block_support() {
 	}
 }
 
+function altapay_checkout_blocks_style() {
+	wp_enqueue_style( 
+		'altapay-block-style', 
+		plugin_dir_url( __FILE__ ) . 'assets/css/blocks.css',
+ 	);
+}
+add_action( 'wp_enqueue_scripts', 'altapay_checkout_blocks_style' );
 add_action( 'woocommerce_blocks_loaded', 'altapay_wc_checkout_block_support' );
 add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );
 register_activation_hook( __FILE__, 'altapayPluginActivation' );
