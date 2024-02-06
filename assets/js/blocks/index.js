@@ -42,8 +42,9 @@ const altapayPaymentMethod = {
 		<>
 			<span class='altapay-payment-method'>
 				{ __( label, 'woocommerce-payments' ) }
-					<img src={ settings.icon }
-				alt={ settings.icon } />
+				{settings.icon &&
+					<img src={ settings.icon } alt='' />
+				}
 			</span>
 		</>
 	),

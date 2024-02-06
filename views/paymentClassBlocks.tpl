@@ -65,7 +65,7 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
             'title'       => $this->get_setting( 'title' ),
             'description' => $this->get_setting( 'description' ),
             'supports'    => array_filter( $this->gateway->supports, [ $this->gateway, 'supports' ] ),
-            'icon'        => untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->gateway->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) )
+            'icon'        => $this->gateway->get_option( 'payment_icon' ) !== 'default' ? untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->gateway->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) ) : ''
         ];
     }
 }
