@@ -98,6 +98,8 @@ function altapay_add_gateway( $methods ) {
 		return $methods;
 	}
 
+	$helper = new Helpers\AltapayHelpers();
+
 	$pluginDir = plugin_dir_path( __FILE__ );
 	// Directory for the terminals
 	$terminalDir = $pluginDir . 'terminals/';
@@ -131,34 +133,25 @@ function altapay_add_gateway( $methods ) {
 			}
 
 			$terminal_file_blocks = $terminalDir . $terminal . '.blocks.class.php';
-
-			if ( ! file_exists( $terminal_file_blocks ) ) {
-				// Create file
-				$template = file_get_contents( $pluginDir . 'views/paymentClassBlocks.tpl' );
-				// Replace patterns
-				$content = str_replace( array( '{key}', '{terminal_id}' ), array( $terminal, strtolower( $terminal ) ), $template );
-
-				$ok = @\file_put_contents( $terminal_file_blocks, $content );
-
-				if ( $ok === \false ) {
-					set_transient( 'terminals_directory_error', 'show' );
-				}
-			}
+			$helper->create_file_from_tpl(
+				$terminal_file_blocks,
+				$pluginDir . 'views/paymentClassBlocks.tpl',
+				array(
+					'{key}'         => $terminal,
+					'{terminal_id}' => strtolower( $terminal ),
+				)
+			);
 
 			$terminal_js_file_blocks = $terminalDir . strtolower( $terminal ) . '.blocks.js';
-
-			if ( ! file_exists( $terminal_js_file_blocks ) ) {
-				// Create file
-				$template = file_get_contents( $pluginDir . 'views/blocksJs.tpl' );
-				// Replace patterns
-				$content = str_replace( array( '{key}', '{name}', '{terminal_id}' ), array( $terminal, $terminalName, strtolower( $terminal ) ), $template );
-
-				$ok = @\file_put_contents( $terminal_js_file_blocks, $content );
-
-				if ( $ok === \false ) {
-					set_transient( 'terminals_directory_error', 'show' );
-				}
-			}
+			$helper->create_file_from_tpl(
+				$terminal_js_file_blocks,
+				$pluginDir . 'views/blocksJs.tpl',
+				array(
+					'{key}'         => $terminal,
+					'{name}'        => $terminalName,
+					'{terminal_id}' => strtolower( $terminal ),
+				)
+			);
 
 			// Check if file exists
 			$terminal_class_file     = $terminalDir . $terminal . '.class.php';
