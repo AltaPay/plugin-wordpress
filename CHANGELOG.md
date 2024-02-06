@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.8]
+- Add support for WooCommerce Checkout Blocks.
+> **Note:** Apple Pay is not supported with WooCommerce Checkout Blocks in this release. We will include it in a future release.
+
 ## [3.5.7]
 - Minor bug fixes & improve error handling.
 
