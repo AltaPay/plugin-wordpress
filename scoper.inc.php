@@ -70,14 +70,14 @@ return [
     //
     // For more information see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#excluded-symbols
     'exclude-namespaces' => [
-    'Altapay',                        // The Altapay namespace (and sub-namespaces)
-    'Humbug',                         // The Altapay namespace (and sub-namespaces)
-    'JetBrains',                      // The Altapay namespace (and sub-namespaces)
-    'Fidry',                          // The Altapay namespace (and sub-namespaces)
-    'Composer'                        // The Altapay namespace (and sub-namespaces)
-    // '~^PHPUnit\\\\Framework$~',    // The whole namespace PHPUnit\Framework (but not sub-namespaces)
-    // '~^$~',                        // The root namespace only
-    // '',                            // Any namespace
+        'Altapay',                        // The Altapay namespace (and sub-namespaces)
+        'Humbug',                         // The Humbug namespace (and sub-namespaces)
+        'JetBrains',                      // The JetBrains namespace (and sub-namespaces)
+        'Fidry',                          // The Fidry namespace (and sub-namespaces)
+        'Composer'                        // The Composer namespace (and sub-namespaces)
+        // '~^PHPUnit\\\\Framework$~',    // The whole namespace PHPUnit\Framework (but not sub-namespaces)
+        // '~^$~',                        // The root namespace only
+        // '',                            // Any namespace
     ],
     'exclude-classes' => [
         // 'ReflectionClassConstant',
