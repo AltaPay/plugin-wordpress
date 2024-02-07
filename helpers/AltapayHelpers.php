@@ -132,9 +132,9 @@ class AltapayHelpers {
 			// Replace patterns
 			$content = str_replace( array_keys( $placeholders ), array_values( $placeholders ), $template );
 
-			$ok = @\file_put_contents( $file_path, $content );
+			$ok = @file_put_contents( $file_path, $content );
 
-			if ( $ok === \false ) {
+			if ( $ok === false ) {
 				set_transient( 'terminals_directory_error', 'show' );
 			}
 		}

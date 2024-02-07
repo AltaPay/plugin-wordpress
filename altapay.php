@@ -168,8 +168,8 @@ function altapay_add_gateway( $methods ) {
 				// Replace patterns
 				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
-				$ok = @\file_put_contents( $terminal_class_file, $content );
-				if ( $ok === \false ) {
+				$ok = @file_put_contents( $terminal_class_file, $content );
+				if ( $ok === false ) {
 					set_transient( 'terminals_directory_error', 'show' );
 				}
 			} else {
@@ -178,9 +178,9 @@ function altapay_add_gateway( $methods ) {
 				// Replace patterns
 				$content = str_replace( array( '{key}', '{name}', '{tokenStatus}', '{supportSubscriptions}' ), array( $terminal, $terminalName, $tokenStatus, $subscriptions ), $template );
 
-				$ok = @\file_put_contents( $terminal_class_file, $content );
+				$ok = @file_put_contents( $terminal_class_file, $content );
 				// Check if terminals folder is writable or use tmp as fallback
-				if ( $ok === \false ) {
+				if ( $ok === false ) {
 					set_transient( 'terminals_directory_error', 'show' );
 				} else {
 					file_put_contents( $terminal_class_file_tmp, $content );
