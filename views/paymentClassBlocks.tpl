@@ -47,7 +47,7 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
         wp_register_script(
             'wc-altapay_{terminal_id}-payments-blocks',
             plugin_dir_url( ALTAPAY_PLUGIN_FILE ) . 'terminals/{terminal_id}.blocks.js',
-            array( 'react', 'wc-blocks-registry', 'wc-settings', 'wp-html-entities', 'wp-i18n' ),
+            array( 'react', 'wc-blocks-data-store', 'wc-blocks-registry', 'wc-settings', 'wp-data', 'wp-html-entities', 'wp-i18n' ),
             '1.0.0',
             true
         );
