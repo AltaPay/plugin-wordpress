@@ -197,7 +197,9 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 					session.completePayment( status );
 				}
 
-				wc_checkout_form.$checkout_form.removeClass( 'processing' ).unblock();
+				if (wc_checkout_form) {
+					wc_checkout_form.$checkout_form.removeClass( 'processing' ).unblock();
+				}
 
 				if (res.data.redirect) {
 					window.location = res.data.redirect;
@@ -227,6 +229,8 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 		// Payment cancelled by WebKit
 		if(wc_checkout_form){
 			wc_checkout_form.$checkout_form.removeClass( 'processing' ).unblock();
+		}else{
+			location.reload();
 		}
 	};
 

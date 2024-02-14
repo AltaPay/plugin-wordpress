@@ -61,11 +61,30 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
      * @return array
      */
     public function get_payment_method_data() {
-        return [
-            'title'       => $this->get_setting( 'title' ),
-            'description' => $this->get_setting( 'description' ),
-            'supports'    => array_filter( $this->gateway->supports, [ $this->gateway, 'supports' ] ),
-            'icon'        => $this->gateway->get_option( 'payment_icon' ) !== 'default' ? untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->gateway->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) ) : ''
-        ];
-    }
+
+		$payment_method_data = array(
+			'title'                   => $this->get_setting( 'title' ),
+			'description'             => $this->get_setting( 'description' ),
+			'supports'                => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
+			'icon'                    => $this->gateway->get_option( 'payment_icon' ) !== 'default' ? untrailingslashit( plugins_url( '/assets/images/payment_icons/' . $this->gateway->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) ) : '',
+			'is_apple_pay'            => $this->gateway->is_apple_pay,
+			'applepay_payment_method' => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
+		);
+
+		if ( $this->gateway->is_apple_pay === 'yes' ) {
+			$additional_params = array(
+				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
+				'nonce'                        => wp_create_nonce( 'apple-pay' ),
+				'currency'                     => get_woocommerce_currency(),
+				'country'                      => get_option( 'woocommerce_default_country' ),
+				'terminal'                     => $this->gateway->terminal,
+				'apply_pay_label'              => $this->gateway->apple_pay_label,
+				'apple_pay_supported_networks' => $this->gateway->get_option( 'apple_pay_supported_networks' ),
+			);
+
+			return array_merge( $payment_method_data, $additional_params );
+		}
+
+		return $payment_method_data;
+	}
 }

@@ -2,14 +2,17 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
+import { CART_STORE_KEY as storeKey } from '@woocommerce/block-data';
+import { select } from '@wordpress/data';
 
-const terminal_key = '';
-const terminal_name = '';
+const settings = getSetting( 'altapay_data', {} );
 
-const settings = getSetting( terminal_key + '_data', {} );
+const { useEffect } = window.wp.element;
+
+let session = '';
 
 const defaultLabel = __(
-	terminal_name,
+	'AltaPay',
 	'woo-gutenberg-products-block'
 );
 
@@ -18,7 +21,42 @@ const label = decodeEntities( settings.title ) || defaultLabel;
 /**
  * Content component
  */
-const Content = () => {
+const Content = ( props ) => {
+	const store = select( storeKey );
+	const cartData = store.getCartTotals();
+	settings.subtotal = cartData.total_price / 100;
+	const { eventRegistration, activePaymentMethod,  emitResponse } = props;
+	const { onCheckoutSuccess } = eventRegistration;
+	useEffect( () => {
+		const unsubscribe = onCheckoutSuccess( (arg) => {
+			if(settings.is_apple_pay === 'yes'){
+				onApplePayButtonClicked( settings, false, null, arg.orderId );
+				return {
+					type: emitResponse.responseTypes.SUCCESS
+				};
+			}
+
+			return {
+				type: emitResponse.responseTypes.SUCCESS
+			};
+		} );
+
+		// Unsubscribes when this component is unmounted.
+		return () => {
+			unsubscribe();
+		};
+
+	}, [
+		emitResponse.responseTypes.SUCCESS,
+		onCheckoutSuccess,
+	] );
+
+	jQuery(".wc-block-components-checkout-place-order-button").click(function(){
+		if (jQuery('#radio-control-wc-payment-method-options-' + settings.applepay_payment_method).is(':checked')) {
+			onApplePayButtonClicked(settings, true, false);
+		}
+	});
+
 	return decodeEntities( settings.description || '' );
 };
 
@@ -37,7 +75,7 @@ const Label = ( props ) => {
  * AltaPay payment method config object.
  */
 const altapayPaymentMethod = {
-	name: terminal_key,
+	name: 'altapay_',
 	label: (
 		<>
 			<span class='altapay-payment-method'>
