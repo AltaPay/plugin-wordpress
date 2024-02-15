@@ -121,4 +121,22 @@ class AltapayHelpers {
 
 		return md5( join( ',', $data ) );
 	}
+
+	/**
+	 * @return void
+	 */
+	public function create_file_from_tpl( $file_path, $template_path, $placeholders ) {
+		if ( ! file_exists( $file_path ) ) {
+			// Create file
+			$template = file_get_contents( $template_path );
+			// Replace patterns
+			$content = str_replace( array_keys( $placeholders ), array_values( $placeholders ), $template );
+
+			$ok = @file_put_contents( $file_path, $content );
+
+			if ( $ok === false ) {
+				set_transient( 'terminals_directory_error', 'show' );
+			}
+		}
+	}
 }

@@ -105,7 +105,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$order = wc_get_order( $order_id );
 			return [
 				'result'   => 'success',
-				'redirect' => $order->get_checkout_order_received_url(),
+				'redirect' => null,
 			];
 		}else{
 			$payment_request = $this->createPaymentRequest( $order_id );
@@ -740,7 +740,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 */
 	public function supportedFeatures() {
 		$supportSubscriptions = '{supportSubscriptions}';
-		$features             = array( 'refunds' );
+		$features             = array( 'products','refunds' );
 
 		if ( $supportSubscriptions == true ) {
 			$features = array_merge(

@@ -42,7 +42,7 @@ class ApplePay {
 	 */
 	public function filter_apple_pay_for_non_safari_browser( $payment_methods ) {
 
-		$user_agent = $_SERVER['HTTP_USER_AGENT'];
+		$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
 		if ( is_checkout() ) {
 
