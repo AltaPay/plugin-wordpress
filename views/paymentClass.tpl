@@ -490,8 +490,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$order->update_meta_data( '_agreement_id', $agreement_id );
 
 				$reconciliation = new Core\AltapayReconciliation();
-				foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
-					$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+				if ( ! empty( $transaction['ReconciliationIdentifiers'] ) ) {
+					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					}
 				}
 
 				if ( $saveCreditCard ) {
@@ -586,8 +588,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$transaction = reset( $transaction );
 
 					$reconciliation = new Core\AltapayReconciliation();
-					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
-						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					if ( ! empty( $transaction['ReconciliationIdentifiers'] ) ) {
+						foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+							$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+						}
 					}
 
 				} catch ( ResponseHeaderException $e ) {
