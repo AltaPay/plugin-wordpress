@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.9]
+- Handle callback exception caused by invalid XML.
+- Add support for the SEPA payment method.
+
 ## [3.5.8]
 - Add support for WooCommerce Checkout Blocks.
 

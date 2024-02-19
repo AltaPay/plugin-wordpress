@@ -7,7 +7,7 @@ Tested up to: 6.4.3
 Stable tag: 3.5.8
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 8.5.2
+WC tested up to: 8.6.0
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
@@ -38,6 +38,10 @@ AltaPay supports major acquiring banks, global payment methods and over 50 prefe
 AltaPay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for AltaPay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
 
 == Changelog ==
+
+= 3.5.9 =
+* Handle callback exception caused by invalid XML.
+* Add support for the SEPA payment method.
 
 = 3.5.8 =
 * Add support for WooCommerce Checkout Blocks.
