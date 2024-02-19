@@ -82,7 +82,7 @@ form {
 }
 
 .pensio_payment_form_card-number input, .pensio_payment_form_cardholder input,
-.altapay-payment-form-cnt input#organisationNumber {
+.altapay-payment-form-cnt input#organisationNumber, .pensio_payment_form_input_cell input  {
 	padding: 12px 14px;
 	width: 100%;
 	border-radius: 3px;
@@ -437,6 +437,37 @@ input#giftcard_account_identifier {
 
 .altapay-payment-form-cnt table.pensio_payment_form_table {
 	margin-bottom: 0;
+}
+
+#klarna_options {
+   padding-top: 20px;
+   padding-bottom: 20px;
+}
+
+#EPayment .IbanPopup img {
+	display: block;
+}
+
+#EPayment .pensio_payment_form_label_cell {
+	display: block;
+	padding: 0.25em 0;
+}
+
+#EPayment .pensio_payment_form_input_cell {
+	padding: 0 0 1em;
+	display: block;
+}
+
+#EPayment .pensio_payment_submit_button button {
+	background-color: #6195f0;
+	border-color: #4a85ee;
+	color: #ffffff;
+	border-radius: 0.25rem;
+	cursor: pointer;
+	font-weight: 600;
+	line-height: 1.25;
+	padding: 0.5rem 1rem;
+	text-align: center;
 }
 
 @media screen and (min-width:992px){
