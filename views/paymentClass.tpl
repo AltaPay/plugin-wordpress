@@ -144,7 +144,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		// Create form request etc.
 		$login = $this->altapayApiLogin();
 		if ( ! $login || is_wp_error( $login ) ) {
-			return new WP_Error( 'error', 'Could not connect to AltaPay!' );
+			throw new Exception( 'Could not connect to AltaPay!' );
 		}
 		// Create payment request
 		$order = new WC_Order( $order_id );
