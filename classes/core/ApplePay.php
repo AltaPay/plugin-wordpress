@@ -44,7 +44,7 @@ class ApplePay {
 
 		$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-		if ( is_checkout() ) {
+		if ( is_checkout() || ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' )) {
 
 			$is_safari = ( strpos( $user_agent, 'Safari' ) !== false && strpos( $user_agent, 'Chrome' ) === false );
 
