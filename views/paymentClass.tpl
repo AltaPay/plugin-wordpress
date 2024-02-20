@@ -358,17 +358,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			$order          = wc_get_order( $order_id );
 			$transaction_id = $order->get_transaction_id();
-			$agreement_id   = '';
+			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
+			$transaction    = array();
 
 			$xmlResponse = isset( $_POST['xml'] ) ? wp_unslash( $_POST['xml'] ) : '';
 
 			try {
 
 				$xml = new SimpleXMLElement( $xmlResponse );
-
-				if ( $type === 'subscriptionAndCharge' || $type === 'subscription' ) {
-					$agreement_id = $txnId;
-				}
 
 				if ( $type === 'subscriptionAndCharge' ) {
 					$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
