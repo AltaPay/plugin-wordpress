@@ -100,24 +100,24 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @return array
 	 * @throws Exception
 	 */
-   public function process_payment( $order_id ) {
+	public function process_payment( $order_id ) {
 		if ( $this->is_apple_pay === 'yes' ) {
-			$order = wc_get_order( $order_id );
 			return [
 				'result'   => 'success',
 				'redirect' => null,
 			];
-		}else{
+		} else {
 			$payment_request = $this->createPaymentRequest( $order_id );
-			if ( is_wp_error( $payment_request ) ) {
-				wc_add_notice($payment_request->get_error_message(), 'error');
-			} else {
-				// Perform redirect
-				return [
-					'result'   => 'success',
-					'redirect' => $payment_request['formurl'],
-				];
+
+			if ( $payment_request['result'] === 'error' ) {
+				throw new Exception( $payment_request['message'] );
 			}
+
+			// Perform redirect
+			return [
+				'result'   => 'success',
+				'redirect' => $payment_request['formurl'],
+			];
 		}
 	}
 
@@ -134,7 +134,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	/**
 	 * @param int $order_id
 	 *
-	 * @return array|WP_Error
+	 * @return array
 	 * @throws Exception
 	 */
 	public function createPaymentRequest( $order_id ) {
@@ -144,7 +144,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		// Create form request etc.
 		$login = $this->altapayApiLogin();
 		if ( ! $login || is_wp_error( $login ) ) {
-			return new WP_Error( 'error', 'Could not connect to AltaPay!' );
+			throw new Exception( 'Could not connect to AltaPay!' );
 		}
 		// Create payment request
 		$order = new WC_Order( $order_id );
@@ -297,15 +297,9 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				} catch ( ResponseHeaderException $e ) {
 					$requestParams['result']  = 'error';
 					$requestParams['message'] = $e->getHeader()->ErrorMessage;
-				} catch ( ResponseMessageException $e ) {
+				} catch ( ResponseMessageException | \Exception $e ) {
 					$requestParams['result']  = 'error';
 					$requestParams['message'] = $e->getMessage();
-				} catch ( \Exception $e ) {
-					$requestParams['result']  = 'error';
-					$requestParams['message'] = $e->getMessage();
-				}
-				if ( isset( $requestParams['message'] ) && $requestParams['result'] === 'error' ) {
-					return new WP_Error( 'ResponseError', $requestParams['message'] );
 				}
 
 				$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
@@ -316,7 +310,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			error_log( 'Could not create the payment request: ' . $e->getMessage() );
 			$order->add_order_note( __( 'Could not create the payment request: ' . $e->getMessage(), 'altapay' ) );
 
-			return new WP_Error( 'error', 'Could not create the payment request' );
+			throw new Exception( 'Could not create the payment request' );
 		}
 	}
 
@@ -335,17 +329,19 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				exit;
 			}
 
-			$order_id       = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
-			$txnId          = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
-			$amount         = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
-			$merchantError  = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
-			$errorMessage   = isset( $_POST['error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['error_message'] ) ) : '';
-			$payment_status = isset( $_POST['payment_status'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_status'] ) ) : '';
-			$status         = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
-			$type           = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
-			$requireCapture = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
-			$fraud_recommendation = !empty( $_POST['fraud_recommendation'] ) ? sanitize_text_field( wp_unslash( $_POST['fraud_recommendation'] ) ) : '';
-			$callback_type =  isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+			$order_id             = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
+			$txnId                = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
+			$amount               = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
+			$merchantError        = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
+			$errorMessage         = isset( $_POST['error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['error_message'] ) ) : '';
+			$payment_status       = isset( $_POST['payment_status'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_status'] ) ) : '';
+			$status               = isset( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+			$type                 = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+			$requireCapture       = isset( $_POST['require_capture'] ) ? sanitize_text_field( wp_unslash( $_POST['require_capture'] ) ) : '';
+			$fraud_recommendation = isset( $_POST['fraud_recommendation'] ) ? sanitize_text_field( wp_unslash( $_POST['fraud_recommendation'] ) ) : '';
+			$callback_type        = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+			$ccToken              = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
+			$saveCreditCard       = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
 
 			if ( $type == 'subscription_payment' ) {
 				$query = new WC_Order_Query( array(
@@ -360,69 +356,70 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			$order        = wc_get_order( $order_id );
-			$agreement_id = '';
+			$order          = wc_get_order( $order_id );
+			$transaction_id = $order->get_transaction_id();
+			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
+			$transaction    = array();
 
-			$xmlResponse = wp_unslash( $_POST['xml'] );
-			$xml         = new SimpleXMLElement( $xmlResponse );
+			$xmlResponse = isset( $_POST['xml'] ) ? wp_unslash( $_POST['xml'] ) : '';
 
-			if ( $type === 'subscriptionAndCharge' || $type === 'subscription' ) {
-				$agreement_id = $txnId;
-			}
+			try {
 
-			if ( $type === 'subscriptionAndCharge' ) {
-				$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
-				$jsonToArray       = json_decode( $xmlToJson, true );
-				$latestTransaction = $this->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
-				$transaction       = $jsonToArray['Transaction'][ $latestTransaction ];
-				$txnId             = $transaction['TransactionId'];
+				$xml = new SimpleXMLElement( $xmlResponse );
 
-				if ( $status === 'succeeded' ) {
-					foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
-						if ( $transaction_data['AuthType'] === 'subscription_payment' &&
-						! in_array( $transaction_data['TransactionStatus'], ['captured', 'pending'] ) ) {
-							$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
-							wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
-							wp_redirect( wc_get_cart_url() );
-							exit;
+				if ( $type === 'subscriptionAndCharge' ) {
+					$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
+					$jsonToArray       = json_decode( $xmlToJson, true );
+					$latestTransaction = $this->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
+					$transaction       = $jsonToArray['Transaction'][ $latestTransaction ];
+					$txnId             = $transaction['TransactionId'];
+
+					if ( $status === 'succeeded' ) {
+						foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
+							if ( $transaction_data['AuthType'] === 'subscription_payment' &&
+								! in_array( $transaction_data['TransactionStatus'], array( 'captured', 'pending' ) ) ) {
+								$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
+								wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
+								wp_redirect( wc_get_cart_url() );
+								exit;
+							}
 						}
 					}
+				} else {
+					$xmlToJson   = wp_json_encode( $xml->Body->Transactions->Transaction );
+					$transaction = json_decode( $xmlToJson, true );
 				}
-			} else {
-				$xmlToJson   = wp_json_encode( $xml->Body->Transactions->Transaction );
-				$transaction = json_decode( $xmlToJson, true );
-			}
 
-			if ( $type === 'subscription' ) {
-				$txnId = '';
-			}
+				if ( $type === 'subscription' ) {
+					$txnId = '';
+				}
 
-			$paymentScheme  = $transaction['PaymentSchemeName'];
-			$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
-			$ccToken        = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
-			$saveCreditCard = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
-			$ccExpiryDate = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
+				$paymentScheme  = $transaction['PaymentSchemeName'];
+				$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
+				$ccExpiryDate   = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 
-			$transaction_id = $order->get_transaction_id();
-
-			/*
-			Exit if payment already completed against the same order and 
-			the new transaction ID is different
-			*/
-			if (! empty( $transaction_id ) && $transaction_id != $txnId ) {
-				// Release duplicate transaction from the gateway side
-				if ( $status === 'succeeded' ) {
-                    $auth = $this->getAuth();
-					if ( in_array( $transaction['TransactionStatus'], ['captured', 'bank_payment_finalized'], true ) ) {
-						$api = new RefundCapturedReservation( $auth );
-					} else {
-						$api = new ReleaseReservation( $auth );
+				/*
+				Exit if payment already completed against the same order and
+				the new transaction ID is different
+				*/
+				if ( ! empty( $transaction_id ) && $transaction_id != $txnId ) {
+					// Release duplicate transaction from the gateway side
+					if ( $status === 'succeeded' ) {
+						$auth = $this->getAuth();
+						if ( in_array( $transaction['TransactionStatus'], array( 'captured', 'bank_payment_finalized' ), true ) ) {
+							$api = new RefundCapturedReservation( $auth );
+						} else {
+							$api = new ReleaseReservation( $auth );
+						}
+						$api->setTransaction( $txnId );
+						$api->call();
 					}
-					$api->setTransaction( $txnId );
-					$api->call();
-				}
 
-				exit;
+					exit;
+				}
+			} catch ( Exception $e ) {
+				error_log( $e->getMessage() );
+				$order->add_order_note( $e->getMessage(), 'altapay' );
 			}
 
 			// If order already on-hold
@@ -435,8 +432,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$order->set_transaction_id( $txnId );
 
 					$reconciliation = new Core\AltapayReconciliation();
-					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
-						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					if ( ! empty( $transaction['ReconciliationIdentifiers'] ) ) {
+						foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+							$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+						}
 					}
 
 					if ( $saveCreditCard ) {
@@ -452,7 +451,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$order->add_order_note( __( 'Notification completed', 'altapay' ) );
 					$order->payment_complete();
 
-				} elseif ($status === 'error' || $status === 'failed') {
+				} elseif ( $status === 'error' || $status === 'failed' ) {
 						$order->update_status( 'failed', 'Payment failed' . $errorMessage );
 						$order->add_order_note( __( 'Payment failed' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
 				}
@@ -488,8 +487,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$order->update_meta_data( '_agreement_id', $agreement_id );
 
 				$reconciliation = new Core\AltapayReconciliation();
-				foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
-					$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+				if ( ! empty( $transaction['ReconciliationIdentifiers'] ) ) {
+					foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					}
 				}
 
 				if ( $saveCreditCard ) {
@@ -584,8 +585,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$transaction = reset( $transaction );
 
 					$reconciliation = new Core\AltapayReconciliation();
-					foreach ( $transaction['ReconciliationIdentifiers'] as $key => $val ) {
-						$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+					if ( ! empty( $transaction['ReconciliationIdentifiers'] ) ) {
+						foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+							$reconciliation->saveReconciliationIdentifier( $order_id, $txnId, $val['Id'], $val['Type'] );
+						}
 					}
 
 				} catch ( ResponseHeaderException $e ) {

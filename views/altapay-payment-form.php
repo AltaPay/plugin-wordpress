@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$order_id      = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
-$order         = wc_get_order( $order_id );
+$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
+$order    = wc_get_order( $order_id );
 if ( $order ) {
 	$wpml_language = $order->get_meta( 'wpml_language' );
 	if ( ! empty( $wpml_language ) ) {
@@ -82,7 +82,7 @@ form {
 }
 
 .pensio_payment_form_card-number input, .pensio_payment_form_cardholder input,
-.altapay-payment-form-cnt input#organisationNumber {
+.altapay-payment-form-cnt input#organisationNumber, .pensio_payment_form_input_cell input  {
 	padding: 12px 14px;
 	width: 100%;
 	border-radius: 3px;
@@ -272,7 +272,8 @@ input[type=tel]:focus {
 }
 
 input[type="submit"].AltaPaySubmitButton,
-input#submitbutton {
+input#submitbutton,
+#EPayment button[type="submit"]{
 	outline: none;
 	padding: 15px 16px;
 	color: white;
@@ -285,21 +286,25 @@ input#submitbutton {
 	font-size: 17px;
 }
 
-input[type="submit"].AltaPaySubmitButton {
+input[type="submit"].AltaPaySubmitButton,
+#EPayment button[type="submit"] {
 	background-color: #31C37E !important;
 }
 
-input[type="submit"].AltaPaySubmitButton:hover {
+input[type="submit"].AltaPaySubmitButton:hover,
+#EPayment button[type="submit"]:hover {
 	background-color: #16b36e !important;
 }
 
 input[type="submit"].AltaPaySubmitButton:disabled,
-input#submitbutton {
+input#submitbutton,
+#EPayment button[type="submit"]:disabled {
 	background-color: black !important;
 	opacity: 1 !important;
 }
 
-input[type="submit"].AltaPaySubmitButton:disabled:hover{
+input[type="submit"].AltaPaySubmitButton:disabled:hover,
+#EPayment button[type="submit"]:disabled:hover{
 	background-color: black !important;
 	color: white;
 }
@@ -437,6 +442,42 @@ input#giftcard_account_identifier {
 
 .altapay-payment-form-cnt table.pensio_payment_form_table {
 	margin-bottom: 0;
+}
+
+#klarna_options {
+   padding-top: 20px;
+   padding-bottom: 20px;
+}
+
+#EPayment .IbanPopup img {
+	display: block;
+}
+
+#EPayment .pensio_payment_form_label_cell,
+#iDealPayment .pensio_payment_form_label_cell,
+#Mobile .pensio_payment_form_label_cell,
+#GiftCard .pensio_payment_form_label_cell {
+	display: block;
+	padding: 0.25em 0;
+}
+
+#EPayment .pensio_payment_form_input_cell,
+#iDealPayment .pensio_payment_form_input_cell,
+#Mobile .pensio_payment_form_input_cell,
+#GiftCard .pensio_payment_form_input_cell {
+	padding: 0 0 1em;
+	display: block;
+}
+
+#GiftCard tr:nth-child(2) td {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+#iDealPayment td.pensio_payment_form_submit_cell,
+#iDealPayment .pensio_payment_form_input_cell,
+#GiftCard .pensio_payment_form_input_cell{
+	padding: 0;
 }
 
 @media screen and (min-width:992px){
