@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.0]
+- Add support for the Trustly payment method.
+
 ## [3.5.9]
 - Handle callback exception caused by invalid XML.
 - Add support for the SEPA payment method.
