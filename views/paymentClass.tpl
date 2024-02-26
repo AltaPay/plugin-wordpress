@@ -680,6 +680,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$customer->setShipping( $address );
 		}
 		$customer->setEmail( $order->get_billing_email() );
+		$customer->setUsername( $order->get_billing_email() );
 		$customer->setPhone( str_replace( ' ', '', $order->get_billing_phone() ) );
 		$customer->setClientIP( $_SERVER['REMOTE_ADDR'] );
 		$customer->setClientAcceptLanguage( substr( $_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2 ) );
