@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.0]
+- Mark the order as successful if the reservation amount is greater than 0 when evaluating the callback response.
+
 ## [3.5.9]
 - Handle callback exception caused by invalid XML.
 - Add support for the SEPA payment method.
