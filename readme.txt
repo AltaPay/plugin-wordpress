@@ -41,6 +41,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.6.0 =
 * Mark the order as successful if the reservation amount is greater than 0 when evaluating the callback response.
+* Fix: Duplicate messages are displayed when the order status is changed to completed.
 
 = 3.5.9 =
 * Handle callback exception caused by invalid XML.
