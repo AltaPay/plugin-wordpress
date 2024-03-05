@@ -151,11 +151,14 @@ class AltapaySettings {
 	 */
 	public function saveCaptureWarning( $newMessage ) {
 		$message = get_transient( 'altapay_capture_warning' );
-		if ( $message ) {
-			$message .= '<br/>';
+
+        // Ignore if transient already contains the message
+		if ( $message && strpos( $message, $newMessage ) !== false ) {
+			return;
 		}
 
-		set_transient( 'altapay_capture_warning', $message . $newMessage, 30 );
+		$message = $message ? $message . '<br/>' . $newMessage : $newMessage;
+		set_transient( 'altapay_capture_warning', $message, 30 );
 	}
 
 	/**
