@@ -152,7 +152,7 @@ class AltapaySettings {
 	public function saveCaptureWarning( $newMessage ) {
 		$message = get_transient( 'altapay_capture_warning' );
 
-        // Ignore if transient already contains the message
+        	// Ignore if transient already contains the message
 		if ( $message && strpos( $message, $newMessage ) !== false ) {
 			return;
 		}
