@@ -342,6 +342,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$callback_type        = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
 			$ccToken              = isset( $_POST['credit_card_token'] ) ? sanitize_text_field( wp_unslash( $_POST['credit_card_token'] ) ) : '';
 			$saveCreditCard       = isset( $_POST['transaction_info']['savecreditcard'] ) && sanitize_text_field( wp_unslash( $_POST['transaction_info']['savecreditcard'] ) );
+			$reservedAmount       = 0;
 
 			if ( $type == 'subscription_payment' ) {
 				$query = new WC_Order_Query( array(
@@ -397,6 +398,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$paymentScheme  = $transaction['PaymentSchemeName'];
 				$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
 				$ccExpiryDate   = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
+				$reservedAmount = $transaction['ReservedAmount'] ?? 0;
 
 				/*
 				Exit if payment already completed against the same order and
@@ -425,7 +427,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			// If order already on-hold
 			if ( $order->has_status( 'on-hold' ) ) {
 
-				if ( $status === 'succeeded' ) {
+				if ( $status === 'succeeded' || $reservedAmount > 0 ) {
 
 					$order->update_meta_data( '_agreement_id', $agreement_id );
 					$order->save();
@@ -474,14 +476,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			// Make some validation
-			if ( $errorMessage || $merchantError || array_key_exists( 'cancel_order', $_GET ) ) {
+			if ( ( ( $errorMessage || $merchantError ) && $reservedAmount == 0 ) || array_key_exists( 'cancel_order', $_GET ) ) {
 				$order->add_order_note( __( 'Payment failed: ' . $errorMessage . ' Merchant error: ' . $merchantError, 'altapay' ) );
 				wc_add_notice( __( 'Payment error:', 'altapay' ) . ' ' . $errorMessage, 'error' );
 				wp_redirect( wc_get_cart_url() );
 				exit;
 			}
 
-			if ( $order->has_status( 'pending' ) && $status === 'succeeded' ) {
+			if ( $order->has_status( 'pending' ) && ( $status === 'succeeded' || $reservedAmount > 0 ) ) {
 
 				$order->set_transaction_id( $txnId );
 				$order->update_meta_data( '_agreement_id', $agreement_id );
@@ -568,7 +570,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' && $callback_type == 'ok' ) {
 				$login = $this->altapayApiLogin();
 				if ( ! $login || is_wp_error( $login ) ) {
-					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+					error_log( 'Could not connect to AltaPay!' );
 					return;
 				}
 
@@ -594,7 +596,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				} catch ( ResponseHeaderException $e ) {
 					error_log( 'Response header exception ' . $e->getMessage() );
 				} catch ( \Exception $e ) {
-					error_log( 'Response header exception ' . $e->getMessage() );
+					error_log( 'Exception ' . $e->getMessage() );
 				}
 			}
 			$redirect = $this->get_return_url( $order );
