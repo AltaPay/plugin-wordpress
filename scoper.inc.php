@@ -11,6 +11,37 @@ use Isolated\Symfony\Component\Finder\Finder;
 // to auto-load any code here: it can result in a conflict or even corrupt
 // the PHP-Scoper analysis.
 
+$polyfillsBootstraps = \array_map(
+    function (SplFileInfo $fileInfo) {
+        return $fileInfo->getPathname();
+    },
+    \iterator_to_array(
+        Finder::create()
+            ->files()
+            ->in(__DIR__.'/vendor/symfony/polyfill-*')
+            ->name('bootstrap.php'),
+        false,
+    ),
+);
+
+$polyfillsStubs = [];
+try {
+    $polyfillsStubs = \array_map(
+        function (SplFileInfo $fileInfo) {
+            return $fileInfo->getPathname();
+        },
+        \iterator_to_array(
+            Finder::create()
+                ->files()
+                ->in(__DIR__.'/vendor/symfony/polyfill-*/Resources/stubs')
+                ->name('*.php'),
+            false,
+        ),
+    );
+} catch (Throwable $e) {
+    // There may not be any stubs?
+}
+
 return [
     // The prefix configuration. If a non null value is be used, a random prefix
     // will be generated instead.
@@ -48,9 +79,7 @@ return [
     // Paths are relative to the configuration file unless if they are already absolute
     //
     // For more see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#patchers
-    'exclude-files' => [
-        'src/a-whitelisted-file.php',
-    ],
+    'exclude-files' => \array_merge($polyfillsBootstraps, $polyfillsStubs),
 
     // When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the
     // original namespace. These will include, for example, strings or string manipulations. PHP-Scoper has limited
@@ -74,7 +103,8 @@ return [
         'Humbug',                         // The Humbug namespace (and sub-namespaces)
         'JetBrains',                      // The JetBrains namespace (and sub-namespaces)
         'Fidry',                          // The Fidry namespace (and sub-namespaces)
-        'Composer'                        // The Composer namespace (and sub-namespaces)
+        'Composer',                       // The Composer namespace (and sub-namespaces)
+        'Symfony\Polyfill',               // The Polyfill namespace (and sub-namespaces)
         // '~^PHPUnit\\\\Framework$~',    // The whole namespace PHPUnit\Framework (but not sub-namespaces)
         // '~^$~',                        // The root namespace only
         // '',                            // Any namespace
