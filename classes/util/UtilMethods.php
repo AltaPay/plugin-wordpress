@@ -243,6 +243,7 @@ class UtilMethods {
 		$orderLine->taxPercent = 0.00;
 		$orderLine->unitCode   = 'unit';
 		$orderLine->discount   = 0.00;
+		$orderLine->setGoodsType( 'handling' );
 
 		return $orderLine;
 	}
