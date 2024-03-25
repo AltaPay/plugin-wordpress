@@ -68,7 +68,7 @@ class UtilMethods {
 			}
 
 			// check if compensation exists to bind it in orderline details
-			if ( ! $wcRefund && $productDetails['compensation']->unitPrice != 0 ) {
+			if ( ! $wcRefund && isset( $productDetails['compensation'] ) ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 		}
@@ -150,6 +150,7 @@ class UtilMethods {
 		$productQuantity     = $item['qty']; // get ordered number of quantity for each orderline
 		$productRegularPrice = $singleProduct->get_regular_price();
 		$productSalePrice    = $singleProduct->get_sale_price();
+		$productData         = array();
 
 		// Get and set tax rate using order line
 		$orderlineTax = $item['subtotal'] > 0 ? array_sum( $item['taxes']['subtotal'] ) / $item['subtotal'] : 0;
@@ -196,9 +197,11 @@ class UtilMethods {
 		// calculate total generated from order lines generated after calculation
 		$totalOrderlines = ( ( $productPrice + $taxAmount ) - ( ( $productPrice + $taxAmount ) * ( $discountPercentage / 100 ) ) ) * $productQuantity;
 		// calculate compensation amount between total generated from woocommerce and total generated from orderlines
-		$compensationAmount = $totalCMS - $totalOrderlines;
+		$compensationAmount = round( ( $totalCMS - $totalOrderlines ), 3 );
 		// generate compensation amount order line using product id and amount
-		$compensationOrderline = $this->compensationAmountOrderline( $productId, $compensationAmount );
+		if ( $compensationAmount > 0 || $compensationAmount < 0 ) {
+			$productData['compensation'] = $this->compensationAmountOrderline( $productId, $compensationAmount );
+		}
 		// generate line date with all the calculated parameters
 		$orderLine = new OrderLine(
 			$item['name'],
@@ -215,13 +218,9 @@ class UtilMethods {
 		$orderLine->unitCode   = $productQuantity > 1 ? 'units' : 'unit';
 		$goodsType             = ( $isSubscription ) ? 'subscription_model' : 'item';
 		$orderLine->setGoodsType( $goodsType );
-		$lineData[] = $orderLine;
+		$productData['product'] = $orderLine;
 
-		// return array with product and compensation line data
-		return array(
-			'product'      => reset( $lineData ),
-			'compensation' => reset( $compensationOrderline ),
-		);
+		return $productData;
 	}
 
 	/**
@@ -229,11 +228,11 @@ class UtilMethods {
 	 *
 	 * @param int   $productId
 	 * @param float $compensationAmount
-	 * @return array
+	 *
+	 * @return OrderLine
 	 */
 	public function compensationAmountOrderline( $productId, $compensationAmount ) {
 		// Generate compensation amount orderline for payment, capture and refund requests
-		$compensation          = array();
 		$orderLine             = new OrderLine(
 			'Compensation',
 			'comp-' . $productId,
@@ -244,9 +243,9 @@ class UtilMethods {
 		$orderLine->taxPercent = 0.00;
 		$orderLine->unitCode   = 'unit';
 		$orderLine->discount   = 0.00;
-		$compensation[]        = $orderLine;
+		$orderLine->setGoodsType( 'handling' );
 
-		return $compensation;
+		return $orderLine;
 	}
 
 	/**

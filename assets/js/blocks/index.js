@@ -29,8 +29,9 @@ const Content = ( props ) => {
 	const { onCheckoutSuccess } = eventRegistration;
 	useEffect( () => {
 		const unsubscribe = onCheckoutSuccess( (arg) => {
+			var orderId = arg.processingResponse.paymentDetails.order_id;
 			if(settings.is_apple_pay === 'yes'){
-				onApplePayButtonClicked( settings, false, null, arg.orderId );
+				onApplePayButtonClicked( settings, false, null, orderId );
 				return {
 					type: emitResponse.responseTypes.SUCCESS
 				};

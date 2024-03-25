@@ -105,6 +105,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			return [
 				'result'   => 'success',
 				'redirect' => null,
+				'order_id' => $order_id,
 			];
 		} else {
 			$payment_request = $this->createPaymentRequest( $order_id );
