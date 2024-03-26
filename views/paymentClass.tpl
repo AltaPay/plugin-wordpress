@@ -47,6 +47,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
      */
     public $payment_action = '';
 
+    public $is_apple_pay;
+    public $apple_pay_label;
+    public $apple_pay_supported_networks;
+    public $secret;
+
 	public function __construct() {
 		// Set default gateway values
 		$this->id                           = strtolower( 'altapay_{key}' );
