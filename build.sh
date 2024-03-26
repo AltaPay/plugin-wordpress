@@ -5,7 +5,7 @@ if [ -z "$1" ]
     echo "No PHP version supplied"
     echo "Usage: ./build.sh <php_version>"
     echo "./build.sh 7.4"
-    echo "./build.sh 8.1"
+    echo "./build.sh 8.2"
     echo "composer.lock will be updated for php > 7.4"
     exit
 fi
