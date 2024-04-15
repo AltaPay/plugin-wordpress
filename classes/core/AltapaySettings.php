@@ -81,8 +81,12 @@ class AltapaySettings {
 			return;
 		}
 		$pay = $payments[0];
+		if ( $pay->CapturedAmount == $pay->ReservedAmount ) {
+			return;
+		}
+
 		if ( $pay->CapturedAmount > 0 ) {
-			$this->saveCaptureWarning( 'This order was already fully or partially captured: ' . $orderID );
+			$this->saveCaptureWarning( 'Could not capture automatically. Manual capture is required for the order: ' . $orderID );
 		} else { // Order wasn't captured and must be captured now.
 			$amount = $pay->ReservedAmount; // Amount to capture.
 

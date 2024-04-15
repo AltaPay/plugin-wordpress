@@ -1,8 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.2]
+- Fix: Add support for PHP 8.2
+
 ## [3.6.1]
-- Fix: Error occured when performing checkout with PHP 7.4
+- Fix: Error occurred when performing checkout with PHP 7.4
 - Fix: Round off unit price in order line to 3 decimal digits.
 
 ## [3.6.0]
