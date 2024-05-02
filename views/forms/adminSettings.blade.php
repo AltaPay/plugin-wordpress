@@ -18,7 +18,7 @@
 			<th scope="row"><?php esc_html_e( 'Gateway URL', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="text" placeholder="{{__('Enter gateway url','altapay')}}" name="altapay_gateway_url"
 					   value="{{$gatewayURL}}" required />
-			   <i><p style="font-size: 10px;">{{__('e.g. https://www.testgateway.altapaysecure.com/', 'altapay')}}</p></i>
+			   <i><p style="font-size: 10px;">{{__('e.g. https://testgateway.altapaysecure.com', 'altapay')}}</p></i>
 			</td>
 		</tr>
 		<tr valign="top">
