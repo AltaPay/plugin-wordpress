@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "altapay/api-php",
-            "version": "3.3.7",
+            "version": "3.3.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AltaPay/api-php.git",
-                "reference": "3c186bb250a2a62c5638ac651c7f13d838ac4da5"
+                "reference": "e46f0bc8db0a6c3edac49a570c6089ff991c15b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/3c186bb250a2a62c5638ac651c7f13d838ac4da5",
-                "reference": "3c186bb250a2a62c5638ac651c7f13d838ac4da5",
+                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/e46f0bc8db0a6c3edac49a570c6089ff991c15b7",
+                "reference": "e46f0bc8db0a6c3edac49a570c6089ff991c15b7",
                 "shasum": ""
             },
             "require": {
@@ -58,9 +58,9 @@
             ],
             "support": {
                 "issues": "https://github.com/AltaPay/api-php/issues",
-                "source": "https://github.com/AltaPay/api-php/tree/3.3.7"
+                "source": "https://github.com/AltaPay/api-php/tree/3.3.9"
             },
-            "time": "2023-12-13T12:52:52+00:00"
+            "time": "2024-04-02T04:53:14+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
