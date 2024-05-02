@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.3]
+- Configure terminal logo automatically.
+
 ## [3.6.2]
 - Fix: Add support for PHP 8.2
 
