@@ -129,26 +129,26 @@ function altapay_add_gateway( $methods ) {
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
 						$tokenStatus = 'CreditCard';
 					}
-                    $current_settings = get_option( 'woocommerce_altapay_'.$terminal.'_settings', [] );
-                    if ( empty ( $current_settings ) ) {
-                        // Set default terminal logo
-                        $terminalSettings = array(
-                            'enabled'        => 'yes',
-                            'title'          => str_replace( '-', ' ', $term->name ),
-                            'description'    => '',
-                            'payment_action' => 'authorize',
-                            'payment_icon'   => Core\AltapaySettings::getPaymentMethodIcon($term->identifier ?? ''),
-                            'currency'       => get_option( 'woocommerce_currency' ),
-                        );
+					$current_settings = get_option( 'woocommerce_altapay_'.$terminal.'_settings', [] );
+					if ( empty ( $current_settings ) ) {
+						// Set default terminal logo
+						$terminalSettings = array(
+							'enabled'        => 'yes',
+							'title'          => str_replace( '-', ' ', $term->name ),
+							'description'    => '',
+							'payment_action' => 'authorize',
+							'payment_icon'   => Core\AltapaySettings::getPaymentMethodIcon($term->identifier ?? ''),
+							'currency'       => get_option( 'woocommerce_currency' ),
+						);
 
-                        // Update option with configuration settings
-                        update_option(
-                            'woocommerce_altapay_' . $terminal . '_settings',
-                            $terminalSettings,
-                            'yes'
-                        );
+						// Update option with configuration settings
+						update_option(
+							'woocommerce_altapay_' . $terminal . '_settings',
+							$terminalSettings,
+							'yes'
+						);
 
-                    }
+					}
 				}
 			}
 
