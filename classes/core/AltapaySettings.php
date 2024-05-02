@@ -460,6 +460,7 @@ class AltapaySettings {
 				'name'    => $terminal->Title,
 				'nature'  => $terminal->Natures,
 				'methods' => $terminal->Methods,
+				'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
 			);
 		}
 
@@ -536,7 +537,7 @@ class AltapaySettings {
 				'title'          => str_replace( '-', ' ', $terminal->Title ),
 				'description'    => '',
 				'payment_action' => 'authorize',
-				'payment_icon'   => 'default',
+				'payment_icon'   => self::getPaymentMethodIcon($terminal->PrimaryMethod->Identifier ?? ''),
 				'currency'       => get_option( 'woocommerce_currency' ),
 			);
 
@@ -637,7 +638,8 @@ class AltapaySettings {
 					'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
 					'name'    => $terminal->Title,
 					'nature'  => $terminal->Natures,
-					'methods' => isset( $terminal->Methods ) ? $terminal->Methods : array(),
+					'methods' => $terminal->Methods ?? array(),
+					'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
 				);
 			}
 
@@ -681,4 +683,43 @@ class AltapaySettings {
 			error_log( 'Error: ' . $e->getMessage() );
 		}
 	}
+
+    /**
+     * Get Terminal logo based on payment method identifier
+     *
+     * @param string $identifier
+     * @return string
+     */
+    static function getPaymentMethodIcon($identifier = '')
+    {
+        $defaultValue = 'default';
+
+        $paymentMethodIcons = [
+            "ApplePay" => "apple_pay.png",
+            "Bancontact" => "bancontact.png",
+            "BankPayment" => "bank.png",
+            "CreditCard" => "creditcard.png",
+            "iDeal" => "ideal.png",
+            "Invoice" => "invoice.png",
+            "Klarna" => "klarna_pink.png",
+            "MobilePay" => "mobilepay.png",
+            "OpenBanking" => "bank.png",
+            "Payconiq" => "payconiq.png",
+            "PayPal" => "paypal.png",
+            "Przelewy24" => "przelewy24.png",
+            "Sepa" => "sepa.png",
+            "SwishSweden" => "swish.png",
+            "Trustly" => "trustly_primary.png",
+            "Twint" => "twint.png",
+            "ViaBill" => "viabill.png",
+            "Vipps" => "vipps.png"
+        ];
+
+        if (isset($paymentMethodIcons[$identifier])) {
+            return $paymentMethodIcons[$identifier];
+        }
+
+        return $defaultValue;
+    }
+
 }

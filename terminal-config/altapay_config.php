@@ -2,11 +2,13 @@
 
 use Altapay\Api\Others\Terminals;
 use Altapay\Api\Test\TestAuthentication;
+use Altapay\Classes\Core\AltapaySettings;
 use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use Altapay\Authentication;
 
 define('WP_USE_THEMES', false);
 require('./wp-load.php');
+require_once('./wp-content/plugins/altapay-for-woocommerce/altapay.php');
 
 // Settings
 $apiUser = "~gatewayusername~";
@@ -36,13 +38,11 @@ $wcSetupWizard = get_option( 'woocommerce_onboarding_profile', array() );
 $wcSetupWizard['skipped'] = true;
 update_option('woocommerce_onboarding_profile', $wcSetupWizard);
 
-$terminals = array();
-$terminals = array();
+$terminals = $altapayTerminals = array();
 
 try {
     $api              = new Terminals(new Authentication($apiUser, $apiPass, $url));
     $response         = $api->call();
-    $altapayTerminals = array();
 
     foreach ($response->Terminals as $key => $terminal) {
         $terminals[$key]    = str_replace(array(' ', '-'), '_', $terminal->Title);
@@ -50,7 +50,8 @@ try {
             'key'    => $terminals[$key],
             'name'   => $terminal->Title,
             'nature' => $terminal->Natures,
-            'methods' => isset( $terminal->Methods ) ? $terminal->Methods : [],
+            'methods' => $terminal->Methods ?? [],
+            'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
         );
     }
     update_option('altapay_terminals', wp_json_encode($altapayTerminals));
@@ -101,17 +102,17 @@ update_option('altapay_fraud_detection_action', 0);
 // Legacy CC form styling for integration tests
 update_option( 'altapay_cc_form_styling', 'legacy' );
 
-foreach ($terminals as $terminal) {
+foreach ($altapayTerminals as $terminal) {
     $terminalSettings = array(
         "enabled"        => "yes",
-        "title"          => str_replace('_', ' ', $terminal),
+        "title"          => str_replace('-', ' ', $terminal['name']),
         "description"    => "",
         "payment_action" => "authorize",
-        "payment_icon"   => "default",
+        "payment_icon"   => AltapaySettings::getPaymentMethodIcon($terminal['identifier']),
         "currency"       => $currency,
     );
 
-    update_option('woocommerce_altapay_' . strtolower($terminal) . '_settings',
-        apply_filters('woocommerce_settings_api_sanitized_fields_' . 'altapay_' . strtolower($terminal),
+    update_option('woocommerce_altapay_' . strtolower($terminal['key']) . '_settings',
+        apply_filters('woocommerce_settings_api_sanitized_fields_' . 'altapay_' . strtolower($terminal['key']),
             $terminalSettings), 'yes');
 }
