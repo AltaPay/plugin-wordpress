@@ -54,18 +54,6 @@ jobs:
          composer prefix-dependencies
          php ./vendor/bin/phpstan analyze
        working-directory: wordpress/wp-content/plugins/plugin-wordpress
-     
-     - name: Install PHP 7.4
-       uses: shivammathur/setup-php@v2
-       with:
-         php-version: '7.4'
-         extensions: intl #optional
-         ini-values: "post_max_size=256M" #optional
-     
-     - name: Run php7.4 linter
-       run: |
-         find . -path ./vendor -prune -false -o -type f -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php7.4 -l -n | (! grep -v "No syntax errors detected" )
-       working-directory: wordpress/wp-content/plugins/plugin-wordpress
 
      - name: Install PHP 7.4
        uses: shivammathur/setup-php@v2

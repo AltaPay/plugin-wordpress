@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.6.2
+ * Version: 3.6.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 8.7.0
+ * WC tested up to: 8.8.3
  *
  * @package Altapay
  */
@@ -39,7 +39,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.2' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.3' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -128,6 +128,26 @@ function altapay_add_gateway( $methods ) {
 						$tokenStatus   = 'CreditCard';
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
 						$tokenStatus = 'CreditCard';
+					}
+					$current_settings = get_option( 'woocommerce_altapay_'.$terminal.'_settings', [] );
+					if ( empty ( $current_settings ) ) {
+						// Set default terminal logo
+						$terminalSettings = array(
+							'enabled'        => 'yes',
+							'title'          => str_replace( '-', ' ', $term->name ),
+							'description'    => '',
+							'payment_action' => 'authorize',
+							'payment_icon'   => Core\AltapaySettings::getPaymentMethodIcon($term->identifier ?? ''),
+							'currency'       => get_option( 'woocommerce_currency' ),
+						);
+
+						// Update option with configuration settings
+						update_option(
+							'woocommerce_altapay_' . $terminal . '_settings',
+							$terminalSettings,
+							'yes'
+						);
+
 					}
 				}
 			}
