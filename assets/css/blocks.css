@@ -6,3 +6,6 @@ span.altapay-payment-method {
 span.altapay-payment-method img {
     float: right;
 }
+#payment .payment_methods li img {
+    max-width: 55px;
+}
