@@ -646,7 +646,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$address->City       = $addressInfo['city'];
 		$address->PostalCode = $addressInfo['postcode'];
 		$address->Region     = $addressInfo['region'] ?: '0';
-		$address->Country    = $addressInfo['country'];
+
+		if ( ! empty( $addressInfo['country'] ) ) {
+			$address->Country = $addressInfo['country'];
+		}
 	}
 
 	/**
