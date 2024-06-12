@@ -482,6 +482,7 @@ input#giftcard_account_identifier {
 
 .altapay-page-wrapper {
 	width: 100%;
+	padding-top: 50px;
 }
 
 @media screen and (min-width:992px){
