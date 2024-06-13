@@ -480,6 +480,11 @@ input#giftcard_account_identifier {
 	padding: 0;
 }
 
+.altapay-page-wrapper {
+	width: 100%;
+	padding-top: 50px;
+}
+
 @media screen and (min-width:992px){
 	.altapay-page-wrapper {
 		display: flex;

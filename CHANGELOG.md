@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.4]
+- Fix: "Parameter customer_info[billing_country] was not a valid country ('')" error during checkout.
+- Fix: Payment method logos appeared too large in some themes.
+
 ## [3.6.3]
 - Configure terminal logo automatically.
 
