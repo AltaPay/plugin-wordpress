@@ -3,11 +3,11 @@ Contributors: altapay_integrations
 Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.4
 Requires at least: 5.0
-Tested up to: 6.5.4
-Stable tag: 3.6.4
+Tested up to: 6.5.5
+Stable tag: 3.6.5
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 8.9.3
+WC tested up to: 9.0.2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
@@ -26,7 +26,7 @@ The whole installation and configuration process is described in our [integratio
 1. Plugin configuration for gateway access
 2. Payment terminal configuration
 3. Checkout page
-4. AltaPay actions
+4. AltaPay Payment Actions
 
 == Support ==
 
@@ -38,6 +38,9 @@ AltaPay supports major acquiring banks, global payment methods and over 50 prefe
 AltaPay's Payment Gateway for WooCommerce provides merchants with access to a full set of business-ready international payment and accounting functionality. With this extension, merchants are able to receive payments through Visa, Mastercard, Dankort, iDeal, PayPal, MobilePay, Klarna and ViaBill. To use the extension an account for AltaPay's payment gateway is needed. Once the account is set, the merchant receives API credentials which will link the extension to the payment gateway.
 
 == Changelog ==
+
+= 3.6.5 =
+* Improve UI for AltaPay Payment Actions grid and move it to the top right side for easy access.
 
 = 3.6.4 =
 * Fix: "Parameter customer_info[billing_country] was not a valid country ('')" error during checkout.
@@ -151,7 +154,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 * Add support for WooCommerce Subscriptions with credit card terminal.
 
 = 3.3.3 =
-* Maintain record for partial/full captures in the AltaPay actions grid.
+* Maintain record for partial/full captures in the AltaPay Payment Actions grid.
 
 = 3.3.2 =
 * Save credit card token based on "Save my card details" checkbox on credit card payment form.
@@ -161,7 +164,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.3.0 =
 * Update minimum PHP supported version to 7.2
-* Fix: inventory not updating when doing refund from AltaPay actions grid
+* Fix: inventory not updating when doing refund from AltaPay Payment Actions grid
 * Fix: Refund response issue with PHP 8.1
 
 = 3.2.9 =

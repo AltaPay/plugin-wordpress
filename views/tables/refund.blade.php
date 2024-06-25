@@ -13,13 +13,13 @@
     <tr style="font-weight: bold; border-collapse: collapse; padding: 15px;">
     <thead>
     <tr>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Product name</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price with tax</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price without tax</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Ordered</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Discount Percent</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Quantity</th>
-        <th class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Total amount</th>
+        <th width="40%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Product name</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price with tax</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price without tax</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Ordered</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Discount Percent</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Quantity</th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Total amount</th>
     </tr>
     </thead>
     </tr>
@@ -98,7 +98,7 @@
             <td class="ap-orderline-refund-max-quantity pv3 pr3 bb b--black-20">{{$qty}}</td>
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercent}}</td>
             <td class="pv3 pr3 bb b--black-20">
-                <input class="form-control ap-order-refund-modify"
+                <input style="width: 100px;" class="form-control ap-order-refund-modify"
                         name="qty"
                         value="{{$refundableQty}}"
                         type="number"

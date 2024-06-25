@@ -5,10 +5,10 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.6.4
+ * Version: 3.6.5
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 8.9.3
+ * WC tested up to: 9.0.2
  *
  * @package Altapay
  */
@@ -39,7 +39,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.4' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.5' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -247,10 +247,11 @@ function altapayAddMetaBoxes() {
 
 	add_meta_box(
 		'altapay-actions',
-		__( 'AltaPay actions', 'altapay' ),
-		'altapay_meta_box',
+		__( 'AltaPay Payment Actions', 'altapay' ),
+		'altapay_meta_box_side',
 		$screen,
-		'normal'
+		'side',
+        'high'
 	);
 
 	add_meta_box(
@@ -268,7 +269,7 @@ function altapayAddMetaBoxes() {
  * @param WP_Post $post Current post object.
  * @return void
  */
-function altapay_meta_box( $post_or_order_object ) {
+function altapay_meta_box_side( $post_or_order_object ) {
 	$order = ( $post_or_order_object instanceof WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 	if ( ! $order ) {
@@ -352,7 +353,7 @@ function altapay_meta_box( $post_or_order_object ) {
 				$type     = $pay->AuthType;
 
 				if ( $status === 'released' ) {
-					echo '<br /><b>' . __( 'Payment released', 'altapay' ) . '</b>';
+					echo '<strong>' . __( 'Payment released', 'altapay' ) . '</strong>';
 				} else {
 					$charge = $reserved - $captured - $refunded;
 					if ( $charge <= 0 ) {
@@ -370,6 +371,7 @@ function altapay_meta_box( $post_or_order_object ) {
 							'items_captured'     => $itemsCaptured,
 							'transaction_status' => $status,
 							'transaction_type'   => $type,
+                            'transaction_id'     => $txnID,
 						)
 					);
 				}
