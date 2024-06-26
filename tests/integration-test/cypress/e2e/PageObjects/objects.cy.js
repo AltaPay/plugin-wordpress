@@ -15,8 +15,8 @@ class Order {
     addproduct() {
         cy.get('.nav-menu > li').contains('Shop').click()
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
-        cy.get('.single_add_to_cart_button').click()
-        cy.contains('View cart').click()
+        cy.get('.single_add_to_cart_button').click().wait(3000)
+        cy.get('.woocommerce-message > .button').click().wait(3000)
         cy.contains('Proceed to Checkout').click().wait(3000)
 
     }
@@ -110,7 +110,8 @@ class Order {
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
-        cy.get('#altapay_capture').click()
+        cy.get('#openCaptureModal').click().wait(2000)
+        cy.get('#altapay_capture').click().wait(2000)
         cy.get('#altapay_capture').should('not.exist')
 
     }
@@ -129,13 +130,15 @@ class Order {
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
+        cy.get('#openCaptureModal').click().wait(2000)
         cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
         cy.get('#altapay_capture').click()
     }
 
     refund() {
 
-        cy.get('[for="tab2"]').click()
+    
+        cy.get('#openRefundModal').click().wait(3000)
         cy.get('#altapay_refund').click().wait(5000)
         cy.get('body').then(($a) => {
             if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
@@ -158,8 +161,8 @@ class Order {
         })
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
-        cy.get('[for="tab2"]').click()
-        cy.get('#refund > [style="overflow-x:auto;"] > .responsive-table > .w-100 > :nth-child(3) > :nth-child(1) > :nth-child(7) > .form-control').click({ force: true }).clear({ force: true }).type('0', { force: true }).click({ force: true })
+        cy.get('#openRefundModal').click().wait(3000)
+        cy.get('#TB_ajaxContent > [style="overflow-x:auto;"] > .responsive-table > .w-100 > :nth-child(3) > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
         cy.get('#altapay_refund').click().wait(2000)
 
 
@@ -187,7 +190,8 @@ class Order {
         cy.get('a[href="admin.php?page=wc-settings"]').click()
         cy.get('#select2-woocommerce_currency-container').click()
         cy.get('.select2-dropdown > .select2-search > .select2-search__field').type('Euro (€){enter}')
-        cy.get('.submit > .button-primary').click()
+        cy.get('.woocommerce-save-button').click()
+    
     }
 
     ideal_payment(iDEAL_EUR_TERMINAL) {
@@ -223,9 +227,8 @@ class Order {
 
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
-        cy.get('[for="tab2"]').click()
+        cy.get('#openRefundModal').click()
         cy.get('#altapay_refund').click().wait(5000)
-        cy.get('[for="tab2"]').click()
         cy.get('body').then(($a) => {
             if ($a.find(':nth-child(6) > tbody > :nth-child(1) > .label').length) {
                 cy.get(':nth-child(6) > tbody > :nth-child(1) > .label').should('have.text', 'Refunded:')
@@ -241,7 +244,7 @@ class Order {
         cy.get('a[href="admin.php?page=wc-settings"]').click()
         cy.get('#select2-woocommerce_currency-container').click()
         cy.get('.select2-dropdown > .select2-search > .select2-search__field').type('Danish Krone{enter}')
-        cy.get('.submit > .button-primary').click()
+        cy.get('.woocommerce-save-button').click()
     }
 
     create_fixed_discount() {
