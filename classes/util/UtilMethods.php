@@ -44,7 +44,7 @@ class UtilMethods {
 			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
 
-        $i = 0;
+		$i = 0;
 
         // generate order lines product by product
 		foreach ( $cartItems as $key => $item ) {
@@ -75,7 +75,7 @@ class UtilMethods {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
 
-            $i++;
+			$i++;
 		}
 		// get the shipping Details
 		$shippingDetails = $this->getShippingDetails(
