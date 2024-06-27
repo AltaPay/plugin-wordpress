@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.5]
+- Improve UI for AltaPay Payment Actions grid and move it to the top right side for easy access.
+
 ## [3.6.4]
 - Fix: "Parameter customer_info[billing_country] was not a valid country ('')" error during checkout.
 - Fix: Payment method logos appeared too large in some themes.
@@ -114,7 +117,7 @@ All notable changes to this project will be documented in this file.
 - Add support for WooCommerce Subscriptions with credit card terminal.
 
 ## [3.3.3]
-- Maintain record for partial/full captures in the AltaPay actions grid.
+- Maintain record for partial/full captures in the AltaPay Payment Actions grid.
 
 ## [3.3.2]
 - Save credit card token based on "Save my card details" checkbox on credit card payment form.
@@ -124,7 +127,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.3.0]
 - Update minimum PHP supported version to 7.2
-- Fix: inventory not updating when doing refund from AltaPay actions grid
+- Fix: inventory not updating when doing refund from AltaPay Payment Actions grid
 - Fix: Refund response issue with PHP 8.1
 
 ## [3.2.9]

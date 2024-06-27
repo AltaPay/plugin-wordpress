@@ -26,10 +26,11 @@ jQuery( document ).ready(
 					function (response) {
 						var result = response.data;
 						if (response.success === true) {
+							jQuery( '.release-status' ).html( '<strong class="green">Payment released.</strong>' );
 							alert( 'Payment released' );
 							location.reload();
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="red">Release failed: ' + result.error + '</strong>' );
+							jQuery( '.release-status' ).html( '<strong class="red">Release failed: ' + result.error + '</strong>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}

@@ -198,12 +198,13 @@ To capture the order follow the below steps:
 
 * Navigate to **WooCommerce** > **Orders**
 * Open an order that you want to capture
-* Scroll to **AltaPay actions** section
-* Select the **Capture** tab (selected by default)
+* Find **AltaPay Payment Actions** box on the top right side
+* Click the **Capture** button which will open a popup
 * Change the quantities of the items for a partial capture
 * Click on **Capture** button
 
    ![capture_order](docs/capture_order.png)
+   ![capture_order_popup](docs/capture_order_popup.png)
 
 ## Refund Payment
 
@@ -211,12 +212,13 @@ To refund the order follow the below steps:
 
 * Navigate to **WooCommerce** > **Orders**
 * Open an order that you want to refund
-* Scroll to **AltaPay actions** section
-* Select **Refund** tab
+* Find **AltaPay Payment Actions** box on the top right side
+* Click the **Refund** button which will open a popup
 * Change the quantities of the items for a partial refund
 * Click on **Refund** button
 
    ![refund_order](docs/refund_order.png)
+   ![refund_order_popup](docs/refund_order_popup.png)
 
 > Note:
 >
@@ -272,8 +274,8 @@ In order to reconcile payments please follow the steps below:
 ## Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.5.4
-- WooCommerce min. 3.9.0 – max. 8.9.3
+- WordPress min. 5.0 – max. 6.5.5
+- WooCommerce min. 3.9.0 – max. 9.0.2
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.

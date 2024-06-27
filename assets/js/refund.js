@@ -62,7 +62,7 @@ jQuery( document ).ready(
 					function (response) {
 						var result = response.data;
 						if (response.success === true) {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="green">'+result.message+'</strong>' );
+							jQuery( '.refund-status' ).html( '<strong class="green">'+result.message+'</strong>' );
 							jQuery( '.payment-reserved' ).text( result.reserved );
 							jQuery( '.payment-captured' ).text( result.captured );
 							jQuery( '.payment-refunded' ).text( result.refunded );
@@ -70,7 +70,7 @@ jQuery( document ).ready(
 							jQuery( 'ul.order_notes' ).prepend( result.note );
 							window.setTimeout(function(){location.reload()},1000);
 						} else {
-							jQuery( '#altapay-actions .inside .capture-status' ).html( '<strong class="red">Refund failed: ' + result.error + '</strong>' );
+							jQuery( '.refund-status' ).html( '<strong class="red">Refund failed: ' + result.error + '</strong>' );
 						}
 						jQuery( '.loader' ).css( 'display', 'none' );
 					}
