@@ -46,7 +46,7 @@ class UtilMethods {
 
 		$i = 0;
 
-        // generate order lines product by product
+		// generate order lines product by product
 		foreach ( $cartItems as $key => $item ) {
 
 			if ( $item->get_total() == 0 ) {

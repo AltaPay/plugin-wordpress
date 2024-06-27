@@ -246,7 +246,7 @@ function altapayAddMetaBoxes() {
 		: 'shop_order';
 
 	add_meta_box(
-		'altapay-actions',
+		'altapay-actions-side',
 		__( 'AltaPay Payment Actions', 'altapay' ),
 		'altapay_meta_box_side',
 		$screen,
