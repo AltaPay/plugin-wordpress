@@ -43,6 +43,9 @@ class UtilMethods {
 		if ( ! $cartItems ) {
 			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
+
+		$i = 0;
+
 		// generate order lines product by product
 		foreach ( $cartItems as $key => $item ) {
 
@@ -55,7 +58,7 @@ class UtilMethods {
 				$couponDiscountPercentage = $this->getCouponDiscount( $appliedCouponItems, $item );
 			}
 			// get product details for each order line
-			$productDetails = $this->getProductDetails( $item, $couponDiscountPercentage, $isSubscription );
+			$productDetails = $this->getProductDetails( $item, $couponDiscountPercentage, ( ( $i == 0 ) ? $isSubscription : 0 ) );
 
 			if ( $wcRefund ) {
 				$orderlineDetails[ $key ] = array(
@@ -71,13 +74,14 @@ class UtilMethods {
 			if ( ! $wcRefund && isset( $productDetails['compensation'] ) ) {
 				$orderlineDetails [] = $productDetails['compensation'];
 			}
+
+			$i++;
 		}
 		// get the shipping Details
 		$shippingDetails = $this->getShippingDetails(
 			$order,
 			$products,
-			$wcRefund,
-			$isSubscription
+			$wcRefund
 		);
 
 		if ( $shippingDetails ) {
@@ -256,7 +260,7 @@ class UtilMethods {
 	 * @param bool     $wcRefund
 	 * @return array|bool
 	 */
-	private function getShippingDetails( $order, $products, $wcRefund, $isSubscription = false ) {
+	private function getShippingDetails( $order, $products, $wcRefund ) {
 		// Get the shipping method
 		$orderShippingMethods = $order->get_shipping_methods();
 		$shippingID           = 'NaN';
@@ -293,7 +297,7 @@ class UtilMethods {
 				);
 				$orderLine->taxAmount  = round( $totalShippingTax, 2 );
 				$orderLine->taxPercent = round( ( $totalShippingTax / $totalShipping ) * 100, 2 );
-				$goodsType             = ( $isSubscription ) ? 'subscription_model' : 'shipment';
+				$goodsType             = 'shipment';
 				$orderLine->setGoodsType( $goodsType );
 				$shippingDetails[] = $orderLine;
 			}

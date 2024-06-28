@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.6]
+- Fix MobilePay Subscription Payment.
+
 ## [3.6.5]
 - Improve UI for AltaPay Payment Actions grid and move it to the top right side for easy access.
 
