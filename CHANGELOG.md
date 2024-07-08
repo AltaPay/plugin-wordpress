@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.7]
+- Extend support to include all languages that the gateway supports.
+
+    Supported languages: https://documentation.altapay.com/Content/Ecom/Reference/Supported%20languages.htm
+
 ## [3.6.6]
 - Fix MobilePay Subscription Payment.
 
