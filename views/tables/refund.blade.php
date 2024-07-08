@@ -137,7 +137,7 @@
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercentage}}</td>
             <td class="pv3 pr3 bb b--black-20">
                 <input class="form-control ap-order-refund-modify" 
-                       name="qty" value="{{$remaining_refund_amount == 0 ? 0 : 1}}" type="number" {{ $remaining_refund_amount == 0 ? 'disabled' : '' }} />
+                       name="qty" value="{{$remaining_refund_amount == 0 ? 0 : 1}}" type="number" style="width: 100px;"  {{ $remaining_refund_amount == 0 ? 'disabled' : '' }} />
             </td>
             <td class="ap-orderline-totalprice-refund pv3 pr3 bb b--black-20">
                 <span class="totalprice-refund">{{$order->get_currency()}} {{$totalIncTax}}</span>

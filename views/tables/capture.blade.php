@@ -134,7 +134,7 @@
             <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercentage}}</td>
             <td class="pv3 pr3 bb b--black-20">
                 <input class="form-control ap-order-capture-modify" name="qty"
-                       value="{{$capturableQty}}" type="number" {{ $capturableQty === 0 ? 'disabled' : '' }} />
+                       value="{{$capturableQty}}" type="number" style="width: 100px;"  {{ $capturableQty === 0 ? 'disabled' : '' }} />
             </td>
             <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20">
                 <span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span>
