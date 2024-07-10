@@ -162,26 +162,41 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$customerInfo	= $this->setCustomer( $order );
 		$cookie 		= isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
 		$language 		= 'en';
-		$languages 		= array(
-			'da_DK' => 'da',
-			'sv_SE' => 'sv',
-			'nn_NO' => 'no',
-			'no_NO' => 'no',
-			'nb_NO' => 'no',
-			'de_DE' => 'de',
-			'cs_CZ' => 'cs',
-			'fi_FI' => 'fi',
-			'fr_FR' => 'fr',
-			'lt' 	=> 'lt',
-			'nl_NL' => 'nl',
-			'pl_PL' => 'pl',
-			'et' 	=> 'et',
-			'ee' 	=> 'et',
-			'en_US' => 'en',
-			'it' 	=> 'it',
+		$languages = array(
+			'ca',
+			'cs',
+			'da',
+			'de',
+			'ee',
+			'en',
+			'es',
+			'et',
+			'fi',
+			'fr',
+			'hr',
+			'is',
+			'it',
+			'ja',
+			'lt',
+			'nb',
+			'nl',
+			'nn',
+			'no',
+			'pl',
+			'pt',
+			'ru',
+			'sk',
+			'sl',
+			'sv',
+			'th',
+			'tr',
+			'zh'
 		);
-		if (array_key_exists(get_locale(), $languages)) {
-			$language = $languages[get_locale()];
+
+		$wpLocale = strtok(get_locale(), '_');
+
+		if (in_array($wpLocale, $languages)) {
+			$language = $wpLocale;
 		}
 
 		$wpml_language = $order->get_meta( 'wpml_language' );

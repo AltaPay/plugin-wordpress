@@ -5,7 +5,7 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.6.6
+ * Version: 3.6.7
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 9.0.2
@@ -39,7 +39,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.6' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.7' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -129,15 +129,15 @@ function altapay_add_gateway( $methods ) {
 					} elseif ( in_array( 'CreditCard', $natures, true ) ) {
 						$tokenStatus = 'CreditCard';
 					}
-					$current_settings = get_option( 'woocommerce_altapay_'.$terminal.'_settings', [] );
-					if ( empty ( $current_settings ) ) {
+					$current_settings = get_option( 'woocommerce_altapay_' . $terminal . '_settings', array() );
+					if ( empty( $current_settings ) ) {
 						// Set default terminal logo
 						$terminalSettings = array(
 							'enabled'        => 'yes',
 							'title'          => str_replace( '-', ' ', $term->name ),
 							'description'    => '',
 							'payment_action' => 'authorize',
-							'payment_icon'   => Core\AltapaySettings::getPaymentMethodIcon($term->identifier ?? ''),
+							'payment_icon'   => Core\AltapaySettings::getPaymentMethodIcon( $term->identifier ?? '' ),
 							'currency'       => get_option( 'woocommerce_currency' ),
 						);
 
@@ -251,7 +251,7 @@ function altapayAddMetaBoxes() {
 		'altapay_meta_box_side',
 		$screen,
 		'side',
-        'high'
+		'high'
 	);
 
 	add_meta_box(
@@ -371,7 +371,7 @@ function altapay_meta_box_side( $post_or_order_object ) {
 							'items_captured'     => $itemsCaptured,
 							'transaction_status' => $status,
 							'transaction_type'   => $type,
-                            'transaction_id'     => $txnID,
+							'transaction_id'     => $txnID,
 						)
 					);
 				}
@@ -1040,6 +1040,23 @@ function altapay_wc_checkout_block_support() {
 		}
 	}
 }
+
+/**
+ * Add custom class to the body
+ *
+ * @param $classes
+ *
+ * @return array
+ */
+function altapay_add_custom_class_to_body( $classes ) {
+	if ( basename( get_permalink() ) === 'altapay-payment-form' ) {
+		$classes[] = 'altapay-checkout-page';
+	}
+
+	return $classes;
+}
+
+add_filter( 'body_class', 'altapay_add_custom_class_to_body', 10, 1 );
 
 /**
  * Enqueue styles for checkout blocks
