@@ -35,6 +35,7 @@
 </head>
 
 <body>
+@php add_thickbox(); @endphp
 <input id="txnID" value="{{$order->get_transaction_id()}}" hidden>
 <!-- Capture Modal -->
 <div style="display: none" id="captureModal">

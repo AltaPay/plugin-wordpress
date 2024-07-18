@@ -1081,20 +1081,6 @@ function altapay_checkout_blocks_style() {
 	);
 }
 
-/**
- * Enqueues the default ThickBox js and css for admin order edit page only.
- * @return void
- */
-function altapay_action_grid_add_thickbox ($hook) {
-
-    global $post;
-    $screen    = get_current_screen();
-    $screen_id = $screen ? $screen->id : '';
-
-    if ( ( ! empty ( $post ) and $post->post_type === 'shop_order' and $hook === 'post.php' ) or $screen_id === wc_get_page_screen_id( 'shop-order' ) ) {
-        add_thickbox();
-    }
-}
 
 add_action( 'wp_enqueue_scripts', 'altapay_checkout_blocks_style' );
 add_action( 'woocommerce_blocks_loaded', 'altapay_wc_checkout_block_support' );
@@ -1110,4 +1096,3 @@ add_action( 'wp_ajax_create_altapay_payment_page', 'createAltapayPaymentPageCall
 add_filter( 'template_include', 'altapay_page_template', 99 );
 add_action( 'plugins_loaded', 'init_altapay_settings', 0 );
 add_action( 'template_redirect', 'validate_checksum_altapay_callback_form' );
-add_action ( 'admin_enqueue_scripts','altapay_action_grid_add_thickbox' );
