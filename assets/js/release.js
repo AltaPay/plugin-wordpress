@@ -26,9 +26,8 @@ jQuery( document ).ready(
 					function (response) {
 						var result = response.data;
 						if (response.success === true) {
-							jQuery( '.release-status' ).html( '<strong class="green">Payment released.</strong>' );
-							alert( 'Payment released' );
-							location.reload();
+							jQuery( '.release-status' ).html( '<strong class="green">' + result.message + '</strong>' );
+							window.setTimeout(function(){location.reload()},1000);
 						} else {
 							jQuery( '.release-status' ).html( '<strong class="red">Release failed: ' + result.error + '</strong>' );
 						}

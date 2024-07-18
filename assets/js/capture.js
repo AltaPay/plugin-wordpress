@@ -59,7 +59,7 @@ jQuery( document ).ready(
 					function (response) {
 						var result = response.data;
 						if (response.success === true) {
-							jQuery( '.capture-status' ).html( '<strong class="green">Payment captured.</strong>' );
+							jQuery( '.capture-status' ).html( '<strong class="green">' + result.message + '</strong>' );
 							jQuery( '.payment-reserved' ).text( result.reserved );
 							jQuery( '.payment-captured' ).text( result.captured );
 							jQuery( '.payment-refunded' ).text( result.refunded );
