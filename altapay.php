@@ -84,6 +84,9 @@ function init_altapay_settings() {
 		Core\AltapaySettings::recreateTerminalData( $settings );
 	}
 
+    load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+
 }
 
 /**

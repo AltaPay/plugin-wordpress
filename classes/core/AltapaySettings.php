@@ -248,15 +248,6 @@ class AltapaySettings {
 
 
 	/**
-	 * Loads language file with language specifics
-	 *
-	 * @return void
-	 */
-	public function altapayLocalizationInit() {
-		load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-	}
-
-	/**
 	 * Add AltaPay settings option in plugins menu
 	 *
 	 * @return void
