@@ -27,7 +27,7 @@ jQuery( document ).ready(
 						var result = response.data;
 						if (response.success === true) {
 							jQuery( '.release-status' ).html( '<strong class="green">' + result.message + '</strong>' );
-							window.setTimeout(function(){location.reload()},1000);
+							window.setTimeout(function(){location.reload()}, 1000);
 						} else {
 							jQuery( '.release-status' ).html( '<strong class="red">Release failed: ' + result.error + '</strong>' );
 						}
