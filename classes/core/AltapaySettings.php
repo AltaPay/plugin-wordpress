@@ -27,8 +27,6 @@ class AltapaySettings {
 	 * AltapaySettings constructor.
 	 */
 	public function __construct() {
-		// Load localization files
-		add_action( 'init', array( $this, 'altapayLocalizationInit' ) );
 		add_action( 'init', array( $this, 'altapayCapturesPostInit' ) );
 		// Add admin menu
 		add_action( 'admin_menu', array( $this, 'altapaySettingsMenu' ), 60 );
