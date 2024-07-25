@@ -45,11 +45,11 @@ msgstr "Ordren har ingen transaktion"
 
 #: altapay.php:708
 msgid "Payment Captured."
-msgstr "Betaling indfanget."
+msgstr "Betaling hentet."
 
 #: altapay.php:832
 msgid "Payment refund is in progress."
-msgstr "Betalingsrefusion er i gang."
+msgstr "Refundering for betaling er i gang."
 
 #: altapay.php:915
 msgid "Payment Refunded."
@@ -104,7 +104,7 @@ msgstr "Beløb"
 #: views/tables/index.blade.php:139
 #: views/tables/index.blade.php:143
 msgid "Capture"
-msgstr "Indfang"
+msgstr "Hent"
 
 #: views/tables/index.blade.php:103
 #: views/tables/index.blade.php:144
@@ -128,7 +128,7 @@ msgstr "Debiterbar"
 #: views/tables/index.blade.php:128
 #: views/tables/index.blade.php:130
 msgid "Captured"
-msgstr "Indfanget"
+msgstr "Hentet"
 
 #: views/tables/index.blade.php:133
 #: views/tables/index.blade.php:136
@@ -138,7 +138,7 @@ msgstr "Refunderet"
 #: views/tables/index.blade.php:138
 #: views/tables/index.blade.php:142
 msgid "Capture Payment"
-msgstr "Indfang betaling"
+msgstr "Hent betaling"
 
 #: views/tables/index.blade.php:143
 #: views/tables/index.blade.php:147
