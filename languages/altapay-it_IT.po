@@ -41,7 +41,7 @@ msgstr "Pagamento rilasciato."
 
 #: altapay.php:385
 msgid "Order got no transaction"
-msgstr "L'ordine non ha nessuna transazione"
+msgstr "L'ordine non ha transazioni"
 
 #: altapay.php:708
 msgid "Payment Captured."
@@ -78,7 +78,7 @@ msgstr "Ordinato"
 #: views/tables/capture.blade.php:20
 #: views/tables/refund.blade.php:20
 msgid "Discount Percent"
-msgstr "Percentuale di sconto"
+msgstr "Percentuale sconto"
 
 #: views/tables/capture.blade.php:21
 #: views/tables/refund.blade.php:21
@@ -93,7 +93,7 @@ msgstr "Importo totale"
 #: views/tables/index.blade.php:59
 #: views/tables/index.blade.php:95
 msgid "Send order lines"
-msgstr "Invia linee d'ordine"
+msgstr "Invia righe ordine"
 
 #: views/tables/index.blade.php:66
 #: views/tables/index.blade.php:101
