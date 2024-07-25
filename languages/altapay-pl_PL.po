@@ -18,7 +18,7 @@ msgstr ""
 
 #: altapay.php:254
 msgid "AltaPay Payment Actions"
-msgstr "Działania płatnicze AltaPay"
+msgstr "Operacje na płatności AltaPay"
 
 #: altapay.php:297
 #: classes/core/AltapayOrderStatus.php:52
@@ -114,7 +114,7 @@ msgstr "Zwrot"
 
 #: views/tables/index.blade.php:113
 msgid "Transaction ID"
-msgstr "ID transakcji"
+msgstr "Identyfikator transakcji"
 
 #: views/tables/index.blade.php:118
 msgid "Reserved"
