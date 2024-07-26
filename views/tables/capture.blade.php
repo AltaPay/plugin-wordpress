@@ -13,13 +13,13 @@
     <tr style="font-weight: bold; border-collapse: collapse; padding: 15px;">
     <thead>
     <tr>
-        <th width="40%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Product name</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price with tax</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Price without tax</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Ordered</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Discount Percent</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Quantity</th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white">Total amount</th>
+        <th width="40%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Product name', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price with tax', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price without tax', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Ordered', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Discount Percent', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Quantity', 'altapay' ); ?></th>
+        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Total amount', 'altapay' ); ?></th>
     </tr>
     </thead>
     </tr>

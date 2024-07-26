@@ -5,10 +5,12 @@
  * Description: Payment Gateway to use with WordPress WooCommerce
  * Author: AltaPay
  * Author URI: https://altapay.com
- * Version: 3.6.7
+ * Text Domain: altapay
+ * Domain Path: /languages
+ * Version: 3.6.8
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 9.0.2
+ * WC tested up to: 9.1.2
  *
  * @package Altapay
  */
@@ -39,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.7' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.8' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -81,6 +83,10 @@ function init_altapay_settings() {
 	if ( empty( $altapay_terminal_classes_recreated ) ) {
 		Core\AltapaySettings::recreateTerminalData( $settings );
 	}
+
+    load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+
 }
 
 /**
@@ -270,6 +276,9 @@ function altapayAddMetaBoxes() {
  * @return void
  */
 function altapay_meta_box_side( $post_or_order_object ) {
+	global $post;
+	$order_post = $post;
+
 	$order = ( $post_or_order_object instanceof WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 	if ( ! $order ) {
@@ -344,6 +353,8 @@ function altapay_meta_box_side( $post_or_order_object ) {
 			wp_reset_postdata();
 		}
 
+		$post = $order_post;
+
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved = $pay->ReservedAmount;
@@ -353,7 +364,7 @@ function altapay_meta_box_side( $post_or_order_object ) {
 				$type     = $pay->AuthType;
 
 				if ( $status === 'released' ) {
-					echo '<strong>' . __( 'Payment released', 'altapay' ) . '</strong>';
+					echo '<strong>' . __( 'Payment Released.', 'altapay' ) . '</strong>';
 				} else {
 					$charge = $reserved - $captured - $refunded;
 					if ( $charge <= 0 ) {
@@ -701,6 +712,7 @@ function altapayCaptureCallback() {
 				'refunded'   => $refunded,
 				'chargeable' => round( $charge, 2 ),
 				'note'       => $noteHtml,
+				'message'    => __( 'Payment Captured.', 'altapay' )
 			)
 		);
 	}
@@ -824,9 +836,10 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 				$reconciliation = new Core\AltapayReconciliation();
 				$reconciliation->saveReconciliationIdentifier( (int) $orderID, $transaction['TransactionId'], $reconciliationId, 'refunded' );
 			} elseif ( strtolower( $response->Result ) === 'open' ) {
-				$order->add_order_note( __( 'Payment refund is in progress.', 'altapay' ) );
+				$note = __( 'Payment refund is in progress.', 'altapay' );
+				$order->add_order_note( $note );
 				return array(
-					'message' => 'Payment refund is in progress.',
+					'message' => $note,
 					'success' => true,
 				);
 			} else {
@@ -906,7 +919,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			'refunded'   => $refunded,
 			'chargeable' => round( $charge, 2 ),
 			'note'       => $noteHtml,
-			'message'    => __( 'Payment refunded.', 'altapay' ),
+			'message'    => __( 'Payment Refunded.', 'altapay' ),
 			'success'    => true,
 		);
 	}
@@ -962,7 +975,7 @@ function altapayReleasePayment() {
 				$order->update_meta_data( '_released', true );
 				$order->add_order_note( __( 'Order released: "The order has been released"', 'altapay' ) );
 				$order->save();
-				wp_send_json_success( array( 'message' => 'Payment Released' ) );
+				wp_send_json_success( array( 'message' => __ ( 'Payment Released.', 'altapay') ) );
 			}
 		} else {
 			$order->add_order_note( __( 'Release failed: ' . $response->MerchantErrorMessage, 'altapay' ) );
@@ -1069,6 +1082,8 @@ function altapay_checkout_blocks_style() {
 		plugin_dir_url( __FILE__ ) . 'assets/css/blocks.css',
 	);
 }
+
+
 add_action( 'wp_enqueue_scripts', 'altapay_checkout_blocks_style' );
 add_action( 'woocommerce_blocks_loaded', 'altapay_wc_checkout_block_support' );
 add_filter( 'woocommerce_payment_gateways', 'altapay_add_gateway' );

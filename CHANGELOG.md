@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.8]
+- Add translation support for the AltaPay Payment Actions grid in the following WordPress-supported languages:
+
+    `Danish, German, Estonian, Finnish, French, Czech, German (Austria), German (Switzerland, informal), German (formal), German (Switzerland), French (Belgium), French (Canada), Italian, Lithuanian, Dutch, Dutch (Belgium), Dutch (Formal), Norwegian Nynorsk, Polish, Romanian, Swedish.`
+
 ## [3.6.7]
 - Extend support to include all languages that the gateway supports.
 

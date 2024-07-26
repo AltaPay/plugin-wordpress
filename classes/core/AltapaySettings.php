@@ -27,8 +27,6 @@ class AltapaySettings {
 	 * AltapaySettings constructor.
 	 */
 	public function __construct() {
-		// Load localization files
-		add_action( 'init', array( $this, 'altapayLocalizationInit' ) );
 		add_action( 'init', array( $this, 'altapayCapturesPostInit' ) );
 		// Add admin menu
 		add_action( 'admin_menu', array( $this, 'altapaySettingsMenu' ), 60 );
@@ -246,15 +244,6 @@ class AltapaySettings {
 		return array_merge( $links, $newLink );
 	}
 
-
-	/**
-	 * Loads language file with language specifics
-	 *
-	 * @return void
-	 */
-	public function altapayLocalizationInit() {
-		load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-	}
 
 	/**
 	 * Add AltaPay settings option in plugins menu

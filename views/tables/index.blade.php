@@ -57,16 +57,16 @@
                     <div>
                         <input class="action-select filled-in" name="allow-orderlines"
                                type="checkbox" id="ap-allow-orderlines" checked="checked"/>
-                        <label for="ap-allow-orderlines" class="form-check-label"> Send order lines</label>
+                        <label for="ap-allow-orderlines" class="form-check-label"> <?php esc_html_e( 'Send order lines', 'altapay' ); ?></label>
                     </div>
                 </div>
                 <br>
                 <div>
                     <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="capture-amount"
                            name="capture-amount" value="{{max($toBeCaptured, 0)}}"
-                           placeholder="Amount"/>
+                           placeholder="<?php esc_html_e( 'Amount', 'altapay' ); ?>"/>
                     <a id="altapay_capture" class="f7 link dim ph4 pv2 mb1 dib white"
-                       style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Capture</a>
+                       style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;"><?php esc_html_e( 'Capture', 'altapay' ); ?></a>
                 </div>
             </div>
         @endif
@@ -93,15 +93,15 @@
                 <div>
                     <input class="action-select filled-in" name="allow-refund-orderlines"
                            type="checkbox" id="ap-allow-refund-orderlines" checked="checked"/>
-                    <label for="ap-allow-refund-orderlines" class="form-check-label"> Send order lines</label>
+                    <label for="ap-allow-refund-orderlines" class="form-check-label"> <?php esc_html_e( 'Send order lines', 'altapay' ); ?></label>
                 </div>
             </div>
             <br>
             <div>
                 <input type="text" pattern="[0-9]+(\.[0-9]{0,2})?%?" id="refund-amount" name="refund-amount"
-                       value="{{max($toBeRefunded, 0)}}" placeholder="Amount"/>
+                       value="{{max($toBeRefunded, 0)}}" placeholder="<?php esc_html_e( 'Amount', 'altapay' ); ?>"/>
                 <a id="altapay_refund" class="f7 link dim ph4 pv2 mb1 dib white"
-                   style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;">Refund</a>
+                   style="margin-left:20px; color:white; background-color:#006064; cursor:pointer; border-radius: 4px;"><?php esc_html_e( 'Refund', 'altapay' ); ?></a>
             </div>
         </div>
     @endif
@@ -111,43 +111,43 @@
 <div>
     <div class="release-status" style="margin-bottom:10px;"></div>
     <div>
-        <strong>Transaction ID:</strong>
+        <strong><?php esc_html_e( 'Transaction ID', 'altapay' ); ?>:</strong>
         <span>{{$transaction_id}}</span>
     </div>
     <br>
     <div>
-        <strong>Reserved:</strong>
+        <strong><?php esc_html_e( 'Reserved', 'altapay' ); ?>:</strong>
         <span class="payment-reserved">{{number_format($reserved, 2)}}</span> {{$order->get_currency()}}
     </div>
     <br>
     <div>
-        <strong>Chargeable:</strong>
+        <strong><?php esc_html_e( 'Chargeable', 'altapay' ); ?>:</strong>
         <span class="payment-chargeable">{{number_format($charge, 2)}}</span> {{$order->get_currency()}}
     </div>
     <br>
     <div>
-        <strong>Captured:</strong>
+        <strong><?php esc_html_e( 'Captured', 'altapay' ); ?>:</strong>
         <span class="payment-captured">{{number_format($captured, 2)}}</span> {{$order->get_currency()}}
     </div>
     <br>
     <div>
-        <strong>Refunded:</strong>
+        <strong><?php esc_html_e( 'Refunded', 'altapay' ); ?>:</strong>
         <span class="payment-refunded">{{number_format($refunded, 2)}}</span> {{$order->get_currency()}}
     </div>
     @if ( $captured < $reserved )
         <br>
-        <a id="openCaptureModal" title="Capture Payment"  href="#TB_inline?&width=800&inlineId=captureModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
-           style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;">Capture</a>
+        <a id="openCaptureModal" title="<?php esc_html_e( 'Capture Payment', 'altapay' ); ?>"  href="#TB_inline?&width=800&inlineId=captureModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
+           style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Capture', 'altapay' ); ?></a>
     @endif
     @if ( $refunded < $reserved and $captured)
         <br>
-        <a id="openRefundModal" title="Refund Payment"  href="#TB_inline?&width=800&inlineId=refundModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
-           style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;">Refund</a>
+        <a id="openRefundModal" title="<?php esc_html_e( 'Refund Payment', 'altapay' ); ?>"  href="#TB_inline?&width=800&inlineId=refundModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
+           style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Refund', 'altapay' ); ?></a>
     @endif
     @if ($order->get_transaction_id() && $captured == 0)
         <br>
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
-           style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;">Release Payment</a>
+           style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Release Payment', 'altapay' ); ?></a>
     @endif
 </div>
 </body>
