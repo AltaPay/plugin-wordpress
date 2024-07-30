@@ -70,9 +70,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->apple_pay_supported_networks = $this->get_option( 'apple_pay_supported_networks' );
 		$this->secret                       = $this->get_option( 'secret' );
 
-		if($this->get_option( 'payment_icon' ) !== 'default') {
-			$this->icon = untrailingslashit( plugins_url( '/assets/images/payment_icons/'.$this->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) );
-		}
+
 		// Load form fields
 		$this->init_form_fields();
 		$this->init_settings();
@@ -788,4 +786,24 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		return $features;
 	}
+
+    /**
+     * Gets the payment method's icon.
+     *
+     * @return string The icon HTML.
+     */
+    public function get_icon() {
+        $icon_html = '';
+        $icons = $this->get_option('payment_icon');
+        if ( ! empty( $icons ) and is_array( $icons ) ) {
+            foreach ( $icons as $icon ) {
+                if ( ! empty( $icon ) and $icon !== 'default' ) {
+                    $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icon, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->title . '">';
+                }
+            }
+        } elseif( ! empty( $icons ) and $icons !== 'default' ) {
+            $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icons, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->title . '">';
+        }
+        return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->id );
+    }
 }

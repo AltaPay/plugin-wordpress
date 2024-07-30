@@ -66,7 +66,6 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
 			'title'                   => $this->get_setting( 'title' ),
 			'description'             => $this->get_setting( 'description' ),
 			'supports'                => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
-			'icon'                    => $this->gateway->get_option( 'payment_icon' ) !== 'default' ? untrailingslashit( plugins_url( '/assets/images/payment_icons/' . $this->gateway->get_option( 'payment_icon' ), ALTAPAY_PLUGIN_FILE ) ) : '',
 			'is_apple_pay'            => $this->gateway->is_apple_pay,
 			'applepay_payment_method' => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
 		);
@@ -87,4 +86,24 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
 
 		return $payment_method_data;
 	}
+
+    /**
+     * Gets the payment method's icon.
+     *
+     * @return string The icon HTML.
+     */
+    public function get_icon() {
+        $icon_html = '';
+        $icons = $this->gateway->get_option('payment_icon');
+        if ( ! empty( $icons ) and is_array( $icons ) ) {
+            foreach ( $icons as $icon ) {
+                if ( ! empty( $icon ) and $icon !== 'default' ) {
+                    $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icon, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->gateway->title . '">';
+                }
+            }
+        } elseif ( ! empty( $icons ) and $icons !== 'default' ) {
+            $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icons, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->gateway->title . '">';
+        }
+        return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->gateway->id );
+    }
 }
