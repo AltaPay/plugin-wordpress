@@ -66,6 +66,7 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
 			'title'                   => $this->get_setting( 'title' ),
 			'description'             => $this->get_setting( 'description' ),
 			'supports'                => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
+            'icon'                    => $this->get_icons_data(),
 			'is_apple_pay'            => $this->gateway->is_apple_pay,
 			'applepay_payment_method' => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
 		);
@@ -88,22 +89,23 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
 	}
 
     /**
-     * Gets the payment method's icon.
+     * Gets the payment method's icons.
      *
-     * @return string The icon HTML.
+     * @return array The icons array.
      */
-    public function get_icon() {
-        $icon_html = '';
+    public function get_icons_data() {
+        $icons_arr = [];
         $icons = $this->gateway->get_option('payment_icon');
         if ( ! empty( $icons ) and is_array( $icons ) ) {
             foreach ( $icons as $icon ) {
                 if ( ! empty( $icon ) and $icon !== 'default' ) {
-                    $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icon, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->gateway->title . '">';
+                    $icons_arr[] = untrailingslashit( plugins_url( '/assets/images/payment_icons/' . $icon, ALTAPAY_PLUGIN_FILE ) );
                 }
             }
         } elseif ( ! empty( $icons ) and $icons !== 'default' ) {
-            $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icons, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->gateway->title . '">';
+            $icons_arr = untrailingslashit( plugins_url( '/assets/images/payment_icons/' . $icons, ALTAPAY_PLUGIN_FILE ) );
         }
-        return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->gateway->id );
+
+        return $icons_arr;
     }
 }
