@@ -793,7 +793,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
      * @return string The icon HTML.
      */
     public function get_icon() {
-        $icon_html = '';
+        $icon_html = '<span>';
         $icons = $this->get_option('payment_icon');
         if ( ! empty( $icons ) and is_array( $icons ) ) {
             foreach ( $icons as $icon ) {
@@ -804,6 +804,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
         } elseif( ! empty( $icons ) and $icons !== 'default' ) {
             $icon_html .= '<img src="' . untrailingslashit(plugins_url('/assets/images/payment_icons/' . $icons, ALTAPAY_PLUGIN_FILE)) . '" alt="' . $this->title . '">';
         }
+        $icon_html .= '</span>';
         return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->id );
     }
 }
