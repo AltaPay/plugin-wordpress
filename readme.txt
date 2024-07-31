@@ -3,11 +3,11 @@ Contributors: altapay_integrations
 Tags: AltaPay, Gateway, Payments, WooCommerce, Payment Card Industry
 Requires PHP: 7.4
 Requires at least: 5.0
-Tested up to: 6.6
+Tested up to: 6.6.1
 Stable tag: 3.6.9
 License: MIT
 WC requires at least: 3.9.0
-WC tested up to: 9.1.2
+WC tested up to: 9.1.4
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A plugin that integrates your WooCommerce web shop to the AltaPay payments gateway.
