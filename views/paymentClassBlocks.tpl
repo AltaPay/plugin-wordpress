@@ -66,7 +66,7 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
 			'title'                   => $this->get_setting( 'title' ),
 			'description'             => $this->get_setting( 'description' ),
 			'supports'                => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
-            'icon'                    => $this->get_icons_data(),
+			'icon'                    => $this->get_icons_data(),
 			'is_apple_pay'            => $this->gateway->is_apple_pay,
 			'applepay_payment_method' => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
 		);
