@@ -3,9 +3,16 @@ span.altapay-payment-method {
     display: block;
     padding-right: 1em;
 }
-span.altapay-payment-method img {
+span.altapay-payment-method img, #payment .payment_methods li img {
+    float: none !important;
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 55px !important;
+}
+span.altapay-payment-method span, #payment .payment_methods li span {
     float: right;
 }
-#payment .payment_methods li img {
-    max-width: 55px;
+span.altapay-payment-method span, #payment .payment_methods li label {
+    overflow: hidden;
 }

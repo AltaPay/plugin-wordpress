@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.9]
+- Support multiple payment method logos for checkout page.
+
 ## [3.6.8]
 - Add translation support for the AltaPay Payment Actions grid in the following WordPress-supported languages:
 

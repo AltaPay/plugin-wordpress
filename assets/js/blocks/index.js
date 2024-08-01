@@ -80,10 +80,16 @@ const altapayPaymentMethod = {
 	label: (
 		<>
 			<span class='altapay-payment-method'>
-				{ __( label, 'woocommerce-payments' ) }
-				{settings.icon &&
-					<img src={ settings.icon } alt='' />
-				}
+				{__(label, 'woocommerce-payments')}
+				<span>
+					{settings.icon && Array.isArray(settings.icon) ? (
+						settings.icon.map((iconUrl, index) => (
+							<img key={index} src={iconUrl} alt={`Icon ${index}`}/>
+						))
+					) : (
+						settings.icon && <img src={settings.icon} alt=''/>
+					)}
+				</span>
 			</span>
 		</>
 	),

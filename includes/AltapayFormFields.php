@@ -57,8 +57,8 @@ $formSettings = array(
 	),
 	'payment_icon'   => array(
 		'title'       => __( 'Icon', 'altapay' ),
-		'description' => __( 'Select image icon to display on checkout page', 'altapay' ),
-		'type'        => 'select',
+		'description' => __( 'Select image icons to display on checkout page', 'altapay' ),
+		'type'        => 'multiselect',
 		'options'     => $files,
 		'default'     => '',
 		'desc_tip'    => true,
