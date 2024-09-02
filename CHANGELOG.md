@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.0]
+- Fix compatibility issues with subscription payments using PHP 8.1.
+- Fix issues with MobilePay subscriptions.
+
 ## [3.6.9]
 - Support multiple payment method logos for checkout page.
 

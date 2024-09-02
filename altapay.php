@@ -7,10 +7,10 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.6.9
+ * Version: 3.7.0
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 9.1.4
+ * WC tested up to: 9.2.3
  *
  * @package Altapay
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.6.9' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.7.0' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -84,8 +84,7 @@ function init_altapay_settings() {
 		Core\AltapaySettings::recreateTerminalData( $settings );
 	}
 
-    load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-
+	load_plugin_textdomain( 'altapay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 }
 
@@ -712,7 +711,7 @@ function altapayCaptureCallback() {
 				'refunded'   => $refunded,
 				'chargeable' => round( $charge, 2 ),
 				'note'       => $noteHtml,
-				'message'    => __( 'Payment Captured.', 'altapay' )
+				'message'    => __( 'Payment Captured.', 'altapay' ),
 			)
 		);
 	}
@@ -975,7 +974,7 @@ function altapayReleasePayment() {
 				$order->update_meta_data( '_released', true );
 				$order->add_order_note( __( 'Order released: "The order has been released"', 'altapay' ) );
 				$order->save();
-				wp_send_json_success( array( 'message' => __ ( 'Payment Released.', 'altapay') ) );
+				wp_send_json_success( array( 'message' => __( 'Payment Released.', 'altapay' ) ) );
 			}
 		} else {
 			$order->add_order_note( __( 'Release failed: ' . $response->MerchantErrorMessage, 'altapay' ) );
@@ -1082,7 +1081,6 @@ function altapay_checkout_blocks_style() {
 		plugin_dir_url( __FILE__ ) . 'assets/css/blocks.css',
 	);
 }
-
 
 add_action( 'wp_enqueue_scripts', 'altapay_checkout_blocks_style' );
 add_action( 'woocommerce_blocks_loaded', 'altapay_wc_checkout_block_support' );
