@@ -145,7 +145,7 @@ class ApplePay {
 		// Add order lines to AltaPay request
 		$order_lines = $utils->createOrderLines( $order );
 
-		$cookie = isset( $_SERVER['HTTP_COOKIE'] ) ? $_SERVER['HTTP_COOKIE'] : '';
+		$cookie = $_SERVER['HTTP_COOKIE'] ?? '';
 
 		$request = new CardWalletAuthorize( $this->getAuth() );
 		$request->setTerminal( $terminal )
