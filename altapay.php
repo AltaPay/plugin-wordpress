@@ -584,9 +584,9 @@ function altapayCaptureCallback() {
 				$api = new ChargeSubscription( $settings->getAuth() );
 			} else {
 				$api = new CaptureReservation( $settings->getAuth() );
-				$api->setOrderLines( $orderLines );
 			}
 
+			$api->setOrderLines( $orderLines );
 			$api->setAmount( round( $amount, 2 ) );
 			$api->setTransaction( $txnID );
 			$api->setReconciliationIdentifier( $reconciliationId );
