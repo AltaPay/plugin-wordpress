@@ -224,16 +224,22 @@ function altapay_add_gateway( $methods ) {
  * @return string
  */
 function altapay_page_template( $template ) {
-	// Get payment form page id
-	$paymentFormPageID = esc_attr( get_option( 'altapay_payment_page' ) );
-	if ( $paymentFormPageID && is_page( $paymentFormPageID ) ) {
-		// Make sure the template is only loaded from AltaPay.
-		// Load template override
-		$template = locate_template( 'altapay-payment-form.php' );
+	$callbackPages = array(
+		'altapay_payment_page'           => 'altapay-payment-form.php',
+		'altapay_callback_redirect_page' => 'altapay-callback-redirect.php',
+	);
 
-		// If no template override load template from plugin
-		if ( ! $template ) {
-			$template = __DIR__ . '/views/altapay-payment-form.php';
+	foreach ( $callbackPages as $optionKey => $templateFile ) {
+		// Get payment form page id
+		$pageId = esc_attr( get_option( $optionKey ) );
+
+		if ( $pageId && is_page( $pageId ) ) {
+			// Make sure the template is only loaded from AltaPay.
+			// Load template override
+			$locatedTemplate = locate_template( $templateFile );
+			// If no template override load template from plugin
+			$template = $locatedTemplate ?: __DIR__ . '/views/' . $templateFile;
+			break;
 		}
 	}
 
@@ -992,6 +998,7 @@ function altapayReleasePayment() {
 function altapayPluginActivation() {
 	Core\AltapayPluginInstall::createPluginTables();
 	Core\AltapayPluginInstall::setDefaultCheckoutFormStyle();
+	Core\AltapayPluginInstall::createCallbackRedirectPage();
 }
 
 /**
