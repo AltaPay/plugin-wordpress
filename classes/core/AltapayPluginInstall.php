@@ -68,13 +68,36 @@ class AltapayPluginInstall {
 	 *
 	 * @return void
 	 */
-
 	public static function setDefaultCheckoutFormStyle() {
 
 		if ( empty( trim( get_option( 'altapay_username' ) ) ) and empty( trim( get_option( 'altapay_cc_form_styling' ) ) ) ) {
 			update_option( 'altapay_cc_form_styling', 'checkout' );
 		}
 
+	}
+
+	/**
+	 * Set the checkout design of the Credit Card form.
+	 *
+	 * @return void
+	 */
+	public static function createCallbackRedirectPage() {
+
+		if ( empty( trim( get_option( 'altapay_callback_redirect_page' ) ) ) ) {
+			$page_data = array(
+				'post_status'    => 'publish',
+				'post_type'      => 'page',
+				'post_author'    => 1,
+				'post_title'     => 'AltaPay callback redirect',
+				'post_content'   => '',
+				'post_parent'    => 0,
+				'comment_status' => 'closed',
+			);
+
+			$page_id = wp_insert_post( $page_data );
+
+			update_option( 'altapay_callback_redirect_page', $page_id );
+		}
 	}
 }
 
