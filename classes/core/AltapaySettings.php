@@ -586,7 +586,7 @@ class AltapaySettings {
 
 		register_post_type( 'altapay_captures', $args );
 
-		$callback_redirect_page = get_site_option( 'altapay_callback_redirect_page' );
+		$callback_redirect_page = get_option( 'altapay_callback_redirect_page' );
 
 		if ( empty( $callback_redirect_page ) ) {
 			Core\AltapayPluginInstall::createCallbackRedirectPage();

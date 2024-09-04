@@ -244,7 +244,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$config->setCallbackNotification( $configUrl['callback_notification'] );
 		$config->setCallbackForm( $configUrl['callback_form'] );
 
-		$callback_redirect_page = get_site_option( 'altapay_callback_redirect_page' );
+		$callback_redirect_page = get_option( 'altapay_callback_redirect_page' );
 
 		if ( ! empty( $callback_redirect_page ) ) {
 			$config->setCallbackRedirect( get_page_link( $callback_redirect_page ) );
