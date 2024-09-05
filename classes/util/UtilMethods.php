@@ -74,11 +74,6 @@ class UtilMethods {
 				$orderLines[] = $productDetails['product'];
 			}
 
-			// check if compensation exists to bind it in orderline details
-			if ( ! $wcRefund && isset( $productDetails['compensation'] ) ) {
-				$orderLines [] = $productDetails['compensation'];
-			}
-
 			$i ++;
 		}
 		// get the shipping Details
@@ -92,6 +87,16 @@ class UtilMethods {
 			$shippingDetails = reset( $shippingDetails );
 			$orderLines []   = $shippingDetails;
 		}
+
+		if ( ! $wcRefund ) {
+			// Calculate compensation amount
+			$totalCompensationAmount = $this->totalCompensationAmount( $orderLines, $order->get_total() );
+
+			if ( $totalCompensationAmount > 0 || $totalCompensationAmount < 0 ) {
+				$orderLines[] = $this->compensationAmountOrderline( 'total', $totalCompensationAmount );
+			}
+		}
+
 		return $orderLines;
 	}
 
@@ -111,7 +116,6 @@ class UtilMethods {
 		$salePrice       = (float) $product->get_sale_price();
 		$subtotal        = $item->get_subtotal();
 		$taxRate         = $subtotal > 0 ? $item->get_subtotal_tax() / $subtotal : 0;
-		$totalCMS        = $item->get_total() + $item->get_total_tax();
 		$productId       = $product->get_sku() ? $item->get_id() . '-' . $product->get_sku() : $item->get_id();
 		$productData     = array();
 		$productDiscount = 0;
@@ -137,15 +141,6 @@ class UtilMethods {
 		} else {
 			$productPrice = $regularPrice;
 			$taxAmount    = $productPrice * $taxRate;
-		}
-
-		// calculate total generated from order lines generated after calculation
-		$orderLineTotal = ( ( $productPrice + $taxAmount ) - ( ( $productPrice + $taxAmount ) * ( $discountPercentage / 100 ) ) ) * $quantity;
-		// calculate compensation amount between total generated from woocommerce and total generated from orderlines
-		$compensationAmount = round( ( $totalCMS - $orderLineTotal ), 3 );
-		// generate compensation amount order line using product id and amount
-		if ( $compensationAmount > 0 || $compensationAmount < 0 ) {
-			$productData['compensation'] = $this->compensationAmountOrderline( $productId, $compensationAmount );
 		}
 
 		$productPrice = $isSubscription ? ( $productPrice + ( $taxAmount * $quantity ) - ( $discount + $productDiscount ) ) : round( $productPrice, 2 );
@@ -256,5 +251,20 @@ class UtilMethods {
 		}
 
 		return $shippingDetails;
+	}
+
+	/**
+	 * @param $orderLines
+	 * @param $total
+	 * @return float
+	 */
+	public function totalCompensationAmount( $orderLines, $total ) {
+		$orderLinesTotal = 0;
+		foreach ( $orderLines as $orderLine ) {
+			$orderLinePriceWithTax = ( $orderLine->unitPrice * $orderLine->quantity ) + $orderLine->taxAmount;
+			$orderLinesTotal      += $orderLinePriceWithTax - ( $orderLinePriceWithTax * ( $orderLine->discount / 100 ) );
+		}
+
+		return round( ( $total - $orderLinesTotal ), 3 );
 	}
 }
