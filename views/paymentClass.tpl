@@ -244,6 +244,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$config->setCallbackNotification( $configUrl['callback_notification'] );
 		$config->setCallbackForm( $configUrl['callback_form'] );
 
+		$callback_redirect_page = get_option( 'altapay_callback_redirect_page' );
+
+		if ( ! empty( $callback_redirect_page ) ) {
+			$config->setCallbackRedirect( get_page_link( $callback_redirect_page ) );
+		}
+
 		// Make these as settings
 		$payment_type = 'payment';
 		if ( $this->payment_action === 'authorize_capture' ) {
@@ -391,17 +397,20 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$xmlToJson         = wp_json_encode( $xml->Body->Transactions );
 					$jsonToArray       = json_decode( $xmlToJson, true );
 					$latestTransaction = $this->getLatestTransaction( $jsonToArray['Transaction'], 'subscription_payment' );
-					$transaction       = $jsonToArray['Transaction'][ $latestTransaction ];
-					$txnId             = $transaction['TransactionId'];
 
-					if ( $status === 'succeeded' ) {
-						foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
-							if ( $transaction_data['AuthType'] === 'subscription_payment' &&
+					if ( $latestTransaction ) {
+						$transaction = $jsonToArray['Transaction'][ $latestTransaction ];
+						$txnId       = $transaction['TransactionId'];
+
+						if ( $status === 'succeeded' ) {
+							foreach ( $jsonToArray['Transaction'] as $transaction_data ) {
+								if ( $transaction_data['AuthType'] === 'subscription_payment' &&
 								! in_array( $transaction_data['TransactionStatus'], array( 'captured', 'pending' ) ) ) {
-								$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
-								wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
-								wp_redirect( wc_get_cart_url() );
-								exit;
+									$order->add_order_note( __( 'Payment failed!', 'altapay' ) );
+									wc_add_notice( __( 'Payment failed!', 'altapay' ), 'error' );
+									wp_redirect( wc_get_cart_url() );
+									exit;
+								}
 							}
 						}
 					}
@@ -414,7 +423,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 					$txnId = '';
 				}
 
-				$paymentScheme  = $transaction['PaymentSchemeName'];
+				$paymentScheme  = $transaction['PaymentSchemeName'] ?? '';
 				$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
 				$ccExpiryDate   = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 				$reservedAmount = $transaction['ReservedAmount'] ?? 0;

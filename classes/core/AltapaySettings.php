@@ -110,7 +110,7 @@ class AltapaySettings {
 			$order->update_meta_data( '_captured', true );
 			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
 			$order->save();
-		
+
 			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
 			$latest_transaction = $this->getLatestTransaction( $transactions, 'payment' );
 			$transaction        = $transactions[ $latest_transaction ];
@@ -154,7 +154,7 @@ class AltapaySettings {
 	public function saveCaptureWarning( $newMessage ) {
 		$message = get_transient( 'altapay_capture_warning' );
 
-        	// Ignore if the transient already contains the same message.
+			// Ignore if the transient already contains the same message.
 		if ( $message && strpos( $message, $newMessage ) !== false ) {
 			return;
 		}
@@ -445,10 +445,10 @@ class AltapaySettings {
 
 		foreach ( $response->Terminals as $terminal ) {
 			$terminals[] = array(
-				'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
-				'name'    => $terminal->Title,
-				'nature'  => $terminal->Natures,
-				'methods' => $terminal->Methods,
+				'key'        => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
+				'name'       => $terminal->Title,
+				'nature'     => $terminal->Natures,
+				'methods'    => $terminal->Methods,
 				'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
 			);
 		}
@@ -526,7 +526,7 @@ class AltapaySettings {
 				'title'          => str_replace( '-', ' ', $terminal->Title ),
 				'description'    => '',
 				'payment_action' => 'authorize',
-				'payment_icon'   => self::getPaymentMethodIcon($terminal->PrimaryMethod->Identifier ?? ''),
+				'payment_icon'   => self::getPaymentMethodIcon( $terminal->PrimaryMethod->Identifier ?? '' ),
 				'currency'       => get_option( 'woocommerce_currency' ),
 			);
 
@@ -585,6 +585,12 @@ class AltapaySettings {
 		);
 
 		register_post_type( 'altapay_captures', $args );
+
+		$callback_redirect_page = get_option( 'altapay_callback_redirect_page' );
+
+		if ( empty( $callback_redirect_page ) ) {
+			Core\AltapayPluginInstall::createCallbackRedirectPage();
+		}
 	}
 
 	/**
@@ -624,10 +630,10 @@ class AltapaySettings {
 
 			foreach ( $response->Terminals as $terminal ) {
 				$recreated_terminals[] = array(
-					'key'     => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
-					'name'    => $terminal->Title,
-					'nature'  => $terminal->Natures,
-					'methods' => $terminal->Methods ?? array(),
+					'key'        => preg_replace( '/[^a-zA-Z0-9]/', '_', $terminal->Title ),
+					'name'       => $terminal->Title,
+					'nature'     => $terminal->Natures,
+					'methods'    => $terminal->Methods ?? array(),
 					'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
 				);
 			}
@@ -679,33 +685,32 @@ class AltapaySettings {
 	 * @param string $identifier
 	 * @return string
 	 */
-	static function getPaymentMethodIcon($identifier = '')
-	{
+	static function getPaymentMethodIcon( $identifier = '' ) {
 		$defaultValue = 'default';
 
-		$paymentMethodIcons = [
-			"ApplePay" => "apple_pay.png",
-			"Bancontact" => "bancontact.png",
-			"BankPayment" => "bank.png",
-			"CreditCard" => "creditcard.png",
-			"iDeal" => "ideal.png",
-			"Invoice" => "invoice.png",
-			"Klarna" => "klarna_pink.png",
-			"MobilePay" => "mobilepay.png",
-			"OpenBanking" => "bank.png",
-			"Payconiq" => "payconiq.png",
-			"PayPal" => "paypal.png",
-			"Przelewy24" => "przelewy24.png",
-			"Sepa" => "sepa.png",
-			"SwishSweden" => "swish.png",
-			"Trustly" => "trustly_primary.png",
-			"Twint" => "twint.png",
-			"ViaBill" => "viabill.png",
-			"Vipps" => "vipps.png"
-		];
+		$paymentMethodIcons = array(
+			'ApplePay'    => 'apple_pay.png',
+			'Bancontact'  => 'bancontact.png',
+			'BankPayment' => 'bank.png',
+			'CreditCard'  => 'creditcard.png',
+			'iDeal'       => 'ideal.png',
+			'Invoice'     => 'invoice.png',
+			'Klarna'      => 'klarna_pink.png',
+			'MobilePay'   => 'mobilepay.png',
+			'OpenBanking' => 'bank.png',
+			'Payconiq'    => 'payconiq.png',
+			'PayPal'      => 'paypal.png',
+			'Przelewy24'  => 'przelewy24.png',
+			'Sepa'        => 'sepa.png',
+			'SwishSweden' => 'swish.png',
+			'Trustly'     => 'trustly_primary.png',
+			'Twint'       => 'twint.png',
+			'ViaBill'     => 'viabill.png',
+			'Vipps'       => 'vipps.png',
+		);
 
-		if (isset($paymentMethodIcons[$identifier])) {
-			return $paymentMethodIcons[$identifier];
+		if ( isset( $paymentMethodIcons[ $identifier ] ) ) {
+			return $paymentMethodIcons[ $identifier ];
 		}
 
 		return $defaultValue;

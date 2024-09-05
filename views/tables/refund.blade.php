@@ -9,90 +9,47 @@
 ?>
 
 <table class="w-100 center" cellspacing="0">
-    <tbody>
-    <tr style="font-weight: bold; border-collapse: collapse; padding: 15px;">
     <thead>
     <tr>
-        <th width="40%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Product name', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price with tax', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price without tax', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Ordered', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Discount Percent', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Quantity', 'altapay' ); ?></th>
-        <th width="10%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Total amount', 'altapay' ); ?></th>
+        <th width="28%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Product name', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price with tax', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Price without tax', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Ordered', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Discount Percent', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Quantity', 'altapay' ); ?></th>
+        <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Total amount', 'altapay' ); ?></th>
     </tr>
     </thead>
-    </tr>
-    </tbody>
+    <tbody>
 
     @php
         $productsWithCoupon = array();
     @endphp
-    @foreach($order->get_items() as $itemData)
+    @foreach($order->get_items() as $item)
 
-        @if($itemData->get_total() == 0)
+        @if($item->get_total() == 0)
             @continue;
         @endif
         @php
-            $productID = $itemData->get_id();
-            $product = wc_get_product($itemData['product_id']);
-            $qty = $itemData->get_quantity();
-
+            $productID = $item->get_id();
+		    $product = $item->get_product();
+            $qty = $item->get_quantity();
             $refunded = abs($order->get_qty_refunded_for_item( $productID ));
             $refundableQty = $qty - $refunded;
+			$subtotal = $item->get_subtotal();
+			$total = $item->get_total();
 
-            $orderedItems = $order->get_items('coupon');
-            $discountPercentageWholeCart = 0;
-        @endphp
-
-        @if($orderedItems)
-            @foreach($orderedItems as $itemID => $item)
-                @php
-                    // Retrieving the coupon ID reference
-                    $couponPostObj = get_page_by_title($item->get_name(), OBJECT, 'shop_coupon');
-                    $couponID = $couponPostObj->ID;
-                    // Get an instance of WC_Coupon object (necessary to use WC_Coupon methods)
-                    $coupon = new WC_Coupon($couponID);
-                    $couponType = $coupon->discount_type;
-                    $appliedCoupons = reset($coupon);
-                    // Filtering with your coupon custom types
-                @endphp
-                @if ($couponType == 'percent' && empty($appliedCoupons['product_ids']))
-                    @php
-                        // Get the Coupon discount amounts in the order
-                        $orderDiscountAmount = wc_get_order_item_meta($itemID, 'discount_amount', true);
-                        $orderDiscountTaxAmount = wc_get_order_item_meta($itemID, 'discount_amount_tax', true);
-                        $totalCouponDiscountAmmount = $orderDiscountAmount + $orderDiscountTaxAmount;
-                        // Or get the coupon amount object
-                        $discountPercentageWholeCart += $coupon->amount;
-                    @endphp
-                @elseif ($couponType == 'percent' && !empty($appliedCoupons['product_ids']))
-                    @php
-                        $discountPercentageOnParticularProduct = $coupon->amount;
-                        $productsWithCoupon = array_values($appliedCoupons['product_ids']);
-                    @endphp
-                @endif
-            @endforeach
-        @endif
-
-        @if (in_array($itemData['product_id'], $productsWithCoupon) || in_array($itemData['variation_id'], $productsWithCoupon))
-            @php($discountPercentage = $discountPercentageWholeCart + $discountPercentageOnParticularProduct)
-        @else
-            @php($discountPercentage = $discountPercentageWholeCart)
-        @endif
-
-        @php
-            $discountPercent = round(((($itemData->get_subtotal() + $itemData->get_subtotal_tax()) - ($itemData->get_total() + $itemData->get_total_tax())) / ($itemData->get_subtotal() + $itemData->get_subtotal_tax())) * 100, 2);
-            $productUnitPriceWithoutTax = round(($itemData->get_total() / $qty), 2);
-            $productUnitPriceWithTax = round(($itemData->get_total() / $qty) + ($itemData->get_total_tax() / $qty), 2);
-            $totalIncTax = round($itemData->get_total() + $itemData->get_total_tax(), 2);
+            $discountPercent = round((($subtotal - $total) / $subtotal) * 100, 2);
+            $productUnitPriceWithoutTax = round(($total / $qty), 2);
+            $productUnitPriceWithTax = round(($total / $qty) + ($item->get_total_tax() / $qty), 2);
+            $totalIncTax = round($total + $item->get_total_tax(), 2);
         @endphp
 
         <tr class="ap-orderlines-refund">
             <td style="display:none">
                 <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/>
             </td>
-            <td class="pv3 pr3 bb b--black-20"> {{$itemData->get_product()->get_name()}} </td>
+            <td class="pv3 pr3 bb b--black-20"> {{$item->get_name()}} </td>
             <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
             <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
             <td class="ap-orderline-refund-max-quantity pv3 pr3 bb b--black-20">{{$qty}}</td>
@@ -144,5 +101,5 @@
             </td>
         </tr>
     @endif
-
+    </tbody>
 </table>

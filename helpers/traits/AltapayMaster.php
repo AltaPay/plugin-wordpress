@@ -240,7 +240,13 @@ trait AltapayMaster {
 		$max_date           = '';
 		$latest_transaction = '';
 		foreach ( $transactions as $key => $transaction ) {
-			if ( $transaction['AuthType'] === $authType && $transaction['CreatedDate'] > $max_date ) {
+			if (
+				is_array( $transaction ) &&
+				isset( $transaction['AuthType'] ) &&
+				$transaction['AuthType'] === $authType &&
+				isset( $transaction['CreatedDate'] ) &&
+				$transaction['CreatedDate'] > $max_date
+			) {
 				$max_date           = $transaction['CreatedDate'];
 				$latest_transaction = $key;
 			}
