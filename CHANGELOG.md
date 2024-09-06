@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.1]
+- Fix: Resolved memory issues encountered during checkout for logged-in users.
+
 ## [3.7.0]
 - Fix compatibility issues with subscription payments using PHP 8.1.
 - Fix issues with MobilePay subscriptions.
