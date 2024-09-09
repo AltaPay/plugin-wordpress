@@ -721,14 +721,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$customer->setClientSessionID( crypt( session_id(), '$5$rounds=5000$customersessionid$' ) );
 
 		// Get user registration date
-		if ( is_user_logged_in() ) {
-			$users         = get_users();
-			$currentUserId = get_current_user_id();
-			foreach ( $users as $user ) {
-				$userData            = get_userdata( $currentUserId );
-				$customerCreatedDate = $altapayHelpers->convertDateTimeFormat( $userData->user_registered );
-				$customer->setCreatedDate( new \DateTime( $customerCreatedDate ) );
-			}
+		if ( is_user_logged_in() && $order->get_user_id() ) {
+			$userData            = get_userdata( $order->get_user_id() );
+			$customerCreatedDate = $altapayHelpers->convertDateTimeFormat( $userData->user_registered );
+			$customer->setCreatedDate( new \DateTime( $customerCreatedDate ) );
 		}
 
 		return $customer;
