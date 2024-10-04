@@ -146,7 +146,7 @@ class AltapaySettings {
 				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
 					$reconciliation->saveReconciliationIdentifier( $orderID, $txn_id, $val['Id'], $val['Type'] );
 				}
-			} catch ( InvalidArgumentException | ResponseHeaderException | Exception $e ) {
+			} catch ( ResponseHeaderException | Exception $e ) {
 				error_log( 'Exception ' . $e->getMessage() );
 			}
 		}
