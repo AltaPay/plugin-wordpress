@@ -57,12 +57,14 @@ class AltapaySettings {
 		$subscription = false;
 		$authType     = 'payment';
 		if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
-			$txnID        = $order->get_meta( '_agreement_id' );
-			$subscription = true;
-			$authType     = 'subscription_payment';
+
 			if ( $order->get_total() == 0 ) {
 				return;
 			}
+
+			$txnID        = $order->get_meta( '_agreement_id' );
+			$subscription = true;
+			$authType     = 'subscription_payment';
 		}
 
 		if ( ! $txnID ) {
