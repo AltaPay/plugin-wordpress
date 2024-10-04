@@ -18,6 +18,8 @@ use Exception;
 use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use WC_Order;
 use Altapay\Classes\Core;
+use Altapay\Api\Subscription\ChargeSubscription;
+use Altapay\Exceptions\ResponseHeaderException;
 
 class AltapaySettings {
 
@@ -52,13 +54,24 @@ class AltapaySettings {
 		$order = new WC_Order( $orderID );
 		$txnID = $order->get_transaction_id();
 
+		$subscription = false;
+		$authType     = 'payment';
+		if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
+			$txnID        = $order->get_meta( '_agreement_id' );
+			$subscription = true;
+			$authType     = 'subscription_payment';
+			if ( $order->get_total() == 0 ) {
+				return;
+			}
+		}
+
 		if ( ! $txnID ) {
 			return;
 		}
 
 		$login = $this->altapayApiLogin();
 		if ( ! $login || is_wp_error( $login ) ) {
-			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
+			error_log( 'Could not connect to AltaPay!' );
 
 			return;
 		}
@@ -88,37 +101,51 @@ class AltapaySettings {
 		} else { // Order wasn't captured and must be captured now.
 			$amount = $pay->ReservedAmount; // Amount to capture.
 
-			$api = new CaptureReservation( $this->getAuth() );
-			$api->setAmount( round( $amount, 2 ) );
-			$api->setTransaction( $txnID );
+			try {
+				if ( $subscription === true ) {
+					$api = new ChargeSubscription( $this->getAuth() );
+				} else {
+					$api = new CaptureReservation( $this->getAuth() );
+				}
 
-			$response = $api->call();
-			if ( $response->Result !== 'Success' ) {
-				$order->add_order_note(
-					__(
-						'Capture failed: ' . $response->MerchantErrorMessage,
-						'Altapay'
-					)
-				); // log to history.
-				$this->saveCaptureFailedMessage(
-					'Capture failed for order ' . $orderID . ': ' . $response->MerchantErrorMessage
-				);
+				$api->setAmount( round( $amount, 2 ) );
+				$api->setTransaction( $txnID );
 
-				return;
-			}
+				$response = $api->call();
+				if ( $response->Result !== 'Success' ) {
+					$order->add_order_note(
+						__(
+							'Capture failed: ' . $response->MerchantErrorMessage,
+							'Altapay'
+						)
+					); // log to history.
+					$this->saveCaptureFailedMessage(
+						'Capture failed for order ' . $orderID . ': ' . $response->MerchantErrorMessage
+					);
 
-			$order->update_meta_data( '_captured', true );
-			$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
-			$order->save();
+					return;
+				}
 
-			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
-			$latest_transaction = $this->getLatestTransaction( $transactions, 'payment' );
-			$transaction        = $transactions[ $latest_transaction ];
-			$txn_id             = $transaction['TransactionId'];
+				$order->update_meta_data( '_captured', true );
+				$order->add_order_note( __( 'Order captured: amount: ' . $amount, 'Altapay' ) );
+				$order->save();
 
-			$reconciliation = new Core\AltapayReconciliation();
-			foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
-				$reconciliation->saveReconciliationIdentifier( $orderID, $txn_id, $val['Id'], $val['Type'] );
+				$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
+				$latest_transaction = $this->getLatestTransaction( $transactions, $authType );
+				$transaction        = $transactions[ $latest_transaction ];
+				$txn_id             = $transaction['TransactionId'];
+
+				if ( $subscription === true ) {
+					$order->set_transaction_id( $txn_id );
+					$order->save();
+				}
+
+				$reconciliation = new Core\AltapayReconciliation();
+				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+					$reconciliation->saveReconciliationIdentifier( $orderID, $txn_id, $val['Id'], $val['Type'] );
+				}
+			} catch ( InvalidArgumentException | ResponseHeaderException | Exception $e ) {
+				error_log( 'Exception ' . $e->getMessage() );
 			}
 		}
 	}
