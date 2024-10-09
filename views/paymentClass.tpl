@@ -155,7 +155,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 		// TODO Get terminal form instance
 		$terminal 		= $this->terminal;
-		$amount 		= $order->get_total();
+		$amount 		= $this->getOrderAmount( $order );
 		$currency		= $order->get_currency();
 		$customerInfo	= $this->setCustomer( $order );
 		$cookie 		= isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
@@ -653,6 +653,25 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param $order
+	 *
+	 * @return float
+	 */
+	private function getOrderAmount( $order ) {
+
+		$amount = $order->get_total();
+
+		if ( $amount == 0 && class_exists( 'WC_Subscriptions_Order' ) && wcs_order_contains_subscription( $order ) ) {
+			$subscriptions = wcs_get_subscriptions_for_order( $order );
+			foreach ( $subscriptions as $subscription ) {
+				$amount += $subscription->get_total();
+			}
+		}
+
+		return $amount;
 	}
 
 	/**

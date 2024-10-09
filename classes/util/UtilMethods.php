@@ -52,6 +52,10 @@ class UtilMethods {
 			$subtotal = $item->get_subtotal();
 			$discount = 0;
 
+			if ( $total == 0 && $isSubscription ) {
+				$total = (float) $item->get_product()->get_regular_price();
+			}
+
 			if ( $total == 0 ) {
 				continue;
 			}

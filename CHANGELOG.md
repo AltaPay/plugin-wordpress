@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.2]
+- Add support for free trials for subscription orders.
+
 ## [3.7.1]
 - Fix: Resolved memory issues encountered during checkout for logged-in users.
 
