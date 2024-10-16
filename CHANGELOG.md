@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.3]
+- Fix: Payment charged multiple times for subscription order.
+
 ## [3.7.2]
 - Add support for free trials for subscription orders.
 
