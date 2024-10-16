@@ -58,7 +58,7 @@ class AltapaySettings {
 		$authType     = 'payment';
 		if ( class_exists( 'WC_Subscriptions_Order' ) && ( wcs_order_contains_subscription( $orderID, 'parent' ) || wcs_order_contains_subscription( $orderID, 'renewal' ) ) ) {
 
-			if ( $order->get_total() == 0 ) {
+			if ( $order->get_total() == 0 || ! empty( $order->get_meta( '_captured' ) ) ) {
 				return;
 			}
 
