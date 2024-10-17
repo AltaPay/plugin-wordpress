@@ -7,7 +7,7 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.7.2
+ * Version: 3.7.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
  * WC tested up to: 9.3.3
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.7.2' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.7.3' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
