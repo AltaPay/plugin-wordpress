@@ -114,7 +114,7 @@ class AltapaySettings {
 				$api->setTransaction( $txnID );
 
 				$response = $api->call();
-				if ( $response->Result !== 'Success' ) {
+				if ( $response && ! in_array( $response->Result, array( 'Success', 'Open' ), true ) ) {
 					$order->add_order_note(
 						__(
 							'Capture failed: ' . $response->MerchantErrorMessage,

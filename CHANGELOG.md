@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.4]
+- Fix: Prevent duplicate charge subscription attempts for MobilePay payments.
+
 ## [3.7.3]
 - Fix: Payment charged multiple times for subscription order.
 
