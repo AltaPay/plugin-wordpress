@@ -699,7 +699,8 @@ function altapayCaptureCallback() {
 			$order->add_order_note( $orderNote );
 		} elseif ( $response->Result === 'Open' ) {
 			$orderNote = 'The payment is pending an update from the payment provider.';
-			$order->update_status( 'on-hold', $orderNote );
+			$order->update_meta_data( '_captured', true );
+			$order->save();
 		}
 
 		$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
