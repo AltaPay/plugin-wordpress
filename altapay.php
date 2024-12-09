@@ -371,7 +371,7 @@ function altapay_meta_box_side( $post_or_order_object ) {
 				if ( $status === 'released' ) {
 					echo '<strong>' . __( 'Payment Released.', 'altapay' ) . '</strong>';
 				} else {
-					$charge = max(0, $reserved - $captured - $refunded);
+					$charge        = max( 0, $reserved - $captured - $refunded );
 					$transactionId = $order->get_transaction_id();
 
 					$blade = new Helpers\AltapayHelpers();
@@ -388,7 +388,7 @@ function altapay_meta_box_side( $post_or_order_object ) {
 							'transaction_type'   => $type,
 							'transaction_id'     => $transactionId,
 							'agreement_id'       => $agreement_id,
-                            'total'              => $order->get_total()
+							'total'              => $order->get_total(),
 						)
 					);
 				}
