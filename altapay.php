@@ -371,15 +371,14 @@ function altapay_meta_box_side( $post_or_order_object ) {
 				if ( $status === 'released' ) {
 					echo '<strong>' . __( 'Payment Released.', 'altapay' ) . '</strong>';
 				} else {
-					$charge = $reserved - $captured - $refunded;
-					if ( $charge <= 0 ) {
-						$charge = 0.00;
-					}
+					$charge = max(0, $reserved - $captured - $refunded);
+					$transactionId = $order->get_transaction_id();
+
 					$blade = new Helpers\AltapayHelpers();
 					echo $blade->loadBladeLibrary()->run(
 						'tables.index',
 						array(
-							'reserved'           => $reserved,
+							'reserved'           => $order->get_transaction_id() ? $reserved : 0,
 							'captured'           => $captured,
 							'charge'             => $charge,
 							'refunded'           => $refunded,
@@ -387,7 +386,9 @@ function altapay_meta_box_side( $post_or_order_object ) {
 							'items_captured'     => $itemsCaptured,
 							'transaction_status' => $status,
 							'transaction_type'   => $type,
-							'transaction_id'     => $txnID,
+							'transaction_id'     => $transactionId,
+							'agreement_id'       => $agreement_id,
+                            'total'              => $order->get_total()
 						)
 					);
 				}

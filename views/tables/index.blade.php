@@ -47,10 +47,13 @@
             </div>
         </div>
         @php
-            $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
-            $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
+            $toBeCaptured = round($reserved - $captured, 2);
+
+            if( !empty($agreement_id) && $toBeCaptured == 0 ){
+                $toBeCaptured = $total;
+            }
         @endphp
-        @if ( $captured < $reserved )
+        @if ( $captured < $reserved || $reserved == 0 )
             <div class="row row-ap">
                 <br>
                 <div class="col-lg-12">
@@ -83,8 +86,7 @@
         </div>
     </div>
     @php
-        $toBeCaptured = (float)number_format($reserved - $captured, 2, '.', '');
-        $toBeRefunded = (float)number_format($captured - $refunded, 2, '.', '');
+        $toBeRefunded = round($captured - $refunded, 2);
     @endphp
     @if ( $refunded < $reserved )
         <div class="row row-ap">
@@ -110,9 +112,16 @@
 
 <div>
     <div class="release-status" style="margin-bottom:10px;"></div>
+    @if ( $agreement_id )
+        <div>
+            <strong><?php esc_html_e( 'Agreement ID', 'altapay' ); ?>:</strong>
+            <span>{{$agreement_id}}</span>
+        </div>
+        <br>
+    @endif
     <div>
         <strong><?php esc_html_e( 'Transaction ID', 'altapay' ); ?>:</strong>
-        <span>{{$transaction_id}}</span>
+        <span>{{ $transaction_id ?: '--' }}</span>
     </div>
     <br>
     <div>
@@ -134,7 +143,12 @@
         <strong><?php esc_html_e( 'Refunded', 'altapay' ); ?>:</strong>
         <span class="payment-refunded">{{number_format($refunded, 2)}}</span> {{$order->get_currency()}}
     </div>
-    @if ( $captured < $reserved )
+    @if ( $transaction_status === 'pending' )
+        <div style="background-color: #d7cad2;padding: 10px;margin-top: 10px;">
+            The transaction is currently in a pending state.
+        </div>
+    @endif
+    @if ( $captured < $reserved || empty( $transaction_id ) )
         <br>
         <a id="openCaptureModal" title="<?php esc_html_e( 'Capture Payment', 'altapay' ); ?>"  href="#TB_inline?&width=800&inlineId=captureModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Capture', 'altapay' ); ?></a>
@@ -144,7 +158,7 @@
         <a id="openRefundModal" title="<?php esc_html_e( 'Refund Payment', 'altapay' ); ?>"  href="#TB_inline?&width=800&inlineId=refundModal" class="thickbox f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#006064; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Refund', 'altapay' ); ?></a>
     @endif
-    @if ($order->get_transaction_id() && $captured == 0)
+    @if ($order->get_transaction_id() && $captured == 0 && $transaction_status !== 'pending' )
         <br>
         <a id="altapay_release_payment" class="f7 link dim ph4 pv2 mb1 dib white"
            style="color:white; background-color:#ed2939; cursor:pointer; border-radius: 4px; width: 100%;text-align: center;font-weight: bold;margin-bottom: 15px;"><?php esc_html_e( 'Release Payment', 'altapay' ); ?></a>
