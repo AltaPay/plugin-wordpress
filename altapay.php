@@ -371,7 +371,7 @@ function altapay_meta_box_side( $post_or_order_object ) {
 				if ( $status === 'released' ) {
 					echo '<strong>' . __( 'Payment Released.', 'altapay' ) . '</strong>';
 				} else {
-					$charge        = max( 0, $reserved - $captured );
+					$charge        = max( 0, $reserved - $captured + $refunded );
 					$transactionId = $order->get_transaction_id();
 
 					$blade = new Helpers\AltapayHelpers();
@@ -668,7 +668,7 @@ function altapayCaptureCallback() {
 			$reserved = (float) $transaction['ReservedAmount'];
 			$captured = (float) $transaction['CapturedAmount'];
 			$refunded = (float) $transaction['RefundedAmount'];
-			$charge   = max( 0, $reserved - $captured );
+			$charge   = max( 0, $reserved - $captured + $refunded );
 		}
 
 		if ( $response->Result === 'Success' ) {
@@ -895,10 +895,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			}
 		}
 
-		$charge = $reserved - $captured - $refunded;
-		if ( $charge <= 0 ) {
-			$charge = 0.00;
-		}
+		$charge = max( 0, $reserved - $captured + $refunded );
 
 		if ( $releaseFlag ) {
 			$order->add_order_note( __( 'Order released', 'altapay' ) );
