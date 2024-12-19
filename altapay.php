@@ -7,10 +7,10 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.7.4
+ * Version: 3.7.5
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 9.4.2
+ * WC tested up to: 9.4.3
  *
  * @package Altapay
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.7.4' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.7.5' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -371,15 +371,14 @@ function altapay_meta_box_side( $post_or_order_object ) {
 				if ( $status === 'released' ) {
 					echo '<strong>' . __( 'Payment Released.', 'altapay' ) . '</strong>';
 				} else {
-					$charge = $reserved - $captured - $refunded;
-					if ( $charge <= 0 ) {
-						$charge = 0.00;
-					}
+					$charge        = max( 0, $reserved - $captured + $refunded );
+					$transactionId = $order->get_transaction_id();
+
 					$blade = new Helpers\AltapayHelpers();
 					echo $blade->loadBladeLibrary()->run(
 						'tables.index',
 						array(
-							'reserved'           => $reserved,
+							'reserved'           => $order->get_transaction_id() ? $reserved : 0,
 							'captured'           => $captured,
 							'charge'             => $charge,
 							'refunded'           => $refunded,
@@ -387,7 +386,9 @@ function altapay_meta_box_side( $post_or_order_object ) {
 							'items_captured'     => $itemsCaptured,
 							'transaction_status' => $status,
 							'transaction_type'   => $type,
-							'transaction_id'     => $txnID,
+							'transaction_id'     => $transactionId,
+							'agreement_id'       => $agreement_id,
+							'total'              => $order->get_total(),
 						)
 					);
 				}
@@ -667,11 +668,7 @@ function altapayCaptureCallback() {
 			$reserved = (float) $transaction['ReservedAmount'];
 			$captured = (float) $transaction['CapturedAmount'];
 			$refunded = (float) $transaction['RefundedAmount'];
-			$charge   = $reserved - $captured - $refunded;
-		}
-
-		if ( $charge <= 0 ) {
-			$charge = 0.00;
+			$charge   = max( 0, $reserved - $captured + $refunded );
 		}
 
 		if ( $response->Result === 'Success' ) {
@@ -698,7 +695,8 @@ function altapayCaptureCallback() {
 			$order->add_order_note( $orderNote );
 		} elseif ( $response->Result === 'Open' ) {
 			$orderNote = 'The payment is pending an update from the payment provider.';
-			$order->update_status( 'on-hold', $orderNote );
+			$order->update_meta_data( '_captured', true );
+			$order->save();
 		}
 
 		$noteHtml = '<li class="note system-note"><div class="note_content"><p>' . $orderNote . '</p></div><p class="meta"><abbr class="exact-date">' . sprintf(
@@ -897,10 +895,7 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 			}
 		}
 
-		$charge = $reserved - $captured - $refunded;
-		if ( $charge <= 0 ) {
-			$charge = 0.00;
-		}
+		$charge = max( 0, $reserved - $captured + $refunded );
 
 		if ( $releaseFlag ) {
 			$order->add_order_note( __( 'Order released', 'altapay' ) );
