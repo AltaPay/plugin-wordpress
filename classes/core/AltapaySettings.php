@@ -101,7 +101,7 @@ class AltapaySettings {
 		if ( $pay->CapturedAmount > 0 ) {
 			$this->saveCaptureWarning( 'Could not capture automatically. Manual capture is required for the order: ' . $orderID );
 		} else {
-            // Order wasn't captured and must be captured now.
+			// Order wasn't captured and must be captured now.
 			$amount = $order->get_total();
 
 			try {
