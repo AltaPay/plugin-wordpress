@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.6]
+- Fix: Charge subscriptions using the renewal order total instead of the original reserved amount.
+
 ## [3.7.5]
 - Display agreement information in the "AltaPay Payment Actions" grid.
 - Show the "pending payment" status if the subscription is awaiting a charge.
