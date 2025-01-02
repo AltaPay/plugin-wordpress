@@ -144,20 +144,24 @@ class AltapayReconciliation {
 			);
 
 			if ( ! empty( $_GET['_customer_user'] ) ) {
-				$customer_id      = (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) );
-				$args['customer'] = $customer_id;
+				$args['customer'] = (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) );
 			}
 
 			if ( ! empty( $_GET['post_status'] ) ) {
 				$args['post_status'] = sanitize_text_field( wp_unslash( $_GET['post_status'] ) );
 			}
 
-			if ( ! empty( $_GET['orderby'] ) ) {
-				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
-			}
+			if ( ! empty( $_GET['m'] ) ) {
+				$yearMonth = sanitize_text_field( wp_unslash( $_GET['m'] ) );
 
-			if ( ! empty( $_GET['order'] ) ) {
-				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+				if ( ! empty( $yearMonth ) && preg_match( '/^[0-9]{6}$/', $yearMonth ) ) {
+
+					$year  = (int) substr( $yearMonth, 0, 4 );
+					$month = (int) substr( $yearMonth, 4, 2 );
+
+					$last_day_of_month    = date_create( "$year-$month" )->format( 'Y-m-t' );
+					$args['date_created'] = "$year-$month-01..." . $last_day_of_month;
+				}
 			}
 
 			if ( ! empty( $_GET['status'] ) ) {
@@ -168,7 +172,7 @@ class AltapayReconciliation {
 
 			if ( ! empty( $ordersData ) ) {
 				$orders              = $ordersData->orders;
-				$orders_to_select = substr( str_repeat( ',%d', count( $orders ) ), 1 );
+				$orders_to_select 	 = substr( str_repeat( ',%d', count( $orders ) ), 1 );
 				$reconciliation_data = $wpdb->get_results(
 					$wpdb->prepare(
 						"SELECT orderId, identifier, transactionType FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($orders_to_select) ",
