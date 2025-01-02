@@ -135,15 +135,36 @@ class AltapayReconciliation {
 
 			$paged = isset( $_REQUEST['orders_pagenum'] ) ? absint( $_REQUEST['orders_pagenum'] ) : 1;
 
-			$ordersData = wc_get_orders(
-				array(
-					'limit'    => $perPage,
-					'return'   => 'ids',
-					'type'     => 'shop_order',
-					'paginate' => true,
-					'page'     => $paged,
-				)
+			$args = array(
+				'limit'    => $perPage,
+				'return'   => 'ids',
+				'type'     => 'shop_order',
+				'paginate' => true,
+				'page'     => $paged,
 			);
+
+			if ( ! empty( $_GET['_customer_user'] ) ) {
+				$customer_id      = (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) );
+				$args['customer'] = $customer_id;
+			}
+
+			if ( ! empty( $_GET['post_status'] ) ) {
+				$args['post_status'] = sanitize_text_field( wp_unslash( $_GET['post_status'] ) );
+			}
+
+			if ( ! empty( $_GET['orderby'] ) ) {
+				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			}
+
+			if ( ! empty( $_GET['order'] ) ) {
+				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+			}
+
+			if ( ! empty( $_GET['status'] ) ) {
+				$args['status'] = sanitize_text_field( wp_unslash( $_GET['status'] ) );
+			}
+
+			$ordersData = wc_get_orders( $args );
 
 			if ( ! empty( $ordersData ) ) {
 				$orders              = $ordersData->orders;
