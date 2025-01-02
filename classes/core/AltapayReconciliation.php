@@ -151,6 +151,18 @@ class AltapayReconciliation {
 				$args['post_status'] = sanitize_text_field( wp_unslash( $_GET['post_status'] ) );
 			}
 
+			if ( ! empty( $_GET['orderby'] ) ) {
+				$args['orderby'] = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+			}
+
+			if ( ! empty( $_GET['order'] ) ) {
+				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
+			}
+
+			if ( ! empty( $_GET['status'] ) ) {
+				$args['status'] = sanitize_text_field( wp_unslash( $_GET['status'] ) );
+			}
+
 			if ( ! empty( $_GET['m'] ) ) {
 				$yearMonth = sanitize_text_field( wp_unslash( $_GET['m'] ) );
 
@@ -162,10 +174,6 @@ class AltapayReconciliation {
 					$last_day_of_month    = date_create( "$year-$month" )->format( 'Y-m-t' );
 					$args['date_created'] = "$year-$month-01..." . $last_day_of_month;
 				}
-			}
-
-			if ( ! empty( $_GET['status'] ) ) {
-				$args['status'] = sanitize_text_field( wp_unslash( $_GET['status'] ) );
 			}
 
 			$ordersData = wc_get_orders( $args );
