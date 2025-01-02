@@ -131,8 +131,9 @@ class Order {
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
         cy.get('#openCaptureModal').click().wait(2000)
-        cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
-        cy.get('#altapay_capture').click()
+        cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').wait(3000)
+        cy.get('#altapay_capture').click().wait(3000)
+        
     }
 
     refund() {
@@ -162,7 +163,7 @@ class Order {
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
         cy.get('#openRefundModal').click().wait(3000)
-        cy.get('#TB_ajaxContent > [style="overflow-x:auto;"] > .responsive-table > .w-100 > :nth-child(3) > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').click()
+        cy.get('#TB_ajaxContent > [style="overflow-x:auto;"] > .responsive-table > .w-100 > tbody > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0')
         cy.get('#altapay_refund').click().wait(2000)
 
 
