@@ -131,14 +131,17 @@ class Order {
         cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
         cy.get('tr').eq(1).click()
         cy.get('#openCaptureModal').click().wait(2000)
-        cy.get('.lh-copy > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0').wait(3000)
+        cy.get('.ap-order-capture-modify').first().click().clear().type('0')
         cy.get('#altapay_capture').click().wait(3000)
+        cy.get('.payment-captured').then(($span) => {
+            const captured_amount = parseFloat($span.text().trim()); // Extract the value and convert to a number
+            expect(captured_amount).to.be.greaterThan(0); // Assert that the amount is greater than 0
+          });
+          
         
     }
 
     refund() {
-
-    
         cy.get('#openRefundModal').click().wait(3000)
         cy.get('#altapay_refund').click().wait(5000)
         cy.get('body').then(($a) => {
@@ -152,19 +155,13 @@ class Order {
     }
 
     partial_refund() {
-
-        cy.get('#toplevel_page_woocommerce > .wp-has-submenu > .wp-menu-name').click({force:true}).wait(3000)
-        cy.get('body').then(($a) => {
-
-            if ($a.find('.components-modal__header > .components-button').length) {
-                cy.get('.components-modal__header > .components-button').click().wait(2000)
-            }
-        })
-        cy.get("#toplevel_page_woocommerce > ul > li:nth-child(3) > a").click()
-        cy.get('tr').eq(1).click()
-        cy.get('#openRefundModal').click().wait(3000)
-        cy.get('#TB_ajaxContent > [style="overflow-x:auto;"] > .responsive-table > .w-100 > tbody > :nth-child(1) > :nth-child(7) > .form-control').click().clear().type('0')
-        cy.get('#altapay_refund').click().wait(2000)
+        cy.get('#openRefundModal').click().wait(2000)
+        cy.get('.ap-order-refund-modify').first().click().clear().type('0')
+        cy.get('#altapay_refund').click().wait(3000)
+        cy.get('.payment-refunded').then(($span) => {
+            const refunded_amount = parseFloat($span.text().trim()); // Extract the value and convert to a number
+            expect(refunded_amount).to.be.greaterThan(0); // Assert that the amount is greater than 0
+          });
 
 
     }
