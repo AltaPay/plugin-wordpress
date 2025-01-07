@@ -18,6 +18,7 @@ class AltapayReconciliation {
 	 */
 	public function registerHooks() {
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'addReconciliationExportButton' ), 20, 1 );
+		add_action( 'woocommerce_order_list_table_extra_tablenav', array( $this, 'addReconciliationExportButtonHpos' ), 10, 2 );
 		add_action( 'admin_init', array( $this, 'exportReconciliationCSV' ) );
 	}
 
@@ -32,15 +33,35 @@ class AltapayReconciliation {
 		global $typenow;
 
 		if ( 'shop_order' === $typenow && 'top' === $which ) {
-			?>
-			<div class="alignleft actions altapay-export-reconciliation-data">
-				<button type="submit" name="export_reconciliation_data" class="button button-primary" value="1">
-					<?php echo __( 'Export Reconciliation Data', 'altapay' ); ?>
-				</button>
-				<input type="hidden" name="orders_pagenum" value="<?php echo isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 0; ?>>">
-			</div>
-			<?php
+			$this->btnExportReconciliationData();
 		}
+	}
+
+	/**
+	 * @param string $order_type  The order type.
+	 * @param string $which The location of the extra table nav markup: 'top' or 'bottom'.
+	 *
+	 * @return void
+	 */
+	public function addReconciliationExportButtonHpos( $order_type, $which ) {
+
+		if ( 'shop_order' === $order_type && 'bottom' === $which ) {
+			$this->btnExportReconciliationData();
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function btnExportReconciliationData() {
+		?>
+		<div class="alignleft actions altapay-export-reconciliation-data">
+			<button type="submit" name="export_reconciliation_data" class="button button-primary" value="1">
+				<?php echo __( 'Export Reconciliation Data', 'altapay' ); ?>
+			</button>
+			<input type="hidden" name="orders_pagenum" value="<?php echo isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1; ?>>">
+		</div>
+		<?php
 	}
 
 	/**
@@ -115,21 +136,15 @@ class AltapayReconciliation {
 			$paged = isset( $_REQUEST['orders_pagenum'] ) ? absint( $_REQUEST['orders_pagenum'] ) : 1;
 
 			$args = array(
-				'posts_per_page' => $perPage,
-				'fields'         => 'ids',
-				'post_type'      => 'shop_order',
-				'post_status'    => array_keys( wc_get_order_statuses() ),
-				'paged'          => $paged,
+				'limit'    => $perPage,
+				'return'   => 'ids',
+				'type'     => 'shop_order',
+				'paginate' => true,
+				'page'     => $paged,
 			);
 
 			if ( ! empty( $_GET['_customer_user'] ) ) {
-				$args['meta_query'] = array(
-					array(
-						'key'     => '_customer_user',
-						'value'   => (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) ),
-						'compare' => '=',
-					),
-				);
+				$args['customer'] = (int) sanitize_text_field( wp_unslash( $_GET['_customer_user'] ) );
 			}
 
 			if ( ! empty( $_GET['post_status'] ) ) {
@@ -144,6 +159,10 @@ class AltapayReconciliation {
 				$args['order'] = sanitize_text_field( wp_unslash( $_GET['order'] ) );
 			}
 
+			if ( ! empty( $_GET['status'] ) ) {
+				$args['status'] = sanitize_text_field( wp_unslash( $_GET['status'] ) );
+			}
+
 			if ( ! empty( $_GET['m'] ) ) {
 				$yearMonth = sanitize_text_field( wp_unslash( $_GET['m'] ) );
 
@@ -152,29 +171,23 @@ class AltapayReconciliation {
 					$year  = (int) substr( $yearMonth, 0, 4 );
 					$month = (int) substr( $yearMonth, 4, 2 );
 
-					$args['date_query'] = array(
-						array(
-							'year'  => $year,
-							'month' => $month,
-						),
-					);
+					$last_day_of_month    = date_create( "$year-$month" )->format( 'Y-m-t' );
+					$args['date_created'] = "$year-$month-01..." . $last_day_of_month;
 				}
 			}
 
-			$query = new \WP_Query( $args );
+			$ordersData = wc_get_orders( $args );
 
-			if ( $query->have_posts() ) {
-
-				$PostToSelect = substr( str_repeat( ',%d', count( $query->posts ) ), 1 );
-
-				$reconciliation_data =
-					$wpdb->get_results(
-						$wpdb->prepare(
-							"SELECT orderId, identifier, transactionType FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($PostToSelect) ",
-							$query->posts
-						),
-						ARRAY_A
-					);
+			if ( ! empty( $ordersData ) ) {
+				$orders              = $ordersData->orders;
+				$orders_to_select 	 = substr( str_repeat( ',%d', count( $orders ) ), 1 );
+				$reconciliation_data = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT orderId, identifier, transactionType FROM {$wpdb->prefix}altapayReconciliationIdentifiers WHERE orderId IN ($orders_to_select) ",
+						$orders
+					),
+					ARRAY_A
+				);
 
 				$output  = $output . 'Order ID,Date Created,Order Total,Currency,Transaction ID,Reconciliation Identifier,Type,Payment Method,Order Status';
 				$output .= "\n";
