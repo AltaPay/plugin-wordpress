@@ -24,7 +24,7 @@ const label = decodeEntities( settings.title ) || defaultLabel;
 const Content = ( props ) => {
 	const store = select( storeKey );
 	const cartData = store.getCartTotals();
-	settings.subtotal = cartData.total_price/Math.pow(10, cartData.currency_minor_unit);
+	settings.subtotal = cartData.total_price / Math.pow(10, cartData.currency_minor_unit);
 	const { eventRegistration, activePaymentMethod,  emitResponse } = props;
 	const { onCheckoutSuccess } = eventRegistration;
 	useEffect( () => {
