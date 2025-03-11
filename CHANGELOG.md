@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.7]
+- Fix: Apple Pay - Incorrect transaction amounts with custom currency configurations.
+
 ## [3.7.6]
 - Fix: Charge subscriptions using the renewal order total instead of the original reserved amount.
 - Support export reconciliation data with WooCommerce High-Performance Order Storage (HPOS).
