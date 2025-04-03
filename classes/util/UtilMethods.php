@@ -9,8 +9,6 @@
 
 namespace Altapay\Classes\Util;
 
-use WC_Coupon;
-use WP_Error;
 use Altapay\Request\OrderLine;
 
 class UtilMethods {
@@ -37,11 +35,6 @@ class UtilMethods {
 				}
 			}
 			$cartItems = $itemsToCapture;
-		}
-
-		// if cart is empty
-		if ( ! $cartItems ) {
-			return new WP_Error( 'error', __( 'There are no items in the cart ', 'altapay' ) );
 		}
 
 		$i = 0;
