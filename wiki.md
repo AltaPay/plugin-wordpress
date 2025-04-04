@@ -53,6 +53,8 @@ We highly recommend gathering all the below information before starting the inst
 
 - AltaPay credentials for the payment gateway, terminals and custom gateway (i.e. yourShopName.altapaysecure.com). These will be provided by AltaPay.
 
+> **Note:** If the API user credentials have not yet been created, refer to the [Creating a New API User](#creating-a-new-api-user) section for step-by-step instructions.
+
 
 ## Installation
 
@@ -270,6 +272,27 @@ In order to reconcile payments please follow the steps below:
 > Warning:
 >
 > If you customized the plugin source code, the changes may be overwritten in the update process.
+
+## Creating a New API User
+
+To create a new API user in your AltaPay account, please follow these steps:
+
+- Log in to your AltaPay account.
+- From the left menu, navigate to **Settings** > **API Keys**.
+
+    ![api_key](docs/api_keys.png)
+    
+- Click on the **Create New API Key** button from top right corner.
+- Fill in the required fields:
+    - **Your current password**  
+    - **Username**  
+    - **Password**  
+    - **Assign Shops**
+    
+    ![api_key](docs/create_api_key.png)
+- After entering the details, click **Create**.
+
+The new credentials can now be used as the API Username and API Password in your AltaPay settings.
 
 ## Supported versions
 
