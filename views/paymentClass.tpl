@@ -304,12 +304,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				'subscription',
 				'subscriptionAndCharge'
 			] ) );
-			if ( $orderLines instanceof WP_Error ) {
-				return $orderLines; // Some error occurred
+
+			if ( $orderLines ) {
+				$request->setOrderLines( $orderLines );
 			}
-
-			$request->setOrderLines( $orderLines );
-
 
 			if ( $request ) {
 				try {

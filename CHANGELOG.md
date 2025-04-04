@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.8]
+- Fix: Remove restriction on order lines when placing an order.
+
 ## [3.7.7]
 - Fix: Apple Pay - Incorrect transaction amounts with custom currency configurations.
 
