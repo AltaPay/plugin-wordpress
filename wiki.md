@@ -174,6 +174,8 @@ For the AltaPay payment method to appear in the checkout page:
       | Is Apple Pay?                | Check if the terminal is for Apple Pay payments.                                                                                                      |
       | Apple Pay form label         | This controls the label shown on Apple Pay popup window.                                                                                              |
       | Apple Pay Supported Networks | The payment networks the merchant supports.                                                                                                           |
+      | Enable Surcharge?            | Check this option to enable surcharge for this payment method.                                                                                        |
+      | Surcharge on renewal orders? | Enable this option to apply surcharge to recurring orders as well.                                                                                    |
       | Token Control                | Enable Customer Token Control.                                                                                                                        |
 - Save the changes.
 
