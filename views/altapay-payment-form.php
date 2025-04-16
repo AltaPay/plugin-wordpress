@@ -548,6 +548,14 @@ input#giftcard_account_identifier {
 	.woocommerce-page .col2-set .col-1, .woocommerce-column--shipping-address.col-2 {
 		padding: 0;
 	}
+    .pensio_payment_form_submit_cell {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .pensio_payment_form_submit_cell span.secure-payments-text {
+        margin-bottom: 10px;
+    }
 	@media screen and (min-width:769px){
 		.altapay-page-wrapper {
 			display: flex;
