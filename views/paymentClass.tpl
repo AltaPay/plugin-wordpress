@@ -429,7 +429,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$reservedAmount = $transaction['ReservedAmount'] ?? 0;
 				$surchargeAmount = $transaction['SurchargeAmount'] ?? 0;
 
-				if ( $this->apply_surcharge && $surchargeAmount > 0 ) {
+				if ( $this->apply_surcharge === 'yes' && $surchargeAmount > 0 ) {
 					$surcharge_fee = new \WC_Order_Item_Fee();
 					$surcharge_fee->set_name( 'Surcharge' );
 					$surcharge_fee->set_amount( $surchargeAmount );
