@@ -51,7 +51,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
     public $apple_pay_label;
     public $apple_pay_supported_networks;
     public $secret;
-	public $apply_surcharge;
+    public $apply_surcharge;
 
 	public function __construct() {
 		// Set default gateway values
