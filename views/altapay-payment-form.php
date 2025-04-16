@@ -16,8 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
-$order    = wc_get_order( $order_id );
+$order_id  = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid'] ) : 0;
+$order     = wc_get_order( $order_id );
+$surcharge = 'no';
 if ( $order ) {
 	$wpml_language = $order->get_meta( 'wpml_language' );
 	if ( ! empty( $wpml_language ) ) {
@@ -27,6 +28,11 @@ if ( $order ) {
 			// Switch the language
 			$sitepress->switch_lang( $wpml_language );
 		}
+	}
+	$payment_method = wc_get_payment_gateway_by_order( $order );
+	if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment_method->settings ) ) {
+		$settings  = $payment_method->settings;
+		$surcharge = $settings['surcharge'] ?? 'no';
 	}
 }
 get_header();
@@ -552,6 +558,17 @@ input#giftcard_account_identifier {
 	}
 <?php } ?>
 
+.altapay-surcharge {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+.surcharge-amount span.currency-symbol {
+	display: none;
+}
+.Surcharged .surcharge-amount span.currency-symbol {
+	display: inline-block;
+}
 /* Hide 'Show Klarna Page' button if hidden attribute exists */
 input#showKlarnaPage[hidden] {
 	display: none;
@@ -562,6 +579,20 @@ input#showKlarnaPage[hidden] {
 		<div class="row">
 			<div class="altapay-page-wrapper">
 				<div class="altapay-payment-form-cnt <?php echo $container_class; ?>">
+					<?php if ( $surcharge === 'yes' ) { ?>
+						<div class="altapay-surcharge">
+							<div class="surcharge-amount">
+								<strong><?php echo __( 'Surcharge:', 'woocommerce' ); ?></strong>
+								<span id="PensioSurcharge"></span>
+								<span class="currency-symbol"><?php echo get_woocommerce_currency_symbol(); ?></span>
+							</div>
+							<div class="total-amount">
+								<strong><?php echo __( 'Total:', 'woocommerce' ); ?></strong>
+								<span id="PensioTotal"></span>
+								<span class="currency-symbol"><?php echo get_woocommerce_currency_symbol(); ?></span>
+							</div>
+						</div>
+					<?php } ?>
 					<form id="PensioPaymentForm"></form>
 				</div>
 				<div class="altapay-order-details woocommerce">

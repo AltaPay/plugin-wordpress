@@ -70,6 +70,30 @@ trait AltapayMaster {
 					return;
 				}
 
+				$payment_method = wc_get_payment_gateway_by_order( $renewal_order );
+				if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment_method->settings ) ) {
+					$settings                = $payment_method->settings;
+					$surcharge               = $settings['surcharge'] ?? 'no';
+					$surcharge_renewal_order = $settings['surcharge_renewal_order'] ?? 'no';
+
+					if ( $surcharge === 'yes' && $surcharge_renewal_order === 'yes' ) {
+						$fees = $parent_order->get_fees();
+						foreach ( $fees as $fee ) {
+							$surchargeAmount = (float) $fee->get_total();
+							if ( $fee->get_name() === 'Surcharge' ) {
+								$surcharge_fee = new \WC_Order_Item_Fee();
+								$surcharge_fee->set_name( 'Surcharge' );
+								$surcharge_fee->set_amount( $surchargeAmount );
+								$surcharge_fee->set_total( $surchargeAmount );
+								$surcharge_fee->set_tax_status( 'none' );
+								$renewal_order->add_item( $surcharge_fee );
+							}
+						}
+
+						$renewal_order->calculate_totals();
+					}
+				}
+
 				// @phpstan-ignore-next-line
 				if ( $this->payment_action === 'authorize_capture' ) {
 					$reconciliationId = wp_generate_uuid4();

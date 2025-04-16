@@ -51,6 +51,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
     public $apple_pay_label;
     public $apple_pay_supported_networks;
     public $secret;
+	public $apply_surcharge;
 
 	public function __construct() {
 		// Set default gateway values
@@ -69,6 +70,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->apple_pay_label              = $this->get_option( 'apple_pay_label' );
 		$this->apple_pay_supported_networks = $this->get_option( 'apple_pay_supported_networks' );
 		$this->secret                       = $this->get_option( 'secret' );
+		$this->apply_surcharge              = $this->get_option( 'surcharge' );
 
 
 		// Load form fields
@@ -425,6 +427,17 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
 				$ccExpiryDate   = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 				$reservedAmount = $transaction['ReservedAmount'] ?? 0;
+				$surchargeAmount = $transaction['SurchargeAmount'] ?? 0;
+
+				if ( $this->apply_surcharge && $surchargeAmount > 0 ) {
+					$surcharge_fee = new \WC_Order_Item_Fee();
+					$surcharge_fee->set_name( 'Surcharge' );
+					$surcharge_fee->set_amount( $surchargeAmount );
+					$surcharge_fee->set_total( $surchargeAmount );
+					$surcharge_fee->set_tax_status( 'none' );
+					$order->add_item( $surcharge_fee );
+					$order->calculate_totals();
+				}
 
 				/*
 				Exit if payment already completed against the same order and

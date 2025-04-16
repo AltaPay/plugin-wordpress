@@ -96,6 +96,20 @@ $formSettings = array(
 		'default'     => array( 'visa', 'masterCard', 'amex' ),
 		'desc_tip'    => true,
 	),
+	'surcharge'   => array(
+		'title'    => __( 'Enable Surcharge?', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Check this option to enable surcharge for this payment method.', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
+	),
+	'surcharge_renewal_order'   => array(
+		'title'    => __( 'Surcharge on renewal orders?', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Enable this option to apply surcharge to recurring orders.', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
+	),
 );
 
 if ( $tokenStatus === 'CreditCard' ) {
