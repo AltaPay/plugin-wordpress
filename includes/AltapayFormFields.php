@@ -103,13 +103,6 @@ $formSettings = array(
 		'default'  => 'no',
 		'desc_tip' => true,
 	),
-	'surcharge_renewal_order'   => array(
-		'title'    => __( 'Surcharge on renewal orders?', 'altapay' ),
-		'type'     => 'checkbox',
-		'label'    => __( 'Enable this option to apply surcharge to recurring orders.', 'altapay' ),
-		'default'  => 'no',
-		'desc_tip' => true,
-	),
 );
 
 if ( $tokenStatus === 'CreditCard' ) {
