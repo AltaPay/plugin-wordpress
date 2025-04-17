@@ -174,6 +174,7 @@ For the AltaPay payment method to appear in the checkout page:
       | Is Apple Pay?                | Check if the terminal is for Apple Pay payments.                                                                                                      |
       | Apple Pay form label         | This controls the label shown on Apple Pay popup window.                                                                                              |
       | Apple Pay Supported Networks | The payment networks the merchant supports.                                                                                                           |
+      | Enable Surcharge?            | Check this option to enable surcharge for this payment method.                                                                                        |
       | Token Control                | Enable Customer Token Control.                                                                                                                        |
 - Save the changes.
 
@@ -297,14 +298,14 @@ The new credentials can now be used as the API Username and API Password in your
 ## Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.7.2
-- WooCommerce min. 3.9.0 – max. 9.7.1
+- WordPress min. 5.0 – max. 6.8
+- WooCommerce min. 3.9.0 – max. 9.8.1
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.7.2, WooCommerce 9.7.1 and PHP 8.2
+- WordPress 6.8, WooCommerce 9.8.1 and PHP 8.2
 
 
 ## Troubleshooting

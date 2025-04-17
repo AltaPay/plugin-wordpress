@@ -20,11 +20,7 @@
         <th width="12%" class="fw6 bb b--black-20 tl pb3 pr3 bg-white"><?php esc_html_e( 'Total amount', 'altapay' ); ?></th>
     </tr>
     </thead>
-    <tbody class="lh-copy">
-
-    @php
-        $productsWithCoupon = array();
-    @endphp
+    <tbody>
 
     @foreach($order->get_items() as $item)
 
@@ -45,26 +41,18 @@
             $productUnitPriceWithTax = round(($total / $qty) + ($item->get_total_tax() / $qty), 2);
             $totalIncTax = round($total + $item->get_total_tax(), 2);
         @endphp
-
-        <tr class="ap-orderlines-capture">
-            <td style="display:none">
-                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/>
-            </td>
-            <td class="pv3 pr3 bb b--black-20"> {{$item->get_name()}} </td>
-            <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
-            <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
-            <td class="ap-orderline-capture-max-quantity pv3 pr3 bb b--black-20">{{ $qty }}</td>
-            <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercent}}</td>
-            <td class="pv3 pr3 bb b--black-20">
-                <input style="width: 100px;" class="form-control ap-order-capture-modify"
-                       name="qty" value="{{$capturableQty}}"
-                       type="number"
-                       {{ !$capturableQty ? 'disabled' : '' }} />
-            </td>
-            <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20">
-                <span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span>
-            </td>
-        </tr>
+        @include('tables.order-line', [
+            'itemId' => $productID,
+            'itemName' => $item->get_name(),
+            'priceWithTax' => $productUnitPriceWithTax,
+            'priceWithoutTax' => $productUnitPriceWithoutTax,
+            'qty' => $qty,
+            'discountPercent' => $discountPercent,
+            'availableQty' => $capturableQty,
+            'currency' => $order->get_currency(),
+            'totalIncTax' => $totalIncTax,
+            'type' => 'capture',
+        ])
     @endforeach
 
     @if ($order->get_shipping_total() <> 0 || $order->get_shipping_tax() <> 0)
@@ -78,28 +66,44 @@
         @foreach ($order_shipping_methods as $ordershipping_key => $ordershippingmethods)
             @php($shipping_id = $ordershippingmethods['method_id'])
         @endforeach
-
-        <tr class="ap-orderlines-capture">
-            @php
-                $capturableQty = ( isset( $items_captured[$shipping_id] ) && $items_captured[$shipping_id]  == 1 ) ? 0 : 1;
-            @endphp
-            <td style="display:none">
-                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID"
-                       type="text" value="{{$shipping_id}}"/>
-            </td>
-            <td class="pv3 pr3 bb b--black-20">{{$order->get_shipping_method()}}</td>
-            <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$totalIncTax}}</td>
-            <td class="pv3 pr3 bb b--black-20">{{$excTax}}</td>
-            <td class="ap-orderline-capture-max-quantity pv3 pr3 bb b--black-20">1</td>
-            <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercentage}}</td>
-            <td class="pv3 pr3 bb b--black-20">
-                <input class="form-control ap-order-capture-modify" name="qty"
-                       value="{{$capturableQty}}" type="number" style="width: 100px;"  {{ $capturableQty === 0 ? 'disabled' : '' }} />
-            </td>
-            <td class="ap-orderline-totalprice-capture pv3 pr3 bb b--black-20">
-                <span class="totalprice-capture">{{$order->get_currency()}} {{$totalIncTax}}</span>
-            </td>
-        </tr>
+        @php
+            $capturableQty = ( isset( $items_captured[$shipping_id] ) && $items_captured[$shipping_id]  == 1 ) ? 0 : 1;
+        @endphp
+        @include('tables.order-line', [
+            'itemId' => $shipping_id,
+            'itemName' => $order->get_shipping_method(),
+            'priceWithTax' => $totalIncTax,
+            'priceWithoutTax' => $excTax,
+            'qty' => 1,
+            'discountPercent' => $discountPercentage,
+            'availableQty' => $capturableQty,
+            'currency' => $order->get_currency(),
+            'totalIncTax' => $totalIncTax,
+            'type' => 'capture',
+        ])
     @endif
+
+    @php
+        $fees = $order->get_fees();
+    @endphp
+    @foreach( $fees as $fee )
+        @php
+            $surchargeAmount = (float) $fee->get_total();
+        @endphp
+        @if( $fee->get_name() === 'Surcharge' )
+            @include('tables.order-line', [
+                'itemId' => $fee->get_id(),
+                'itemName' => $fee->get_name(),
+                'priceWithTax' => $surchargeAmount,
+                'priceWithoutTax' => $surchargeAmount,
+                'qty' => 1,
+                'discountPercent' => 0,
+                'availableQty' => 1,
+                'currency' => $order->get_currency(),
+                'totalIncTax' => $surchargeAmount,
+                'type' => 'capture'
+            ])
+        @endif
+    @endforeach
     </tbody>
 </table>

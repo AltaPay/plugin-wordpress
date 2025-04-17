@@ -50,7 +50,7 @@
             $toBeCaptured = round($reserved - $captured, 2);
 
             if( !empty($agreement_id) && $toBeCaptured == 0 ){
-                $toBeCaptured = $total;
+                $toBeCaptured = round($total, 2);
             }
         @endphp
         @if ( $captured < $reserved || $reserved == 0 )

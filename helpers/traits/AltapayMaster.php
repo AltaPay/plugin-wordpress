@@ -19,6 +19,7 @@ use Altapay\Api\Test\TestAuthentication;
 use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use Altapay\Api\Subscription\ChargeSubscription;
 use Altapay\Classes\Core;
+use Altapay\Api\Others\CalculateSurcharge;
 
 trait AltapayMaster {
 
@@ -68,6 +69,29 @@ trait AltapayMaster {
 				if ( ! $login || is_wp_error( $login ) ) {
 					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
 					return;
+				}
+
+				$payment_method = wc_get_payment_gateway_by_order( $renewal_order );
+				if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment_method->settings ) ) {
+					$settings  = $payment_method->settings;
+					$surcharge = $settings['surcharge'] ?? 'no';
+
+					if ( $surcharge === 'yes' ) {
+						$api = new CalculateSurcharge( $this->getAuth() );
+						$api->setPaymentId( $agreement_id );
+						$api->setAmount( round( $amount, 2 ) );
+						$surcharge = $api->call();
+						if ( $surcharge->Result === 'Success' && $surcharge->SurchageAmount > 0 ) {
+							$surchargeAmount = (float) $surcharge->SurchageAmount;
+							$surcharge_fee   = new \WC_Order_Item_Fee();
+							$surcharge_fee->set_name( 'Surcharge' );
+							$surcharge_fee->set_amount( $surchargeAmount );
+							$surcharge_fee->set_total( $surchargeAmount );
+							$surcharge_fee->set_tax_status( 'none' );
+							$renewal_order->add_item( $surcharge_fee );
+							$renewal_order->calculate_totals();
+						}
+					}
 				}
 
 				// @phpstan-ignore-next-line

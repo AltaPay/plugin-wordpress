@@ -96,6 +96,13 @@ $formSettings = array(
 		'default'     => array( 'visa', 'masterCard', 'amex' ),
 		'desc_tip'    => true,
 	),
+	'surcharge'   => array(
+		'title'    => __( 'Enable Surcharge?', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Check this option to enable surcharge for this payment method.', 'altapay' ),
+		'default'  => 'no',
+		'desc_tip' => true,
+	),
 );
 
 if ( $tokenStatus === 'CreditCard' ) {
