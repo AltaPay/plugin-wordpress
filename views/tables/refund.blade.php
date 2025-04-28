@@ -22,9 +22,6 @@
     </thead>
     <tbody>
 
-    @php
-        $productsWithCoupon = array();
-    @endphp
     @foreach($order->get_items() as $item)
 
         @if($item->get_total() == 0)
@@ -44,27 +41,18 @@
             $productUnitPriceWithTax = round(($total / $qty) + ($item->get_total_tax() / $qty), 2);
             $totalIncTax = round($total + $item->get_total_tax(), 2);
         @endphp
-
-        <tr class="ap-orderlines-refund">
-            <td style="display:none">
-                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" type="text" value="{{$productID}}"/>
-            </td>
-            <td class="pv3 pr3 bb b--black-20"> {{$item->get_name()}} </td>
-            <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$productUnitPriceWithTax}}</td>
-            <td class="pv3 pr3 bb b--black-20">{{$productUnitPriceWithoutTax}}</td>
-            <td class="ap-orderline-refund-max-quantity pv3 pr3 bb b--black-20">{{$qty}}</td>
-            <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercent}}</td>
-            <td class="pv3 pr3 bb b--black-20">
-                <input style="width: 100px;" class="form-control ap-order-refund-modify"
-                        name="qty"
-                        value="{{$refundableQty}}"
-                        type="number"
-                        {{ !$refundableQty ? 'disabled' : '' }} />
-            </td>
-            <td class="ap-orderline-totalprice-refund pv3 pr3 bb b--black-20">
-                <span class="totalprice-refund">{{$order->get_currency()}} {{$totalIncTax}}</span>
-            </td>
-        </tr>
+        @include('tables.order-line', [
+            'itemId' => $productID,
+            'itemName' => $item->get_name(),
+            'priceWithTax' => $productUnitPriceWithTax,
+            'priceWithoutTax' => $productUnitPriceWithoutTax,
+            'qty' => $qty,
+            'discountPercent' => $discountPercent,
+            'availableQty' => $refundableQty,
+            'currency' => $order->get_currency(),
+            'totalIncTax' => $totalIncTax,
+            'type' => 'refund',
+        ])
     @endforeach
 
     @if ($order->get_shipping_total() <> 0 || $order->get_shipping_tax() <> 0)
@@ -78,28 +66,43 @@
         @foreach ($order_shipping_methods as $ordershipping_key => $ordershippingmethods)
             @php($shipping_id = $ordershippingmethods['method_id'])
         @endforeach
-
-        <tr class="ap-orderlines-refund">
-            @php
-                $remaining_refund_amount = $order->get_remaining_refund_amount();
-            @endphp
-            <td style="display:none">
-                <input class="form-control ap-order-product-sku pv3 pr3 bb b--black-20" name="productID" 
-                       type="text" value="{{$shipping_id}}"/>
-            </td>
-            <td class="pv3 pr3 bb b--black-20">{{$order->get_shipping_method()}}</td>
-            <td class="ap-orderline-unit-price pv3 pr3 bb b--black-20">{{$totalIncTax}}</td>
-            <td class="pv3 pr3 bb b--black-20">{{$excTax}}</td>
-            <td class="ap-orderline-refund-max-quantity pv3 pr3 bb b--black-20">1</td>
-            <td class="ap-orderline-discount-percent pv3 pr3 bb b--black-20">{{$discountPercentage}}</td>
-            <td class="pv3 pr3 bb b--black-20">
-                <input class="form-control ap-order-refund-modify" 
-                       name="qty" value="{{$remaining_refund_amount == 0 ? 0 : 1}}" type="number" style="width: 100px;"  {{ $remaining_refund_amount == 0 ? 'disabled' : '' }} />
-            </td>
-            <td class="ap-orderline-totalprice-refund pv3 pr3 bb b--black-20">
-                <span class="totalprice-refund">{{$order->get_currency()}} {{$totalIncTax}}</span>
-            </td>
-        </tr>
+        @php
+            $remaining_refund_amount = $order->get_remaining_refund_amount();
+        @endphp
+        @include('tables.order-line', [
+            'itemId' => $shipping_id,
+            'itemName' => $order->get_shipping_method(),
+            'priceWithTax' => $totalIncTax,
+            'priceWithoutTax' => $excTax,
+            'qty' => 1,
+            'discountPercent' => $discountPercentage,
+            'availableQty' => $remaining_refund_amount == 0 ? 0 : 1,
+            'currency' => $order->get_currency(),
+            'totalIncTax' => $totalIncTax,
+            'type' => 'refund',
+        ])
     @endif
+    @php
+        $fees = $order->get_fees();
+    @endphp
+    @foreach( $fees as $fee )
+        @php
+            $surchargeAmount = (float) $fee->get_total();
+        @endphp
+        @if( $fee->get_name() === 'Surcharge' )
+            @include('tables.order-line', [
+                'itemId' => $fee->get_id(),
+                'itemName' => $fee->get_name(),
+                'priceWithTax' => $surchargeAmount,
+                'priceWithoutTax' => $surchargeAmount,
+                'qty' => 1,
+                'discountPercent' => 0,
+                'availableQty' => 1,
+                'currency' => $order->get_currency(),
+                'totalIncTax' => $surchargeAmount,
+                'type' => 'refund',
+            ])
+        @endif
+    @endforeach
     </tbody>
 </table>
