@@ -295,6 +295,27 @@ class Order {
         cy.get('.checkout-button').click()
     }
 
+    surcharge_payment(CC_TERMINAL_NAME) {
+
+        cy.contains(CC_TERMINAL_NAME).click({ force: true })
+        //billing details
+        cy.get('#billing_first_name').clear().type('Test')
+        cy.get('#billing_last_name').clear().type('Person-dk')
+        cy.get('#billing_address_1').clear().type('65 Nygårdsvej')
+        cy.get('#billing_postcode').clear().type('2100')
+        cy.get('#billing_city').clear().type('København Ø')
+        cy.get('#billing_phone').clear().type('33 13 71 12')
+        cy.get('#billing_email').clear().type('customer@email.dk')
+        cy.get('#place_order').click().wait(3000)
+        cy.get('body').should('contain.text', 'surcharge')
+        cy.get('[id=creditCardNumberInput]').type('4111111111111111')
+        cy.get('#emonth').select('12')
+        cy.get('#eyear').select('2025')
+        cy.get('#cvcInput').type('123')
+        cy.get('#cardholderNameInput').type('testname')
+        cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(2000)
+        cy.get('.entry-title').should('include.text', 'Order received')
+    }
 }
 
 export default Order
