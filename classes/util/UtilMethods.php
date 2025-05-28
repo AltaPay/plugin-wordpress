@@ -41,9 +41,7 @@ class UtilMethods {
 
 		// generate order lines product by product
 		foreach ( $cartItems as $key => $item ) {
-			$total    = $item->get_total();
-			$subtotal = $item->get_subtotal();
-			$discount = 0;
+			$total = $item->get_total();
 
 			if ( $total == 0 && $isSubscription ) {
 				$total = (float) $item->get_product()->get_regular_price();
@@ -53,14 +51,6 @@ class UtilMethods {
 				continue;
 			}
 
-			$discountPercentage = 0;
-			if ( $subtotal > 0 ) {
-				$discount           = $subtotal - $total;
-				$discountPercentage = ( $subtotal - $total ) / $subtotal * 100;
-			}
-			// get product details for each order line
-			$productDetails = $this->getProductDetails( $item, $discount, $discountPercentage, ( ( $i == 0 ) ? $isSubscription : 0 ) );
-
 			if ( $wcRefund ) {
 				$orderLines[ $key ] = array(
 					'qty'          => $products['itemQty'][ $key ],
@@ -68,7 +58,7 @@ class UtilMethods {
 					'refund_tax'   => ( $item->get_total_tax() / $item->get_quantity() ) * $products['itemQty'][ $key ],
 				);
 			} else {
-				$orderLines[] = $productDetails['product'];
+				$orderLines[] = $this->getOrderLine( $item, ( ( $i == 0 ) ? $isSubscription : 0 ) );
 			}
 
 			$i ++;
@@ -85,6 +75,20 @@ class UtilMethods {
 			$orderLines []   = $shippingDetails;
 		}
 
+		if ( $order->get_total_discount() ) {
+			$orderLine            = new OrderLine(
+				'Discount',
+				'discount',
+				1,
+				-abs( $order->get_total_discount() )
+			);
+			$orderLine->taxAmount = 0;
+			$orderLine->unitCode  = 'unit';
+			$orderLine->setGoodsType( 'handling' );
+
+			$orderLines [] = $orderLine;
+		}
+
 		if ( ! $wcRefund ) {
 			// Calculate compensation amount
 			$totalCompensationAmount = $this->totalCompensationAmount( $orderLines, $order->get_total() );
@@ -98,76 +102,36 @@ class UtilMethods {
 	}
 
 	/**
-	 * Returns product Details based on product type and tax configuration settings
+	 * Returns order line for the order item
 	 *
 	 * @param object $item
-	 * @param float  $discount
-	 * @param float  $discountPercentage
+	 * @param bool   $isSubscription
 	 *
-	 * @return array
+	 * @return OrderLine
 	 */
-	private function getProductDetails( $item, $discount, $discountPercentage, $isSubscription = false ) {
-		$product         = $item->get_product();
-		$quantity        = $item->get_quantity();
-		$regularPrice    = (float) $product->get_regular_price();
-		$salePrice       = (float) $product->get_sale_price();
-		$subtotal        = $item->get_subtotal();
-		$taxRate         = $subtotal > 0 ? $item->get_subtotal_tax() / $subtotal : 0;
-		$productId       = $product->get_sku() ? $item->get_id() . '-' . $product->get_sku() : $item->get_id();
-		$productData     = array();
-		$productDiscount = 0;
-
-		if ( $product->get_type() === 'variable' || $product->get_type() === 'variable-subscription' ) {
-			$variationId  = (int) $item->get_variation_id();
-			$product_data = wc_get_product( $variationId );
-			$regularPrice = (float) $product_data->get_regular_price();
-			$salePrice    = (float) $product_data->get_sale_price() ? $product_data->get_sale_price() : 0;
-		}
-
-		// calculate discount if catalogue rule is applied on order line i.e. product sale price is set
-		if ( $product->is_on_sale() ) {
-			$productDiscount = $regularPrice - $salePrice;
-			// convert discount amount into percentage
-			$discountPercentage += round( ( $productDiscount / $regularPrice ) * 100, 2 );
-		}
-
-		if ( wc_prices_include_tax() ) {
-			$taxRate      = 1 + $taxRate;
-			$productPrice = round( $regularPrice / $taxRate, 2 );
-			$taxAmount    = $regularPrice - $productPrice;
-		} else {
-			$productPrice = $regularPrice;
-			$taxAmount    = $productPrice * $taxRate;
-		}
-
-		$productPrice = $isSubscription ? ( $productPrice + ( $taxAmount * $quantity ) - ( $discount + $productDiscount ) ) : round( $productPrice, 2 );
-		$taxPercent   = $productPrice > 0 ? round( ( $taxAmount / $productPrice ) * 100, 2 ) : 0;
-		$taxAmount    = round( $taxAmount * $quantity, 2 );
-		$discount     = round( $discountPercentage, 2 );
+	private function getOrderLine( $item, $isSubscription = false ) {
+		$product  = $item->get_product();
+		$quantity = $item->get_quantity();
 
 		// generate line date with all the calculated parameters
 		$orderLine             = new OrderLine(
 			$item->get_name(),
-			$productId,
+			$item->get_id(),
 			$quantity,
-			round( $productPrice, 2 )
+			round( $item->get_subtotal() / $quantity, 2 )
 		);
 		$orderLine->productUrl = $product->get_permalink();
 		$orderLine->imageUrl   = wp_get_attachment_url( $product->get_image_id() );
 		$orderLine->unitCode   = $quantity > 1 ? 'units' : 'unit';
 
 		if ( ! $isSubscription ) {
-			$orderLine->discount   = $discount;
-			$orderLine->taxAmount  = $taxAmount;
-			$orderLine->taxPercent = $taxPercent;
+			$orderLine->taxAmount = round( $item->get_total_tax(), 2 );
 		}
 
 		$goodsType = ( $isSubscription ) ? 'subscription_model' : 'item';
 		$orderLine->setGoodsType( $goodsType );
 
-		$productData['product'] = $orderLine;
-
-		return $productData;
+		return $orderLine;
 	}
 
 	/**
@@ -180,16 +144,14 @@ class UtilMethods {
 	 */
 	public function compensationAmountOrderline( $productId, $compensationAmount ) {
 		// Generate compensation amount orderline for payment, capture and refund requests
-		$orderLine             = new OrderLine(
+		$orderLine            = new OrderLine(
 			'Compensation',
 			'comp-' . $productId,
 			1,
 			$compensationAmount
 		);
-		$orderLine->taxAmount  = 0.00;
-		$orderLine->taxPercent = 0.00;
-		$orderLine->unitCode   = 'unit';
-		$orderLine->discount   = 0.00;
+		$orderLine->taxAmount = 0.00;
+		$orderLine->unitCode  = 'unit';
 		$orderLine->setGoodsType( 'handling' );
 
 		return $orderLine;
@@ -233,16 +195,14 @@ class UtilMethods {
 					'refund_tax'   => wc_format_decimal( $totalShippingTax ),
 				);
 			} else {
-				$orderLine             = new OrderLine(
+				$orderLine            = new OrderLine(
 					$order->get_shipping_method(),
 					$shippingID,
 					1,
 					round( $totalShipping, 2 )
 				);
-				$orderLine->taxAmount  = round( $totalShippingTax, 2 );
-				$orderLine->taxPercent = round( ( $totalShippingTax / $totalShipping ) * 100, 2 );
-				$goodsType             = 'shipment';
-				$orderLine->setGoodsType( $goodsType );
+				$orderLine->taxAmount = round( $totalShippingTax, 2 );
+				$orderLine->setGoodsType( 'shipment' );
 				$shippingDetails[] = $orderLine;
 			}
 		}
