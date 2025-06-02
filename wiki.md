@@ -298,14 +298,14 @@ The new credentials can now be used as the API Username and API Password in your
 ## Supported versions
 
 Minimum system requirements are:
-- WordPress min. 5.0 – max. 6.8
-- WooCommerce min. 3.9.0 – max. 9.8.1
+- WordPress min. 5.0 – max. 6.8.1
+- WooCommerce min. 3.9.0 – max. 9.8.5
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.8, WooCommerce 9.8.1 and PHP 8.2
+- WordPress 6.8.1, WooCommerce 9.8.5 and PHP 8.2
 
 
 ## Troubleshooting
