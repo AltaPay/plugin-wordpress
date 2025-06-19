@@ -75,12 +75,16 @@ class UtilMethods {
 			$orderLines []   = $shippingDetails;
 		}
 
-		if ( $order->get_total_discount() ) {
+		$discount_total = (float) $order->get_discount_total();
+		$discount_tax   = (float) $order->get_discount_tax();
+		$total_discount = round( $discount_total + $discount_tax, 2 );
+
+		if ( $total_discount ) {
 			$orderLine            = new OrderLine(
 				'Discount',
 				'discount',
 				1,
-				-abs( $order->get_total_discount() )
+				-$total_discount
 			);
 			$orderLine->taxAmount = 0;
 			$orderLine->unitCode  = 'unit';
@@ -125,7 +129,7 @@ class UtilMethods {
 		$orderLine->unitCode   = $quantity > 1 ? 'units' : 'unit';
 
 		if ( ! $isSubscription ) {
-			$orderLine->taxAmount = round( $item->get_total_tax(), 2 );
+			$orderLine->taxAmount = round( $item->get_subtotal_tax(), 2 );
 		}
 
 		$goodsType = ( $isSubscription ) ? 'subscription_model' : 'item';
