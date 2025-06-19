@@ -16,7 +16,7 @@ jQuery( document ).ready(
 				var goodwillrefund  = 'no';
 				var amount          = parseFloat( $( '#refund-amount' ).val() );
 				var productsArrData = [];
-				if ($( "#ap-allow-refund-orderlines" ).attr( "checked" ) === "checked") {
+				if ($("#ap-allow-refund-orderlines").prop("checked")) {
 					$( '.ap-orderlines-refund:has(input)' ).each(
 						function () {
 							var productArrData = [];

@@ -28,7 +28,7 @@ jobs:
         with:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
-          ref: 'main'
+          ref: 'update-ubuntu-22.04'
 
       # Install version 1.0.8 of Terraform CLI
       - name: Setup Terraform
