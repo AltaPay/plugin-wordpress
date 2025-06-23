@@ -84,7 +84,7 @@ class UtilMethods {
 				'Discount',
 				'discount',
 				1,
-				-$total_discount
+				-abs( $total_discount )
 			);
 			$orderLine->taxAmount = 0;
 			$orderLine->unitCode  = 'unit';
