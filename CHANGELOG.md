@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.1]
+- Fix: Order line calculations when a cart discount is applied.
+
 ## [3.8.0]
 - Add support for the new PayPal Integration.
 

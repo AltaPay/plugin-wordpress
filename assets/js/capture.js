@@ -14,7 +14,7 @@ jQuery( document ).ready(
 			capture: function (element) {
 				var amount          = parseFloat( $( '#capture-amount' ).val() );
 				var productsArrData = [];
-				if ($( "#ap-allow-orderlines" ).attr( "checked" ) === "checked") {
+				if ($( "#ap-allow-orderlines" ).prop("checked")) {
 					$( '.ap-orderlines-capture:has(input)' ).each(
 						function () {
 							var productArrData = [];
