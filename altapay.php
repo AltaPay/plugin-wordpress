@@ -1004,11 +1004,13 @@ function validate_checksum_altapay_callback_form() {
 	if ( is_page( get_option( 'altapay_payment_page' ) ) ) {
 		$checksum = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 
-		$altapay_helper = new Helpers\AltapayHelpers();
-		$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
-		if ( ! empty( $checksum ) and ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
-			error_log( 'checksum validation failed' );
-			exit;
+		if ( ! empty( $checksum ) ) {
+			$altapay_helper = new Helpers\AltapayHelpers();
+			$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
+			if ( ! empty( $checksum ) and ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
+				error_log( 'checksum validation failed' );
+				exit;
+			}
 		}
 	}
 }
@@ -1078,6 +1080,9 @@ add_filter( 'body_class', 'altapay_add_custom_class_to_body', 10, 1 );
  * @return void
  */
 function altapay_checkout_blocks_style() {
+	if ( ! is_checkout() && ! is_checkout_pay_page() ) {
+		return;
+	}
 	wp_enqueue_style(
 		'altapay-block-style',
 		plugin_dir_url( __FILE__ ) . 'assets/css/blocks.css',
