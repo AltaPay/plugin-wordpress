@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.2]
+- Load plugin CSS and JS only on the checkout page to improve performance.
+
 ## [3.8.1]
 - Fix: Order line calculations when a cart discount is applied.
 
