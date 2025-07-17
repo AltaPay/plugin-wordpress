@@ -1007,7 +1007,7 @@ function validate_checksum_altapay_callback_form() {
 		if ( ! empty( $checksum ) ) {
 			$altapay_helper = new Helpers\AltapayHelpers();
 			$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
-			if ( ! empty( $checksum ) and ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
+			if ( ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
 				error_log( 'checksum validation failed' );
 				exit;
 			}
