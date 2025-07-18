@@ -66,6 +66,9 @@ class ApplePay {
 	 * @return void
 	 */
 	public function altapay_load_apple_pay_script() {
+		if ( ! is_checkout() && ! is_checkout_pay_page() ) {
+			return;
+		}
 
 		wp_enqueue_script(
 			'altapay-applepay-sdk',

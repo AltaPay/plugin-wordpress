@@ -7,10 +7,10 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.8.1
+ * Version: 3.8.2
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 9.9.4
+ * WC tested up to: 10.0.2
  *
  * @package Altapay
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.1' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.2' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -1004,11 +1004,13 @@ function validate_checksum_altapay_callback_form() {
 	if ( is_page( get_option( 'altapay_payment_page' ) ) ) {
 		$checksum = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 
-		$altapay_helper = new Helpers\AltapayHelpers();
-		$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
-		if ( ! empty( $checksum ) and ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
-			error_log( 'checksum validation failed' );
-			exit;
+		if ( ! empty( $checksum ) ) {
+			$altapay_helper = new Helpers\AltapayHelpers();
+			$secret         = wc_get_payment_gateway_by_order( $_POST['shop_orderid'] )->secret;
+			if ( ! empty( $secret ) and $altapay_helper->calculateChecksum( $_POST, $secret ) !== $checksum ) {
+				error_log( 'checksum validation failed' );
+				exit;
+			}
 		}
 	}
 }
@@ -1078,6 +1080,9 @@ add_filter( 'body_class', 'altapay_add_custom_class_to_body', 10, 1 );
  * @return void
  */
 function altapay_checkout_blocks_style() {
+	if ( ! is_checkout() && ! is_checkout_pay_page() ) {
+		return;
+	}
 	wp_enqueue_style(
 		'altapay-block-style',
 		plugin_dir_url( __FILE__ ) . 'assets/css/blocks.css',
