@@ -65,12 +65,6 @@ trait AltapayMaster {
 					return;
 				}
 
-				$login = $this->altapayApiLogin();
-				if ( ! $login || is_wp_error( $login ) ) {
-					echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-					return;
-				}
-
 				$payment_method = wc_get_payment_gateway_by_order( $renewal_order );
 				if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment_method->settings ) ) {
 					$settings  = $payment_method->settings;
@@ -111,8 +105,7 @@ trait AltapayMaster {
 					$transaction        = $jsonToArray[ $latest_transaction ];
 					$transaction_id     = $transaction['TransactionId'];
 
-					$renewal_order->update_meta_data( '_transaction_id', $transaction_id );
-					$renewal_order->save();
+					$renewal_order->set_transaction_id( $transaction_id );
 
 					if ( $response->Result === 'Success' ) {
 						$reconciliation = new Core\AltapayReconciliation();

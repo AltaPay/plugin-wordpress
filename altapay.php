@@ -301,12 +301,6 @@ function altapay_meta_box_side( $post_or_order_object ) {
 
 	if ( $txnID || $agreement_id ) {
 		$settings = new Core\AltapaySettings();
-		$login    = $settings->altapayApiLogin();
-
-		if ( ! $login || is_wp_error( $login ) ) {
-			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-			return;
-		}
 
 		if ( ! $txnID ) {
 			$txnID = $agreement_id;
@@ -557,14 +551,6 @@ function altapayCaptureCallback() {
 	}
 
 	if ( $txnID ) {
-
-		$login = $settings->altapayApiLogin();
-		if ( ! $login ) {
-			wp_send_json_error( array( 'error' => 'Could not login to the Merchant API:' ) );
-		} elseif ( is_wp_error( $login ) ) {
-			wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
-		}
-
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 
 		$orderLines       = array();
@@ -769,13 +755,6 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 		return array( 'error' => 'Invalid order' );
 	}
 
-	$login = $settings->altapayApiLogin();
-	if ( ! $login ) {
-		return array( 'error' => 'Could not login to the Merchant API:' );
-	} elseif ( is_wp_error( $login ) ) {
-		return array( 'error' => wp_kses_post( $login->get_error_message() ) );
-	}
-
 	$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 	if ( $postOrderLines ) {
 		$selectedProducts = array(
@@ -939,12 +918,6 @@ function altapayReleasePayment() {
 	$reserved = 0;
 	$refunded = 0;
 
-	$login = $settings->altapayApiLogin();
-	if ( ! $login ) {
-		wp_send_json_error( array( 'error' => 'Could not login to the Merchant API:' ) );
-	} elseif ( is_wp_error( $login ) ) {
-		wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
-	}
 	try {
 		$auth = $settings->getAuth();
 		$api  = new Payments( $auth );

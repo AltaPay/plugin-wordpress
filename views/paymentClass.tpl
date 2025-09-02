@@ -147,11 +147,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		global $wpdb;
 		$utilMethods 	= new Util\UtilMethods;
 		$altapayHelpers = new Helpers\AltapayHelpers;
-		// Create form request etc.
-		$login = $this->altapayApiLogin();
-		if ( ! $login || is_wp_error( $login ) ) {
-			throw new Exception( 'Could not connect to AltaPay!' );
-		}
 		// Create payment request
 		$order = new WC_Order( $order_id );
 
@@ -160,7 +155,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$amount 		= $this->getOrderAmount( $order );
 		$currency		= $order->get_currency();
 		$customerInfo	= $this->setCustomer( $order );
-		$cookie 		= isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : '';
+		$cookie         = $_SERVER['HTTP_COOKIE'] ?? '';
 		$language 		= 'en';
 		$languages = array(
 			'ca',
@@ -427,6 +422,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$lastFourDigits = $transaction['CardInformation']['LastFourDigits'] ?? '';
 				$ccExpiryDate   = isset( $transaction['CreditCardExpiry'] ) ? ( $transaction['CreditCardExpiry']['Month'] . '/' . $transaction['CreditCardExpiry']['Year'] ) : '';
 				$reservedAmount = $transaction['ReservedAmount'] ?? 0;
+				$capturedAmount = $transaction['CapturedAmount'] ?? 0;
 				$surchargeAmount = $transaction['SurchargeAmount'] ?? 0;
 
 				if ( $this->apply_surcharge === 'yes' && $surchargeAmount > 0 ) {
@@ -551,7 +547,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				if ( $transaction['AuthType'] === 'subscription_payment' and $transaction['TransactionStatus'] === 'pending' ) {
 					$order->update_status( 'on-hold', 'The payment is pending an update from the payment provider.' );
 				} else {
-					$order->add_order_note( __( 'Callback completed', 'altapay' ) );
 					$order->payment_complete();
 				}
 
@@ -607,12 +602,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			// Redirect to Order Confirmation Page
 			if ( $type === 'paymentAndCapture' && $requireCapture === 'true' && $callback_type == 'ok' ) {
-				$login = $this->altapayApiLogin();
-				if ( ! $login || is_wp_error( $login ) ) {
-					error_log( 'Could not connect to AltaPay!' );
-					return;
-				}
-
 				$api = new CaptureReservation( $this->getAuth() );
 				$api->setAmount( round( $amount, 2 ) );
 				$api->setTransaction( $txnId );
@@ -637,7 +626,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				} catch ( \Exception $e ) {
 					error_log( 'Exception ' . $e->getMessage() );
 				}
+			} elseif ( $type === 'paymentAndCapture' && $capturedAmount == $this->getOrderAmount( $order ) ) {
+				$order->update_meta_data( '_captured', true );
+				$order->save();
 			}
+
 			$redirect = $this->get_return_url( $order );
 			wp_redirect( $redirect );
 			exit;
