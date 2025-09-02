@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.3]
+- Fix: Unable to refund orders that contain deleted products.
+- Avoid unnecessary extra API calls in the daily flow.
+
 ## [3.8.2]
 - Load plugin CSS and JS only on the checkout page to improve performance.
 
