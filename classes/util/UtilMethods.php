@@ -118,15 +118,19 @@ class UtilMethods {
 		$quantity = $item->get_quantity();
 
 		// generate line date with all the calculated parameters
-		$orderLine             = new OrderLine(
+		$orderLine = new OrderLine(
 			$item->get_name(),
 			$item->get_id(),
 			$quantity,
 			round( $item->get_subtotal() / $quantity, 2 )
 		);
-		$orderLine->productUrl = $product->get_permalink();
-		$orderLine->imageUrl   = wp_get_attachment_url( $product->get_image_id() );
-		$orderLine->unitCode   = $quantity > 1 ? 'units' : 'unit';
+
+		if ( $product ) {
+			$orderLine->productUrl = $product->get_permalink();
+			$orderLine->imageUrl   = wp_get_attachment_url( $product->get_image_id() );
+		}
+
+		$orderLine->unitCode = $quantity > 1 ? 'units' : 'unit';
 
 		if ( ! $isSubscription ) {
 			$orderLine->taxAmount = round( $item->get_subtotal_tax(), 2 );

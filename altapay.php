@@ -7,10 +7,10 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.8.2
+ * Version: 3.8.3
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 10.0.2
+ * WC tested up to: 10.1.2
  *
  * @package Altapay
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.2' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.3' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -301,12 +301,6 @@ function altapay_meta_box_side( $post_or_order_object ) {
 
 	if ( $txnID || $agreement_id ) {
 		$settings = new Core\AltapaySettings();
-		$login    = $settings->altapayApiLogin();
-
-		if ( ! $login || is_wp_error( $login ) ) {
-			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-			return;
-		}
 
 		if ( ! $txnID ) {
 			$txnID = $agreement_id;
@@ -557,14 +551,6 @@ function altapayCaptureCallback() {
 	}
 
 	if ( $txnID ) {
-
-		$login = $settings->altapayApiLogin();
-		if ( ! $login ) {
-			wp_send_json_error( array( 'error' => 'Could not login to the Merchant API:' ) );
-		} elseif ( is_wp_error( $login ) ) {
-			wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
-		}
-
 		$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 
 		$orderLines       = array();
@@ -769,13 +755,6 @@ function altapayRefundPayment( $orderID, $amount, $reason, $isAjax ) {
 		return array( 'error' => 'Invalid order' );
 	}
 
-	$login = $settings->altapayApiLogin();
-	if ( ! $login ) {
-		return array( 'error' => 'Could not login to the Merchant API:' );
-	} elseif ( is_wp_error( $login ) ) {
-		return array( 'error' => wp_kses_post( $login->get_error_message() ) );
-	}
-
 	$postOrderLines = isset( $_POST['orderLines'] ) ? wp_unslash( $_POST['orderLines'] ) : '';
 	if ( $postOrderLines ) {
 		$selectedProducts = array(
@@ -939,12 +918,6 @@ function altapayReleasePayment() {
 	$reserved = 0;
 	$refunded = 0;
 
-	$login = $settings->altapayApiLogin();
-	if ( ! $login ) {
-		wp_send_json_error( array( 'error' => 'Could not login to the Merchant API:' ) );
-	} elseif ( is_wp_error( $login ) ) {
-		wp_send_json_error( array( 'error' => wp_kses_post( $login->get_error_message() ) ) );
-	}
 	try {
 		$auth = $settings->getAuth();
 		$api  = new Payments( $auth );

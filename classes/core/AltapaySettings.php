@@ -71,13 +71,6 @@ class AltapaySettings {
 			return;
 		}
 
-		$login = $this->altapayApiLogin();
-		if ( ! $login || is_wp_error( $login ) ) {
-			error_log( 'Could not connect to AltaPay!' );
-
-			return;
-		}
-
 		try {
 			$auth = $this->getAuth();
 			$api  = new Payments( $auth );

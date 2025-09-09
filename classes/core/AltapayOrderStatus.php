@@ -39,6 +39,10 @@ class AltapayOrderStatus {
 	 * @return void|WP_Error
 	 */
 	public function orderStatusChanged( $orderID, $previousStatus, $newStatus, $order ) {
+		if ( ! in_array( $newStatus, array( 'cancelled', 'completed' ), true ) ) {
+			return;
+		}
+
 		$txnID    = $order->get_transaction_id();
 		$captured = 0;
 		$reserved = 0;
@@ -46,23 +50,15 @@ class AltapayOrderStatus {
 		$status   = '';
 
 		$settings = new Core\AltapaySettings();
-		$login    = $settings->altapayApiLogin();
-
-		if ( ! $login || is_wp_error( $login ) ) {
-			echo '<p><b>' . __( 'Could not connect to AltaPay!', 'altapay' ) . '</b></p>';
-			return;
-		}
-
-		$auth = $settings->getAuth();
+		$auth     = $settings->getAuth();
 		try {
 			$api = new Payments( $auth );
 			$api->setTransaction( $txnID );
 			$payments = $api->call();
 		} catch ( Exception $e ) {
-			echo '<p><b>' . __( 'Could not fetch Payments from AltaPay!', 'altapay' ) . '</b></p>';
+			$order->add_order_note( $e->getMessage() );
 			return;
 		}
-
 		if ( $payments ) {
 			foreach ( $payments as $pay ) {
 				$reserved += $pay->ReservedAmount;
