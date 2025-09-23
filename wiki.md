@@ -105,14 +105,16 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 
 ![altpay_checkout_form_style_settings.jpg](docs/altpay_checkout_form_style_settings.jpg)
 
-- `Legacy` Choose this option if legacy form is enabled from the gateway side.
+- `Legacy` Legacy design with basic form styling.
 <br><br>
     ![altapay_cc_legacy_form.png](docs/altapay_cc_legacy_form.png)
 <br><br>
-- `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+- `Checkout` Select the option to show the Credit Card form in a modern look.
 <br><br>
-
-    ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+  ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+- `Checkout v2` Select this option to display the credit card form with a sleek design, showing the expiry date in two-digit month and year format, and the payment amount on the pay button.
+  <br><br>
+    ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form_v2.png)
 <br><br>
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
@@ -299,13 +301,13 @@ The new credentials can now be used as the API Username and API Password in your
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.8.2
-- WooCommerce min. 3.9.0 – max. 10.1.2
+- WooCommerce min. 3.9.0 – max. 10.2.1
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.8.2, WooCommerce 10.1.2 and PHP 8.2
+- WordPress 6.8.2, WooCommerce 10.2.1 and PHP 8.2
 
 
 ## Troubleshooting
