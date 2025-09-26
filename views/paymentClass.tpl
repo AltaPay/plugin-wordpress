@@ -306,26 +306,30 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				$request->setOrderLines( $orderLines );
 			}
 
-			if ( $request ) {
-				try {
-					$response                 = $request->call();
-					$requestParams['result']  = 'success';
-					$requestParams['formurl'] = $response->Url;
-				} catch ( ClientException $e ) {
-					$requestParams['result']  = 'error';
-					$requestParams['message'] = $e->getResponse()->getBody();
-				} catch ( ResponseHeaderException $e ) {
-					$requestParams['result']  = 'error';
-					$requestParams['message'] = $e->getHeader()->ErrorMessage;
-				} catch ( ResponseMessageException | \Exception $e ) {
-					$requestParams['result']  = 'error';
-					$requestParams['message'] = $e->getMessage();
-				}
+			$form_template = $this->get_form_template();
 
-				$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
-
-				return $requestParams;
+			if ( ! empty( $form_template ) ) {
+				$request->setFormTemplate( $form_template );
 			}
+
+			try {
+				$response                 = $request->call();
+				$requestParams['result']  = 'success';
+				$requestParams['formurl'] = $response->Url;
+			} catch ( ClientException $e ) {
+				$requestParams['result']  = 'error';
+				$requestParams['message'] = $e->getResponse()->getBody();
+			} catch ( ResponseHeaderException $e ) {
+				$requestParams['result']  = 'error';
+				$requestParams['message'] = $e->getHeader()->ErrorMessage;
+			} catch ( ResponseMessageException | \Exception $e ) {
+				$requestParams['result']  = 'error';
+				$requestParams['message'] = $e->getMessage();
+			}
+
+			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
+
+			return $requestParams;
 		} catch ( Exception $e ) {
 			error_log( 'Could not create the payment request: ' . $e->getMessage() );
 			$order->add_order_note( __( 'Could not create the payment request: ' . $e->getMessage(), 'altapay' ) );
@@ -835,4 +839,25 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
         $icon_html .= '</span>';
         return apply_filters( 'woocommerce_gateway_icon', $icon_html, $this->id );
     }
+
+	/**
+	 * Return matching form template value
+	 *
+	 * @return string|null
+	 */
+	function get_form_template(): ?string {
+		$form_templates = array(
+			'legacy'      => 'form_dynamic_div',
+			'checkout'    => 'form_checkout_div',
+			'checkout_v2' => 'form_checkout',
+		);
+
+		$style = get_option('altapay_cc_form_styling');
+
+		if (empty($style)) {
+			return null;
+		}
+
+		return $form_templates[$style] ?? null;
+	}
 }

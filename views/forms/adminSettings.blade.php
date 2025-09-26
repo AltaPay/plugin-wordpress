@@ -68,6 +68,7 @@
 				<select name="altapay_cc_form_styling">
 					<option @if($cc_form_styling == 'legacy') selected @endif value="legacy">Legacy</option>
 					<option @if($cc_form_styling == 'checkout') selected @endif value="checkout">Checkout</option>
+					<option @if($cc_form_styling == 'checkout_v2') selected @endif value="checkout_v2">Checkout v2</option>
 					<option @if($cc_form_styling == 'custom') selected @endif value="custom">Custom</option>
 				</select>
 			</td>
