@@ -745,7 +745,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$customer->setClientIP( $_SERVER['REMOTE_ADDR'] );
 		$customer->setClientAcceptLanguage( substr( $_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2 ) );
 		$customer->setHttpUserAgent( $_SERVER['HTTP_USER_AGENT'] );
-		$customer->setClientSessionID( crypt( session_id(), '$5$rounds=5000$customersessionid$' ) );
+		$customer->setClientSessionID( wp_hash( session_id() ) );
 
 		// Get user registration date
 		if ( is_user_logged_in() && $order->get_user_id() ) {
