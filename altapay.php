@@ -227,6 +227,7 @@ function altapay_page_template( $template ) {
 	$callbackPages = array(
 		'altapay_payment_page'           => 'altapay-payment-form.php',
 		'altapay_callback_redirect_page' => 'altapay-callback-redirect.php',
+		'altapay_external_payment_page'  => 'altapay-payment-form-external.php',
 	);
 
 	foreach ( $callbackPages as $optionKey => $templateFile ) {

@@ -200,8 +200,11 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$language = $wpml_language;
 		}
 
+		$payment_page_layout = get_option( 'altapay_payment_page_layout' );
 		// Get chosen page from AltaPay's settings
-		$form_page_id = esc_attr( get_option('altapay_payment_page') );
+		$form_page_id = $payment_page_layout === 'checkout_independent'
+				? esc_attr( get_option( 'altapay_external_payment_page' ) )
+				: esc_attr( get_option( 'altapay_payment_page' ) );
 		$configUrl = array(
 			'callback_form' 		=> get_page_link($form_page_id),
 			'callback_ok' 			=> add_query_arg(

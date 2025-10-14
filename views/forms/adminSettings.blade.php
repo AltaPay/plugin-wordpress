@@ -75,6 +75,18 @@
 		</tr>
 
 		<tr valign="top">
+			<th scope="row"><?php esc_html_e( 'Payment page layout', 'altapay' ); ?></th>
+			<td>
+				<select name="altapay_payment_page_layout">
+					<option @if($payment_page_layout == 'default_layout') selected @endif value="default_layout">Default</option>
+					<option @if($payment_page_layout == 'checkout_independent') selected @endif value="checkout_independent">Checkout Independent</option>
+				</select>
+				<i><p style="font-size: 10px;">The default option follows the theme styling, <br /> while the custom option
+						displays the payment page independently of the theme styling.</p></i>
+			</td>
+		</tr>
+
+		<tr valign="top">
 			<th scope="row" colspan="2">
 				<h2 style="background: #006064; color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Fraud detection service', 'altapay' ); ?></h2>
 			</th>
