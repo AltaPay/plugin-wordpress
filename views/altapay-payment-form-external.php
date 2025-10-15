@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&family=Roboto&display=swap"
           rel="stylesheet">
-    <title>AltaPay</title>
+    <title><?php bloginfo( 'name' ); ?></title>
     <style>
         * {
             box-sizing: border-box;
@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
 
         .site-branding {
             text-align: center;
-            padding: 15px;
+            padding: 30px 0 15px;
             max-width: 1100px;
             margin: 0 auto;
         }
@@ -678,7 +678,9 @@ defined( 'ABSPATH' ) || exit;
         }
 
         .site-branding img {
+            max-width: 180px;
             max-height: 120px;
+            height: auto;
             width: auto;
         }
 
