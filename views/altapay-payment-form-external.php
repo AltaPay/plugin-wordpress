@@ -756,7 +756,7 @@ $container_class = 'checkout';
 $cc_form_styling = get_option( 'altapay_cc_form_styling' );
 $container_class .= ( $cc_form_styling === 'checkout_v2' ) ? ' checkout-v2' : '';
 
-$surcharge = 'no';
+$surcharge     = 'no';
 $wpml_language = $order->get_meta( 'wpml_language' );
 if ( ! empty( $wpml_language ) ) {
 	global $sitepress;
@@ -788,9 +788,9 @@ if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment
             <ul class="order_details">
                 <li class="order">
                     <strong><?php esc_html_e( 'Order number:', 'woocommerce' ); ?></strong>
-			        <?php echo esc_html( $order->get_order_number() ); ?>
+					<?php echo esc_html( $order->get_order_number() ); ?>
                 </li>
-		        <?php if ( $surcharge === 'yes' ) { ?>
+				<?php if ( $surcharge === 'yes' ) { ?>
                     <li class="surcharge">
                         <strong><?php echo __( 'Surcharge:', 'woocommerce' ); ?></strong>
                         <span id="PensioSurcharge"></span>
@@ -801,12 +801,12 @@ if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment
                         <span id="PensioTotal"></span>
                         <span class="currency-symbol"><?php echo get_woocommerce_currency_symbol(); ?></span>
                     </li>
-		        <?php } else { ?>
+				<?php } else { ?>
                     <li class="total">
                         <strong><?php esc_html_e( 'Total:', 'woocommerce' ); ?></strong>
-                        <?php echo wp_kses_post( $order->get_formatted_order_total() ); ?>
+						<?php echo wp_kses_post( $order->get_formatted_order_total() ); ?>
                     </li>
-		        <?php } ?>
+				<?php } ?>
             </ul>
         </div>
         <form id="PensioPaymentForm">
