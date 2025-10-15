@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.5]
+- Support gateway form independent of the plugin/theme styling.
+
 ## [3.8.4]
 - Add support for Checkout Design v2.
 
