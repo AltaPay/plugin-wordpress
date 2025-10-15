@@ -127,7 +127,7 @@ defined( 'ABSPATH' ) || exit;
 
         .pensio_payment_form_card-number input, .pensio_payment_form_cardholder input,
         .altapay-payment-form-cnt input#organisationNumber, .pensio_payment_form_input_cell input {
-            padding: 12px 14px;
+            padding: 16px 14px;
             width: 100%;
             border-radius: 3px;
             border: 1px solid rgba(0, 0, 0, 0.16);
@@ -174,9 +174,11 @@ defined( 'ABSPATH' ) || exit;
         .altapay-payment-form-cnt input#enableAccount,
         .altapay-payment-form-cnt input#acceptTerms,
         .altapay-payment-form-cnt input#phoneNumber,
-        .altapay-payment-form-cnt select#birthdateYear {
+        .altapay-payment-form-cnt select#birthdateYear,
+        .legacy select#emonth,
+        .legacy select#eyear{
             margin-top: 4px;
-            padding: 12px 14px;
+            padding: 16px 14px;
             width: 100%;
             border-radius: 3px;
             border: 1px solid rgba(0, 0, 0, 0.16);
@@ -185,7 +187,7 @@ defined( 'ABSPATH' ) || exit;
         }
 
         .pensio_payment_form-cvc-input input {
-            padding: 12px 14px;
+            padding: 16px 14px;
             width: 100%;
             border-radius: 3px;
             border: 1px solid rgba(0, 0, 0, 0.16);
@@ -699,7 +701,7 @@ defined( 'ABSPATH' ) || exit;
             font-weight: 700;
         }
 
-        .checkout-v2 li.surcharge, .checkout-v2 li.total {
+        .checkout-v2 li.surcharge {
             display: none;
         }
 
@@ -735,6 +737,36 @@ defined( 'ABSPATH' ) || exit;
                 white-space: normal;
             }
         }
+
+        .legacy .pensio_payment_form_row.expiry_row {
+            display: block;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .legacy .pensio_payment_form_input_cell {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .legacy .pensio_payment_form_row.cvc_description_row {
+            margin-bottom: 15px;
+        }
+
+        .legacy select#emonth, .legacy select#eyear {
+            padding: 12px 14px;
+            width: auto;
+            min-width: 100px;
+        }
+
+        .legacy .pensio_payment_form_card-number input,
+        .legacy .pensio_payment_form_cardholder input,
+        .legacy .altapay-payment-form-cnt input#organisationNumber,
+        .legacy .pensio_payment_form_input_cell input {
+            padding: 12px 14px;
+        }
     </style>
 </head>
 <?php
@@ -752,9 +784,10 @@ $show_purchase_note = $order->has_status( apply_filters( 'woocommerce_purchase_n
     'processing'
 ) ) );
 
-$container_class = 'checkout';
 $cc_form_styling = get_option( 'altapay_cc_form_styling' );
-$container_class .= ( $cc_form_styling === 'checkout_v2' ) ? ' checkout-v2' : '';
+$container_class = $cc_form_styling;
+$container_class .= ( $cc_form_styling === 'checkout' ) ? 'checkout' : '';
+$container_class .= ( $cc_form_styling === 'checkout_v2' ) ? 'checkout checkout-v2' : '';
 
 $surcharge     = 'no';
 $wpml_language = $order->get_meta( 'wpml_language' );
