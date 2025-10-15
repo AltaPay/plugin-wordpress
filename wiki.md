@@ -120,6 +120,20 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 
 >  Follow [Customize the checkout page](#customize-the-checkout-page) section for more information on payment page styling.
 
+### Payment page layout
+
+Choose one of the below options from Payment page layout dropdown to select the layout type for payment page.
+
+![altapay_cc_checkout_form.png](docs/payment_page_layout.png)
+
+`Default` This will use the styling from the checkout/theme.
+
+  ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+
+`Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+
+  ![altapay_cc_checkout_form.png](docs/independent_payment_page_layout.png)
+
 ### Configure fraud detection
 
 If you wish to enable fraud detection service and release/refund if fraud is detected then refer to the below screenshot.
