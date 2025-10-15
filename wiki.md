@@ -23,6 +23,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 * [Checkout form styling](#checkout-form-styling)
 
+* [Payment page layout](#payment-page-layout)
+
 * [Configure fraud detection](#configure-fraud-detection)
 
 * [Synchronize payment methods](#synchronize-payment-methods)
@@ -122,15 +124,15 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 
 ### Payment page layout
 
-Choose one of the below options from Payment page layout dropdown to select the layout type for payment page.
+Choose one of the below options from **Payment page layout** dropdown to select the layout type for payment page.
 
 ![altapay_cc_checkout_form.png](docs/payment_page_layout.png)
 
-`Default` This will use the styling from the checkout/theme.
+- `Default` This will use the styling from the checkout/theme.
 
   ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
 
-`Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+- `Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
 
   ![altapay_cc_checkout_form.png](docs/independent_payment_page_layout.png)
 
