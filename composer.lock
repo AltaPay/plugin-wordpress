@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "altapay/api-php",
-            "version": "3.5.4",
+            "version": "3.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AltaPay/api-php.git",
-                "reference": "6fd4457ebb66a83c0995ad86764db40207ad5f53"
+                "reference": "b1e1b06e9645a52a462e6b88ba7209feba8dfdae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/6fd4457ebb66a83c0995ad86764db40207ad5f53",
-                "reference": "6fd4457ebb66a83c0995ad86764db40207ad5f53",
+                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/b1e1b06e9645a52a462e6b88ba7209feba8dfdae",
+                "reference": "b1e1b06e9645a52a462e6b88ba7209feba8dfdae",
                 "shasum": ""
             },
             "require": {
@@ -29,7 +29,7 @@
                 "ext-simplexml": "*",
                 "ext-spl": "*",
                 "guzzlehttp/guzzle": "^6.0 || ^7.0",
-                "php": "^7.0 || ^8.0",
+                "php": "^7.1 || ^8.0",
                 "symfony/event-dispatcher": "^2.1 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "symfony/options-resolver": "^2.6 || ^3.0 || ^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
@@ -58,9 +58,9 @@
             ],
             "support": {
                 "issues": "https://github.com/AltaPay/api-php/issues",
-                "source": "https://github.com/AltaPay/api-php/tree/3.5.4"
+                "source": "https://github.com/AltaPay/api-php/tree/3.5.5"
             },
-            "time": "2025-09-15T05:02:36+00:00"
+            "time": "2025-10-10T14:59:05+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
@@ -3185,16 +3185,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.47",
+            "version": "8.5.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c0134803429af3aef9c5fd2fbb41a1f1340fe20d"
+                "reference": "75f469c1948b91aa566206f88412c88f08090b32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c0134803429af3aef9c5fd2fbb41a1f1340fe20d",
-                "reference": "c0134803429af3aef9c5fd2fbb41a1f1340fe20d",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/75f469c1948b91aa566206f88412c88f08090b32",
+                "reference": "75f469c1948b91aa566206f88412c88f08090b32",
                 "shasum": ""
             },
             "require": {
@@ -3216,7 +3216,7 @@
                 "sebastian/comparator": "^3.0.6",
                 "sebastian/diff": "^3.0.6",
                 "sebastian/environment": "^4.2.5",
-                "sebastian/exporter": "^3.1.7",
+                "sebastian/exporter": "^3.1.8",
                 "sebastian/global-state": "^3.0.6",
                 "sebastian/object-enumerator": "^3.0.5",
                 "sebastian/resource-operations": "^2.0.3",
@@ -3263,7 +3263,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.47"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.48"
             },
             "funding": [
                 {
@@ -3287,7 +3287,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-23T06:18:09+00:00"
+            "time": "2025-09-24T06:27:39+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -3561,16 +3561,16 @@
         },
         {
             "name": "sebastian/exporter",
-            "version": "3.1.7",
+            "version": "3.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "8c86ae3e84f69acff53b9d4b96614a68e3572901"
+                "reference": "64cfeaa341951ceb2019d7b98232399d57bb2296"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/8c86ae3e84f69acff53b9d4b96614a68e3572901",
-                "reference": "8c86ae3e84f69acff53b9d4b96614a68e3572901",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/64cfeaa341951ceb2019d7b98232399d57bb2296",
+                "reference": "64cfeaa341951ceb2019d7b98232399d57bb2296",
                 "shasum": ""
             },
             "require": {
@@ -3626,7 +3626,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/exporter/issues",
-                "source": "https://github.com/sebastianbergmann/exporter/tree/3.1.7"
+                "source": "https://github.com/sebastianbergmann/exporter/tree/3.1.8"
             },
             "funding": [
                 {
@@ -3646,7 +3646,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-22T05:03:57+00:00"
+            "time": "2025-09-24T05:55:14+00:00"
         },
         {
             "name": "sebastian/global-state",
@@ -4182,12 +4182,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.4 || ^8.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
