@@ -743,13 +743,13 @@ $order_id = isset( $_POST['shop_orderid'] ) ? wp_unslash( $_POST['shop_orderid']
 $order    = wc_get_order( $order_id );
 
 if ( ! $order ) {
-	return;
+    return;
 }
 
 $order_items        = $order->get_items( apply_filters( 'woocommerce_purchase_order_item_types', 'line_item' ) );
 $show_purchase_note = $order->has_status( apply_filters( 'woocommerce_purchase_note_order_statuses', array(
-	'completed',
-	'processing'
+    'completed',
+    'processing'
 ) ) );
 
 $container_class = 'checkout';
@@ -759,28 +759,28 @@ $container_class .= ( $cc_form_styling === 'checkout_v2' ) ? ' checkout-v2' : ''
 $surcharge     = 'no';
 $wpml_language = $order->get_meta( 'wpml_language' );
 if ( ! empty( $wpml_language ) ) {
-	global $sitepress;
-	// Check if the WPML plugin is active
-	if ( defined( 'ICL_SITEPRESS_VERSION' ) && is_object( $sitepress ) ) {
-		// Switch the language
-		$sitepress->switch_lang( $wpml_language );
-	}
+    global $sitepress;
+    // Check if the WPML plugin is active
+    if ( defined( 'ICL_SITEPRESS_VERSION' ) && is_object( $sitepress ) ) {
+        // Switch the language
+        $sitepress->switch_lang( $wpml_language );
+    }
 }
 $payment_method = wc_get_payment_gateway_by_order( $order );
 if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment_method->settings ) ) {
-	$settings  = $payment_method->settings;
-	$surcharge = $settings['surcharge'] ?? 'no';
+    $settings  = $payment_method->settings;
+    $surcharge = $settings['surcharge'] ?? 'no';
 }
 ?>
 <body>
 <div class="site-branding">
-	<?php
-	if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
-		echo get_custom_logo();
-	} else {
-		echo '<div class="site-title"><a href="' . esc_url( home_url( '/' ) ) . '" rel="home">' . esc_html( get_bloginfo( 'name' ) ) . '</a></div>';
-	}
-	?>
+    <?php
+    if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
+        echo get_custom_logo();
+    } else {
+        echo '<div class="site-title"><a href="' . esc_url( home_url( '/' ) ) . '" rel="home">' . esc_html( get_bloginfo( 'name' ) ) . '</a></div>';
+    }
+    ?>
 </div>
 <div class="altapay-payment-form-cnt <?php echo $container_class; ?>">
     <div class="payment-form-wrapper">
@@ -788,9 +788,9 @@ if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment
             <ul class="order_details">
                 <li class="order">
                     <strong><?php esc_html_e( 'Order number:', 'woocommerce' ); ?></strong>
-					<?php echo esc_html( $order->get_order_number() ); ?>
+                    <?php echo esc_html( $order->get_order_number() ); ?>
                 </li>
-				<?php if ( $surcharge === 'yes' ) { ?>
+                <?php if ( $surcharge === 'yes' ) { ?>
                     <li class="surcharge">
                         <strong><?php echo __( 'Surcharge:', 'woocommerce' ); ?></strong>
                         <span id="PensioSurcharge"></span>
@@ -801,12 +801,12 @@ if ( $payment_method && isset( $payment_method->settings ) && is_array( $payment
                         <span id="PensioTotal"></span>
                         <span class="currency-symbol"><?php echo get_woocommerce_currency_symbol(); ?></span>
                     </li>
-				<?php } else { ?>
+                <?php } else { ?>
                     <li class="total">
                         <strong><?php esc_html_e( 'Total:', 'woocommerce' ); ?></strong>
-						<?php echo wp_kses_post( $order->get_formatted_order_total() ); ?>
+                        <?php echo wp_kses_post( $order->get_formatted_order_total() ); ?>
                     </li>
-				<?php } ?>
+                <?php } ?>
             </ul>
         </div>
         <form id="PensioPaymentForm">
