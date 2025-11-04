@@ -297,6 +297,7 @@ class AltapaySettings {
 		register_setting( 'altapay-settings-group', 'altapay_fraud_detection_action' );
 		register_setting( 'altapay-settings-group', 'altapay_payment_page' );
 		register_setting( 'altapay-settings-group', 'altapay_cc_form_styling' );
+		register_setting( 'altapay-settings-group', 'altapay_payment_page_layout' );
 		register_setting(
 			'altapay-settings-group',
 			'altapay_terminals_enabled',
@@ -338,6 +339,7 @@ class AltapaySettings {
 		$altapay_fraud_detection        = get_option( 'altapay_fraud_detection' );
 		$altapay_fraud_detection_action = get_option( 'altapay_fraud_detection_action' );
 		$cc_form_styling                = get_option( 'altapay_cc_form_styling' );
+		$payment_page_layout			= get_option( 'altapay_payment_page_layout' );
 
 		if ( $terminalDetails ) {
 			$terminals = json_decode( get_option( 'altapay_terminals' ) );
@@ -398,6 +400,7 @@ class AltapaySettings {
 						'altapay_fraud_detection'        => $altapay_fraud_detection,
 						'altapay_fraud_detection_action' => $altapay_fraud_detection_action,
 						'cc_form_styling'                => $cc_form_styling,
+						'payment_page_layout'			 => $payment_page_layout,
 
 					)
 				);
@@ -613,6 +616,12 @@ class AltapaySettings {
 
 		if ( empty( $callback_redirect_page ) ) {
 			Core\AltapayPluginInstall::createCallbackRedirectPage();
+		}
+
+		$external_payment_page = get_option( 'altapay_external_payment_page' );
+
+		if ( empty( $external_payment_page ) ) {
+			Core\AltapayPluginInstall::createExternalPaymentPage();
 		}
 	}
 

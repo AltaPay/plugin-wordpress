@@ -7,10 +7,10 @@
  * Author URI: https://altapay.com
  * Text Domain: altapay
  * Domain Path: /languages
- * Version: 3.8.4
+ * Version: 3.8.5
  * Name: SDM_Altapay
  * WC requires at least: 3.9.0
- * WC tested up to: 10.2.1
+ * WC tested up to: 10.2.2
  *
  * @package Altapay
  */
@@ -41,7 +41,7 @@ if ( ! defined( 'ALTAPAY_DB_VERSION' ) ) {
 }
 
 if ( ! defined( 'ALTAPAY_PLUGIN_VERSION' ) ) {
-	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.4' );
+	define( 'ALTAPAY_PLUGIN_VERSION', '3.8.5' );
 }
 
 // Include the autoloader, so we can dynamically include the rest of the classes.
@@ -227,6 +227,7 @@ function altapay_page_template( $template ) {
 	$callbackPages = array(
 		'altapay_payment_page'           => 'altapay-payment-form.php',
 		'altapay_callback_redirect_page' => 'altapay-callback-redirect.php',
+		'altapay_external_payment_page'  => 'altapay-payment-form-external.php',
 	);
 
 	foreach ( $callbackPages as $optionKey => $templateFile ) {

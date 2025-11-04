@@ -23,6 +23,8 @@ Installing this plug-in will enable the web shop to handle card transactions thr
 
 * [Checkout form styling](#checkout-form-styling)
 
+* [Payment page layout](#payment-page-layout)
+
 * [Configure fraud detection](#configure-fraud-detection)
 
 * [Synchronize payment methods](#synchronize-payment-methods)
@@ -119,6 +121,20 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
 >  Follow [Customize the checkout page](#customize-the-checkout-page) section for more information on payment page styling.
+
+### Payment page layout
+
+Choose one of the below options from **Payment page layout** dropdown to select the layout type for payment page.
+
+![altapay_cc_checkout_form.png](docs/payment_page_layout.png)
+
+- `Default` This will use the styling from the checkout/theme.
+
+  ![altapay_cc_checkout_form.png](docs/altapay_cc_checkout_form.png)
+
+- `Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+
+  ![altapay_cc_checkout_form.png](docs/independent_payment_page_layout.png)
 
 ### Configure fraud detection
 
@@ -301,13 +317,13 @@ The new credentials can now be used as the API Username and API Password in your
 
 Minimum system requirements are:
 - WordPress min. 5.0 – max. 6.8.2
-- WooCommerce min. 3.9.0 – max. 10.2.1
+- WooCommerce min. 3.9.0 – max. 10.2.2
 - PHP 7.4 and above
 - PHP-bcmath library installed.
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 6.8.2, WooCommerce 10.2.1 and PHP 8.2
+- WordPress 6.8.2, WooCommerce 10.2.2 and PHP 8.4
 
 
 ## Troubleshooting

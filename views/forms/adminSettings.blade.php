@@ -14,27 +14,27 @@
 		do_settings_sections('altapay-settings-group');
 	@endphp
 	<table class="form-table">
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'Gateway URL', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="text" placeholder="{{__('Enter gateway url','altapay')}}" name="altapay_gateway_url"
 					   value="{{$gatewayURL}}" required />
 			   <i><p style="font-size: 10px;">{{__('e.g. https://testgateway.altapaysecure.com', 'altapay')}}</p></i>
 			</td>
 		</tr>
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'API username', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="text" placeholder="{{__('Enter API username','altapay')}}" name="altapay_username"
 					   value="{{$username}}" required />
 			</td>
 		</tr>
 
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'API password', 'altapay' ); ?></th>
 			<td><input class="input-text regular-input" type="password" placeholder="{{__('Enter API password','altapay')}}" name="altapay_password"
 					   value="{{$password}}" required />
 			</td>
 		</tr>
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'Payment page', 'altapay' ); ?></th>
 			<td>
 				@php // Validate if payment page exists by looping through the pages
@@ -62,7 +62,7 @@
 			</td>
 		</tr>
 
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'Checkout form style', 'altapay' ); ?></th>
 			<td>
 				<select name="altapay_cc_form_styling">
@@ -74,13 +74,25 @@
 			</td>
 		</tr>
 
-		<tr valign="top">
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Payment page layout', 'altapay' ); ?></th>
+			<td>
+				<select name="altapay_payment_page_layout">
+					<option @if($payment_page_layout == 'default_layout') selected @endif value="default_layout">Default</option>
+					<option @if($payment_page_layout == 'checkout_independent') selected @endif value="checkout_independent">Checkout Independent</option>
+				</select>
+				<i><p style="font-size: 10px;">The default option follows the theme styling, <br /> while the custom option
+						displays the payment page independently of the theme styling.</p></i>
+			</td>
+		</tr>
+
+		<tr>
 			<th scope="row" colspan="2">
 				<h2 style="background: #006064; color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Fraud detection service', 'altapay' ); ?></h2>
 			</th>
 		</tr>
 
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'Fraud detection', 'altapay' ); ?></th>
 			<td>
 				<select name="altapay_fraud_detection">
@@ -89,7 +101,7 @@
 				</select>
 			</td>
 		</tr>
-		<tr valign="top">
+		<tr>
 			<th scope="row"><?php esc_html_e( 'Release/Refund on Fraud detection', 'altapay' ); ?></th>
 			<td>
 				<select name="altapay_fraud_detection_action">
@@ -100,13 +112,13 @@
 		</tr>
 
 		@if ($terminals)
-			<tr valign="top">
+			<tr>
 				<th scope="row" colspan="2">
 					<h2 style="background: #006064; color:white; line-height: 30px; padding-left: 1%;"><?php esc_html_e( 'Terminals', 'altapay' ); ?></h2>
 				</th>
 			</tr>
 			@foreach ($terminals as $terminal)
-				<tr valign="top">
+				<tr>
 					<th scope="row">{{$terminal->name}}</th>
 					<td><input type="checkbox" name="altapay_terminals_enabled[]"
 							   value="{{$terminal->key}}"
