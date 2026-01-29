@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.6]
+- Fix: Apple Pay orders are marked as Processing even when the payment fails.
+
 ## [3.8.5]
 - Support gateway form independent of the plugin/theme styling.
 

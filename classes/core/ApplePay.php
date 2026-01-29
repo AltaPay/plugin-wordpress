@@ -184,12 +184,10 @@ class ApplePay {
 			$txn_id             = $transaction['TransactionId'];
 
 			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
-			$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
-			$order->payment_complete();
-			$order->set_transaction_id( $txn_id );
-			$order->save();
-
 			if ( $response->Result === 'Success' ) {
+				$order->set_transaction_id( $txn_id );
+				$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
+				$order->payment_complete();
 
 				$reconciliation = new Core\AltapayReconciliation();
 				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
