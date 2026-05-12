@@ -12,6 +12,7 @@ use Altapay\Classes\Util;
 use Altapay\Classes\Core;
 use Altapay\Helpers;
 use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Api\Payments\CheckoutSession;
 use Altapay\Request\Address;
 use Altapay\Request\Customer;
 use Altapay\Request\Config;
@@ -271,7 +272,41 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			$auth    = $this->getAuth();
+			$sessionId = null;
+
+			$active_terminals = [ $terminal ];
+			$enabled_keys     = json_decode( get_option( 'altapay_terminals_enabled', '[]' ), true ) ?: [];
+			$all_terminals    = json_decode( get_option( 'altapay_terminals', '[]' ), true ) ?: [];
+
+			if ( ! empty( $all_terminals ) && ! empty( $enabled_keys ) ) {
+				foreach ( $all_terminals as $t ) {
+					if ( isset( $t['key'], $t['name'] ) && in_array( $t['key'], $enabled_keys, true ) && $t['name'] !== $terminal ) {
+						$active_terminals[] = $t['name'];
+					}
+				}
+			}
+
+			try {
+				$checkoutSession = new CheckoutSession( $auth );
+				$checkoutSession->setTerminal( $terminal )
+								->setTerminals( $active_terminals )
+								->setShopOrderId( $order_id )
+								->setAmount( round( $amount, 2 ) )
+								->setCurrency( $currency );
+
+				$checkoutSessionResponse = $checkoutSession->call();
+				if ( $checkoutSessionResponse->Result === 'Success' ) {
+					$sessionId = $checkoutSessionResponse->SessionId;
+				}
+			} catch ( \Exception $e ) {
+				$logger = wc_get_logger();
+				$logger->warning( 'CheckoutSession failed: ' . $e->getMessage(), array( 'source' => 'altapay' ) );
+			}
+
 			$request = new PaymentRequest( $auth );
+			if ( $sessionId ) {
+				$request->setSessionId( $sessionId );
+			}
 			$request->setTerminal( $terminal )
 			        ->setShopOrderId( $order_id )
 			        ->setAmount( round( $amount, 2 ) )
