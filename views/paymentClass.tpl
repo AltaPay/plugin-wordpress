@@ -295,8 +295,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 								->setCurrency( $currency );
 
 				$checkoutSessionResponse = $checkoutSession->call();
-				if ( $checkoutSessionResponse->Result === 'Success' ) {
-					$sessionId = $checkoutSessionResponse->SessionId;
+				if ( isset($checkoutSessionResponse->Session->Id ) && !empty( $checkoutSessionResponse->Session->Id ) ) {
+					$sessionId = $checkoutSessionResponse->Session->Id;
 				}
 			} catch ( \Exception $e ) {
 				$logger = wc_get_logger();
