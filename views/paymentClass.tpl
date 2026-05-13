@@ -275,14 +275,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			$sessionId = null;
 
 			$active_terminals = [ $terminal ];
-			$enabled_keys     = json_decode( get_option( 'altapay_terminals_enabled', '[]' ), true ) ?: [];
-			$all_terminals    = json_decode( get_option( 'altapay_terminals', '[]' ), true ) ?: [];
-
-			if ( ! empty( $all_terminals ) && ! empty( $enabled_keys ) ) {
-				foreach ( $all_terminals as $t ) {
-					if ( isset( $t['key'], $t['name'] ) && in_array( $t['key'], $enabled_keys, true ) && $t['name'] !== $terminal ) {
-						$active_terminals[] = $t['name'];
-					}
+			$all_gateways = WC()->payment_gateways()->payment_gateways();
+			foreach ( $all_gateways as $gateway ) {
+				if ( strpos( $gateway->id, 'altapay_' ) === 0 && property_exists( $gateway, 'terminal' ) && isset( $gateway->enabled ) && $gateway->enabled === 'yes' && ! empty( trim( (string) $gateway->terminal ) ) && $gateway->terminal !== $terminal ) {
+					$active_terminals[] = $gateway->terminal;
 				}
 			}
 
