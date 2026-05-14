@@ -41,6 +41,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 
 = 3.8.7 =
 * Add support for MarketPay payment methods.
+* Fix: Renewal/Recurring order status automatically changed to Processing.
 
 = 3.8.6 =
 * Fix: Apple Pay orders are marked as Processing even when the payment fails.
