@@ -272,7 +272,6 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			$auth    = $this->getAuth();
-			$sessionId = null;
 
 			$active_terminals = [ $terminal ];
 			$all_gateways = WC()->payment_gateways()->payment_gateways();
@@ -282,21 +281,30 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			try {
-				$checkoutSession = new CheckoutSession( $auth );
-				$checkoutSession->setTerminal( $terminal )
-								->setTerminals( $active_terminals )
-								->setShopOrderId( $order_id )
-								->setAmount( round( $amount, 2 ) )
-								->setCurrency( $currency );
+			$sessionId = WC()->session->get( 'altapay_checkout_session_id' );
+			if ( $sessionId !== $order->get_order_key() ) {
+				$sessionId = null;
+			}
 
-				$checkoutSessionResponse = $checkoutSession->call();
-				if ( isset($checkoutSessionResponse->Session->Id ) && !empty( $checkoutSessionResponse->Session->Id ) ) {
-					$sessionId = $checkoutSessionResponse->Session->Id;
+			if ( ! $sessionId ) {
+				try {
+					$checkoutSession = new CheckoutSession( $auth );
+					$checkoutSession->setTerminal( $terminal )
+									->setTerminals( $active_terminals )
+									->setShopOrderId( $order_id )
+									->setAmount( round( $amount, 2 ) )
+									->setCurrency( $currency )
+									->setSessionId( $order->get_order_key() );
+
+					$checkoutSessionResponse = $checkoutSession->call();
+					if ( isset( $checkoutSessionResponse->Session->Id ) ) {
+						$sessionId = $checkoutSessionResponse->Session->Id;
+						WC()->session->set( 'altapay_checkout_session_id', $sessionId );
+					}
+				} catch ( \Exception $e ) {
+					$logger = wc_get_logger();
+					$logger->warning( 'CheckoutSession failed: ' . $e->getMessage(), array( 'source' => 'altapay' ) );
 				}
-			} catch ( \Exception $e ) {
-				$logger = wc_get_logger();
-				$logger->warning( 'CheckoutSession failed: ' . $e->getMessage(), array( 'source' => 'altapay' ) );
 			}
 
 			$request = new PaymentRequest( $auth );
