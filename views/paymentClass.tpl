@@ -281,25 +281,23 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			$sessionId = WC()->session->get( 'altapay_checkout_session_id' );
-			if ( $sessionId !== $order->get_order_key() ) {
-				$sessionId = null;
-			}
+			$sessionId = WC()->session->get( 'altapay_checkout_session_id_' . $order_id );
 
-			if ( ! $sessionId ) {
+			if ( empty( $sessionId ) ) {
 				try {
+					$hashedOrderKey = wp_hash( $order->get_order_key() );
 					$checkoutSession = new CheckoutSession( $auth );
 					$checkoutSession->setTerminal( $terminal )
 									->setTerminals( $active_terminals )
 									->setShopOrderId( $order_id )
 									->setAmount( round( $amount, 2 ) )
 									->setCurrency( $currency )
-									->setSessionId( $order->get_order_key() );
+									->setSessionId( $hashedOrderKey );
 
 					$checkoutSessionResponse = $checkoutSession->call();
 					if ( isset( $checkoutSessionResponse->Session->Id ) ) {
 						$sessionId = $checkoutSessionResponse->Session->Id;
-						WC()->session->set( 'altapay_checkout_session_id', $sessionId );
+						WC()->session->set( 'altapay_checkout_session_id_' . $order_id, $sessionId );
 					}
 				} catch ( \Exception $e ) {
 					$logger = wc_get_logger();
