@@ -12,6 +12,7 @@ use Altapay\Classes\Util;
 use Altapay\Classes\Core;
 use Altapay\Helpers;
 use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Api\Payments\CheckoutSession;
 use Altapay\Request\Address;
 use Altapay\Request\Customer;
 use Altapay\Request\Config;
@@ -271,7 +272,43 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			$auth    = $this->getAuth();
+
+			$active_terminals = [ $terminal ];
+			$all_gateways = WC()->payment_gateways()->payment_gateways();
+			foreach ( $all_gateways as $gateway ) {
+				if ( strpos( $gateway->id, 'altapay_' ) === 0 && property_exists( $gateway, 'terminal' ) && isset( $gateway->enabled ) && $gateway->enabled === 'yes' && ! empty( trim( (string) $gateway->terminal ) ) && $gateway->terminal !== $terminal ) {
+					$active_terminals[] = $gateway->terminal;
+				}
+			}
+
+			$sessionId = WC()->session->get( 'altapay_checkout_session_id_' . $order_id );
+
+			if ( empty( $sessionId ) ) {
+				try {
+					$hashedOrderKey = wp_hash( $order->get_order_key() );
+					$checkoutSession = new CheckoutSession( $auth );
+					$checkoutSession->setTerminal( $terminal )
+									->setTerminals( $active_terminals )
+									->setShopOrderId( $order_id )
+									->setAmount( round( $amount, 2 ) )
+									->setCurrency( $currency )
+									->setSessionId( $hashedOrderKey );
+
+					$checkoutSessionResponse = $checkoutSession->call();
+					if ( isset( $checkoutSessionResponse->Session->Id ) ) {
+						$sessionId = $checkoutSessionResponse->Session->Id;
+						WC()->session->set( 'altapay_checkout_session_id_' . $order_id, $sessionId );
+					}
+				} catch ( \Exception $e ) {
+					$logger = wc_get_logger();
+					$logger->warning( 'CheckoutSession failed: ' . $e->getMessage(), array( 'source' => 'altapay' ) );
+				}
+			}
+
 			$request = new PaymentRequest( $auth );
+			if ( $sessionId ) {
+				$request->setSessionId( $sessionId );
+			}
 			$request->setTerminal( $terminal )
 			        ->setShopOrderId( $order_id )
 			        ->setAmount( round( $amount, 2 ) )

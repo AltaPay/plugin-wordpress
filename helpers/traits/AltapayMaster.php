@@ -95,7 +95,7 @@ trait AltapayMaster {
 					$api = new ChargeSubscription( $this->getAuth() );
 					$api->setTransaction( $agreement_id );
 					$api->setAmount( round( $amount, 2 ) );
-					$api->setReconciliationIdentifier( wp_generate_uuid4() );
+					$api->setReconciliationIdentifier( $reconciliationId );
 
 					$response = $api->call();
 
@@ -119,8 +119,6 @@ trait AltapayMaster {
 							sprintf( __( 'AltaPay payment declined: %s', 'altapay' ), $response->MerchantErrorMessage )
 						);
 					}
-				} else {
-					$renewal_order->payment_complete();
 				}
 
 				$renewal_order->update_meta_data( '_agreement_id', $agreement_id );
