@@ -423,7 +423,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			$order          = wc_get_order( $order_id );
+			$order = wc_get_order( $order_id );
+			if ( ! $order ) {
+				wc_get_logger()->error(
+					'Could not find order for callback. order_id: ' . $order_id,
+					array( 'source' => 'altapay' )
+				);
+				exit;
+			}
 			$transaction_id = $order->get_transaction_id();
 			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
 			$transaction    = array();
