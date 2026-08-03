@@ -92,7 +92,7 @@ class ApplePay {
 	 * @param string $payment_method.
 	 * @return bool
 	 */
-	private function is_legacy_apple_pay_flow( $payment_method ) {
+	private function isLegacyApplePayFlow( $payment_method ) {
 
 		if ( ! $payment_method ) {
 			return true;
@@ -130,7 +130,7 @@ class ApplePay {
 			->setValidationUrl( $validation_url )
 			->setDomain( $_SERVER['HTTP_HOST'] );
 
-		if ( ! $this->is_legacy_apple_pay_flow( $applepay_payment_method ) ) {
+		if ( ! $this->isLegacyApplePayFlow( $applepay_payment_method ) ) {
 			$request->setShopOrderId( $_POST['order_id'] )
 				->setAmount( (float) $_POST['amount'] )
 				->setCurrency( $_POST['currency'] )
@@ -142,7 +142,7 @@ class ApplePay {
 
 		try {
 			$response = $request->call();
-			$this->send_validate_merchant_response( $response, $order );
+			$this->sendValidateMerchantResponse( $response, $order );
 		} catch ( \Exception $e ) {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
@@ -156,7 +156,7 @@ class ApplePay {
 	 * @param WC_Order|false $order
 	 * @return void
 	 */
-	private function send_validate_merchant_response( $response, $order ) {
+	private function sendValidateMerchantResponse( $response, $order ) {
 
 		if ( $response->Result !== 'Success' ) {
 			wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
@@ -199,7 +199,7 @@ class ApplePay {
 		$order_id      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
 		$order         = wc_get_order( $order_id );
 
-		$legacy_flow = $this->is_legacy_apple_pay_flow( $applepay_payment_method );
+		$legacy_flow = $this->isLegacyApplePayFlow( $applepay_payment_method );
 
 		if ( ! $legacy_flow ) {
 			$altapay_payment_id = $order->get_meta( 'altapay_payment_id' );
@@ -234,6 +234,29 @@ class ApplePay {
 			$request->setPaymentId( $altapay_payment_id );
 		}
 
+		$payment_type = $this->determinePaymentType( $payment_gateways, $payment_method );
+
+		$request->setType( $payment_type );
+
+		try {
+			$response = $request->call();
+			$this->sendCardWalletAuthorizeResponse( $response, $order, $order_id, $payment_type );
+		} catch ( \Exception $e ) {
+			$order->add_order_note( __( 'Payment failed: ' . $e->getMessage() ) );
+			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+		}
+	}
+
+	/**
+	 * Whether the gateway used for this order is set to authorize-and-capture.
+	 *
+	 * @param array  $payment_gateways
+	 * @param string $payment_method
+	 * @return string
+	 */
+	private function determinePaymentType( $payment_gateways, $payment_method ) {
+
 		$payment_type = 'payment';
 
 		foreach ( $payment_gateways as $key => $payment_gateway ) {
@@ -245,43 +268,48 @@ class ApplePay {
 			}
 		}
 
-		$request->setType( $payment_type );
+		return $payment_type;
+	}
 
-		try {
-			$response = $request->call();
+	/**
+	 * Send the AJAX response for a CardWalletAuthorize result.
+	 *
+	 * @param object   $response
+	 * @param WC_Order $order
+	 * @param string   $order_id
+	 * @param string   $payment_type
+	 * @return void
+	 */
+	private function sendCardWalletAuthorizeResponse( $response, $order, $order_id, $payment_type ) {
 
-			$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
-			$latest_transaction = $this->getLatestTransaction( $transactions, $payment_type );
-			$transaction        = $transactions[ $latest_transaction ];
-			$txn_id             = $transaction['TransactionId'];
+		$transactions       = json_decode( wp_json_encode( $response->Transactions ), true );
+		$latest_transaction = $this->getLatestTransaction( $transactions, $payment_type );
+		$transaction        = $transactions[ $latest_transaction ];
+		$txn_id             = $transaction['TransactionId'];
 
-			$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
-			if ( $response->Result === 'Success' ) {
-				$order->set_transaction_id( $txn_id );
-				$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
-				$order->payment_complete();
+		$order->add_order_note( __( "Gateway Order ID: $order_id", 'altapay' ) );
 
-				$reconciliation = new Core\AltapayReconciliation();
-				foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
-					$reconciliation->saveReconciliationIdentifier( $order_id, $txn_id, $val['Id'], $val['Type'] );
-				}
-
-				wp_send_json_success(
-					array(
-						'redirect' => $order->get_checkout_order_received_url(),
-					),
-					200
-				);
-			} else {
-				$order->add_order_note( __( 'Payment failed.' ) );
-				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
-				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
-			}
-		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'Payment failed: ' . $e->getMessage() ) );
-			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
+		if ( $response->Result !== 'Success' ) {
+			$order->add_order_note( __( 'Payment failed.' ) );
+			wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
+
+		$order->set_transaction_id( $txn_id );
+		$order->add_order_note( __( 'Apple Pay payment completed', 'altapay' ) );
+		$order->payment_complete();
+
+		$reconciliation = new Core\AltapayReconciliation();
+		foreach ( $transaction['ReconciliationIdentifiers'] as $val ) {
+			$reconciliation->saveReconciliationIdentifier( $order_id, $txn_id, $val['Id'], $val['Type'] );
+		}
+
+		wp_send_json_success(
+			array(
+				'redirect' => $order->get_checkout_order_received_url(),
+			),
+			200
+		);
 	}
 
 	/**
