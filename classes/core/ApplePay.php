@@ -142,29 +142,43 @@ class ApplePay {
 
 		try {
 			$response = $request->call();
-			if ( $response->Result === 'Success' ) {
-				if ( isset( $response->ApplePaySession ) ) {
-					wp_send_json_success( $response->ApplePaySession, 200 );
-				} elseif ( isset( $response->WalletData->Session ) ) {
-					$transaction = ! empty( $response->Transactions ) ? reset( $response->Transactions ) : null;
-
-					if ( $order && isset( $transaction->PaymentId ) ) {
-						$order->update_meta_data( 'altapay_payment_id', $transaction->PaymentId );
-						$order->save();
-					}
-					wp_send_json_success( $response->WalletData->Session, 200 );
-				} else {
-					wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
-					wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
-				}
-			} else {
-				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
-				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
-			}
+			$this->send_validate_merchant_response( $response, $order );
 		} catch ( \Exception $e ) {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
+	}
+
+	/**
+	 * Send the AJAX response for a CardWalletSession result.
+	 *
+	 * @param object         $response
+	 * @param WC_Order|false $order
+	 * @return void
+	 */
+	private function send_validate_merchant_response( $response, $order ) {
+
+		if ( $response->Result !== 'Success' ) {
+			wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
+			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+		}
+
+		if ( isset( $response->ApplePaySession ) ) {
+			wp_send_json_success( $response->ApplePaySession, 200 );
+		}
+
+		if ( isset( $response->WalletData->Session ) ) {
+			$transaction = ! empty( $response->Transactions ) ? reset( $response->Transactions ) : null;
+
+			if ( $order && isset( $transaction->PaymentId ) ) {
+				$order->update_meta_data( 'altapay_payment_id', $transaction->PaymentId );
+				$order->save();
+			}
+			wp_send_json_success( $response->WalletData->Session, 200 );
+		}
+
+		wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
+		wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 	}
 
 	/**
