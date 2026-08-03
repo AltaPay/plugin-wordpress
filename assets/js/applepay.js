@@ -138,7 +138,11 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 				ajax_nonce: applepay_obj.nonce,
 				action: 'validate_merchant',
 				validation_url: event.validationURL,
-				terminal: applepay_obj.terminal
+				terminal: applepay_obj.terminal,
+				applepay_payment_method: applepay_obj.applepay_payment_method,
+				order_id: order_id,
+				amount: applepay_obj.subtotal,
+				currency: applepay_obj.currency
 			},
 			function (res) {
 				if (res.success === true) {
@@ -185,6 +189,7 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 				action: 'card_wallet_authorize',
 				provider_data: JSON.stringify( event.payment.token ),
 				terminal: applepay_obj.terminal,
+				applepay_payment_method: applepay_obj.applepay_payment_method,
 				order_id: order_id
 			},
 			function (res) {

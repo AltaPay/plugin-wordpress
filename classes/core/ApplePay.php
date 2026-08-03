@@ -87,6 +87,27 @@ class ApplePay {
 	}
 
 	/**
+	 * Whether the Apple Pay has the legacy flow enabled.
+	 *
+	 * @param string $payment_method.
+	 * @return bool
+	 */
+	private function is_legacy_apple_pay_flow( $payment_method ) {
+
+		if ( ! $payment_method ) {
+			return true;
+		}
+
+		$settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+
+		if ( ! is_array( $settings ) ) {
+			return true;
+		}
+
+		return ( $settings['apple_pay_legacy_flow'] ?? 'yes' ) === 'yes';
+	}
+
+	/**
 	 * Validate Apple Pay Session
 	 *
 	 * @return void
@@ -100,16 +121,42 @@ class ApplePay {
 
 		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
+		$applepay_payment_method = isset( $_POST['applepay_payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['applepay_payment_method'] ) ) : '';
+		$order_id       = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
+		$order          = $order_id ? wc_get_order( $order_id ) : false;
 
 		$request = new CardWalletSession( $this->getAuth() );
 		$request->setTerminal( $terminal )
 			->setValidationUrl( $validation_url )
 			->setDomain( $_SERVER['HTTP_HOST'] );
 
+		if ( ! $this->is_legacy_apple_pay_flow( $applepay_payment_method ) ) {
+			$request->setShopOrderId( $_POST['order_id'] )
+				->setAmount( (float) $_POST['amount'] )
+				->setCurrency( $_POST['currency'] )
+				->setApplePayRequestData( [
+					'validationUrl' => $validation_url,
+					'domain'        => $_SERVER['HTTP_HOST']
+				] );
+		}
+
 		try {
 			$response = $request->call();
 			if ( $response->Result === 'Success' ) {
-				wp_send_json_success( $response->ApplePaySession, 200 );
+				if ( isset( $response->ApplePaySession ) ) {
+					wp_send_json_success( $response->ApplePaySession, 200 );
+				} elseif ( isset( $response->WalletData->Session ) ) {
+					$transaction = ! empty( $response->Transactions ) ? reset( $response->Transactions ) : null;
+
+					if ( $order && isset( $transaction->PaymentId ) ) {
+						$order->update_meta_data( 'altapay_payment_id', $transaction->PaymentId );
+						$order->save();
+					}
+					wp_send_json_success( $response->WalletData->Session, 200 );
+				} else {
+					wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
+					wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+				}
 			} else {
 				wc_add_notice( __( 'Payment failed.', 'altapay' ), 'error' );
 				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
@@ -134,8 +181,15 @@ class ApplePay {
 
 		$provider_data = isset( $_POST['provider_data'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_data'] ) ) : '';
 		$terminal      = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
+		$applepay_payment_method = isset( $_POST['applepay_payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['applepay_payment_method'] ) ) : '';
 		$order_id      = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : '';
 		$order         = wc_get_order( $order_id );
+
+		$legacy_flow = $this->is_legacy_apple_pay_flow( $applepay_payment_method );
+
+		if ( ! $legacy_flow ) {
+			$altapay_payment_id = $order->get_meta( 'altapay_payment_id' );
+		}
 
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		$payment_method   = $order->get_payment_method();
@@ -161,6 +215,10 @@ class ApplePay {
 			->setCookie( $cookie )
 			->setOrderLines( $order_lines )
 			->setSaleReconciliationIdentifier( wp_generate_uuid4() );
+
+		if ( ! $legacy_flow ) {
+			$request->setPaymentId( $altapay_payment_id );
+		}
 
 		$payment_type = 'payment';
 
@@ -233,6 +291,7 @@ class ApplePay {
 					'subtotal' => WC()->cart->get_total( 'edit' ),
 					'terminal' => $payment_gateway->terminal,
 					'apply_pay_label' => $payment_gateway->apple_pay_label,
+					'apple_pay_legacy_flow' => $payment_gateway->apple_pay_legacy_flow,
 					'apple_pay_supported_networks' => $payment_gateway->get_option('apple_pay_supported_networks'),
 					'applepay_payment_method' => $payment_gateway->id
 				);
