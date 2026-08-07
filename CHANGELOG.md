@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.8]
+- Extended Apple Pay support to include the MarketPay acquirer.
+
 ## [3.8.7]
 - Add support for MarketPay payment methods.
 - Fix: Renewal/Recurring order status automatically changed to Processing.
