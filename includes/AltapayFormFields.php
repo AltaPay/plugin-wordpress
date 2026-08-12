@@ -77,6 +77,13 @@ $formSettings = array(
 		'default'  => 'no',
 		'desc_tip' => true,
 	),
+	'apple_pay_legacy_flow' => array(
+		'title'    => __( 'Legacy Apple Pay flow', 'altapay' ),
+		'type'     => 'checkbox',
+		'label'    => __( 'Supports legacy ApplePay flow.', 'altapay' ),
+		'default'  => 'yes',
+		'desc_tip' => true,
+	),
 	'apple_pay_label'	=> array(
 		'title'       => __( 'Apple Pay form label', 'altapay' ),
 		'type'        => 'text',

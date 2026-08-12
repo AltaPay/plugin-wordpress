@@ -49,6 +49,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
     public $payment_action = '';
 
     public $is_apple_pay;
+    public $apple_pay_legacy_flow;
     public $apple_pay_label;
     public $apple_pay_supported_networks;
     public $secret;
@@ -68,6 +69,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->token                        = $this->get_option( 'token' );
 		$this->payment_action               = $this->get_option( 'payment_action' );
 		$this->is_apple_pay                 = $this->get_option( 'is_apple_pay' );
+		$this->apple_pay_legacy_flow        = $this->get_option( 'apple_pay_legacy_flow' );
 		$this->apple_pay_label              = $this->get_option( 'apple_pay_label' );
 		$this->apple_pay_supported_networks = $this->get_option( 'apple_pay_supported_networks' );
 		$this->secret                       = $this->get_option( 'secret' );
@@ -421,7 +423,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				}
 			}
 
-			$order          = wc_get_order( $order_id );
+			$order = wc_get_order( $order_id );
+			if ( ! $order ) {
+				wc_get_logger()->error(
+					'Could not find order for callback. order_id: ' . $order_id,
+					array( 'source' => 'altapay' )
+				);
+				exit;
+			}
 			$transaction_id = $order->get_transaction_id();
 			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
 			$transaction    = array();
