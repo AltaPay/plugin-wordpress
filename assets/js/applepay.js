@@ -140,9 +140,7 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 				validation_url: event.validationURL,
 				terminal: applepay_obj.terminal,
 				applepay_payment_method: applepay_obj.applepay_payment_method,
-				order_id: order_id,
-				amount: applepay_obj.subtotal,
-				currency: applepay_obj.currency
+				order_id: order_id
 			},
 			function (res) {
 				if (res.success === true) {

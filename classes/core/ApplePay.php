@@ -131,9 +131,15 @@ class ApplePay {
 			->setDomain( $_SERVER['HTTP_HOST'] );
 
 		if ( ! $this->isLegacyApplePayFlow( $applepay_payment_method ) ) {
-			$request->setShopOrderId( $_POST['order_id'] )
-				->setAmount( (float) $_POST['amount'] )
-				->setCurrency( $_POST['currency'] )
+
+			if ( ! $order ) {
+				wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
+				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+			}
+
+			$request->setShopOrderId( $order_id )
+				->setAmount( (float) $order->get_total() )
+				->setCurrency( $order->get_currency() )
 				->setApplePayRequestData( [
 					'validationUrl' => $validation_url,
 					'domain'        => $_SERVER['HTTP_HOST']
