@@ -40,7 +40,7 @@ AltaPay's Payment Gateway for WooCommerce provides merchants with access to a fu
 == Changelog ==
 
 = 3.8.8 =
-* Extended Apple Pay support to include the MarketPay acquirer.
+* Extended Apple Pay support to include the MarketPay acquirer. For the updated payment methods settings please see [Configure the terminals for the checkout page](https://github.com/AltaPay/plugin-wordpress/wiki#configure-the-terminals-for-the-checkout-page)
 
 = 3.8.7 =
 * Add support for MarketPay payment methods.

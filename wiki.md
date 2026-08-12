@@ -190,6 +190,7 @@ For the AltaPay payment method to appear in the checkout page:
       | Icon                         | Select image icon to display on checkout page.                                                                                                        |
       | Secret                       | Add the payment method secret as defined in the AltaPay payment gateway to enable checksum validation. To disable checksum validation leave it empty. |
       | Is Apple Pay?                | Check if the terminal is for Apple Pay payments.                                                                                                      |
+      | Legacy Apple Pay flow        | Supports the legacy Apple Pay flow. If your AltaPay gateway is on [version 20260113](https://documentation.altapay.com/Content/Ecom/Ecom%20Release%20Notes.htm) or later, uncheck this to use the new integration. If your gateway is on an older version, leave it checked (the default). |
       | Apple Pay form label         | This controls the label shown on Apple Pay popup window.                                                                                              |
       | Apple Pay Supported Networks | The payment networks the merchant supports.                                                                                                           |
       | Enable Surcharge?            | Check this option to enable surcharge for this payment method.                                                                                        |
