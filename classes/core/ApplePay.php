@@ -115,8 +115,7 @@ class ApplePay {
 	public function applepay_validate_merchant() {
 
 		if ( ! wp_verify_nonce( wp_unslash( $_POST['ajax_nonce'] ), 'apple-pay' ) ) {
-			wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
-			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+			$this->sendPaymentFailedResponse();
 		}
 
 		$terminal       = isset( $_POST['terminal'] ) ? sanitize_text_field( wp_unslash( $_POST['terminal'] ) ) : '';
@@ -133,8 +132,7 @@ class ApplePay {
 		if ( ! $this->isLegacyApplePayFlow( $applepay_payment_method ) ) {
 
 			if ( ! $order ) {
-				wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
-				wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+				$this->sendPaymentFailedResponse();
 			}
 
 			$request->setShopOrderId( $order_id )
@@ -153,6 +151,16 @@ class ApplePay {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
+	}
+
+	/**
+	 * Add a generic payment-failed notice and redirect to the cart page.
+	 *
+	 * @return void
+	 */
+	private function sendPaymentFailedResponse() {
+		wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
+		wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 	}
 
 	/**
@@ -195,8 +203,7 @@ class ApplePay {
 	public function applepay_card_wallet_authorize() {
 
 		if ( ! wp_verify_nonce( wp_unslash( $_POST['ajax_nonce'] ), 'apple-pay' ) ) {
-			wc_add_notice( __( 'Payment failed. Please try again.', 'altapay' ), 'error' );
-			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
+			$this->sendPaymentFailedResponse();
 		}
 
 		$provider_data = isset( $_POST['provider_data'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_data'] ) ) : '';
