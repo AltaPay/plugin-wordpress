@@ -476,6 +476,8 @@ class AltapaySettings {
 				'nature'     => $terminal->Natures,
 				'methods'    => $terminal->Methods,
 				'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
+				'method_configs' => self::getMethodConfigurations( $terminal ),
+				'schemes'        => self::getSchemes( $terminal ),
 			);
 		}
 
@@ -667,6 +669,8 @@ class AltapaySettings {
 					'nature'     => $terminal->Natures,
 					'methods'    => $terminal->Methods ?? array(),
 					'identifier' => $terminal->PrimaryMethod->Identifier ?? '',
+					'method_configs' => self::getMethodConfigurations( $terminal ),
+					'schemes'        => self::getSchemes( $terminal ),
 				);
 			}
 
@@ -712,6 +716,91 @@ class AltapaySettings {
 	}
 
 	/**
+	 * The acquirer configurations of a terminal, keyed by payment method identifier.
+	 *
+	 * @param object $terminal
+	 * @return array<string, array<string, string>>
+	 */
+	static function getMethodConfigurations( $terminal ) {
+
+		$configurations = array();
+
+		foreach ( $terminal->MethodConfigurations ?? array() as $method_config ) {
+
+			$identifier = $method_config->identifier ?? '';
+
+			if ( ! $identifier ) {
+				continue;
+			}
+
+			$configurations[ $identifier ] = array(
+				'method'        => $method_config->method ?? '',
+				'environment'   => $method_config->WalletEnvironment ?? '',
+				'merchant_id'   => $method_config->MerchantId ?? '',
+				'merchant_name' => $method_config->MerchantName ?? '',
+			);
+		}
+
+		return $configurations;
+	}
+
+	/**
+	 * The card schemes a terminal accepts, as scheme codes.
+	 *
+	 * @param object $terminal
+	 * @return array<int, string>
+	 */
+	static function getSchemes( $terminal ) {
+
+		$schemes = array();
+
+		foreach ( $terminal->Schemes ?? array() as $scheme ) {
+			if ( ! empty( $scheme->code ) ) {
+				$schemes[] = $scheme->code;
+			}
+		}
+
+		return $schemes;
+	}
+
+	/**
+	 * The stored terminal record matching a terminal name.
+	 *
+	 * @param string $terminal_name
+	 * @return array<string, mixed>
+	 */
+	static function getStoredTerminal( $terminal_name ) {
+
+		$terminals = json_decode( get_option( 'altapay_terminals' ), true );
+
+		if ( ! is_array( $terminals ) ) {
+			return array();
+		}
+
+		foreach ( $terminals as $terminal ) {
+			if ( isset( $terminal['name'] ) && $terminal['name'] === $terminal_name ) {
+				return $terminal;
+			}
+		}
+
+		return array();
+	}
+
+	/**
+	 * Whether a terminal is configured for a wallet.
+	 *
+	 * @param string $terminal_name
+	 * @param string $identifier
+	 * @return bool
+	 */
+	static function isWalletTerminal( $terminal_name, $identifier ) {
+
+		$terminal = self::getStoredTerminal( $terminal_name );
+
+		return isset( $terminal['method_configs'][ $identifier ] );
+	}
+
+	/**
 	 * Get Terminal logo based on payment method identifier
 	 *
 	 * @param string $identifier
@@ -725,6 +814,7 @@ class AltapaySettings {
 			'Bancontact'  => 'bancontact.png',
 			'BankPayment' => 'bank.png',
 			'CreditCard'  => 'creditcard.png',
+			'GooglePay'   => 'creditcard_wallet.png',
 			'iDeal'       => 'ideal.png',
 			'Invoice'     => 'invoice.png',
 			'Klarna'      => 'klarna_pink.png',
