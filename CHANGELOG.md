@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.0]
+- Add support for Google Pay.
 ## [3.8.8]
 - Extended Apple Pay support to include the MarketPay acquirer. For the updated payment methods settings please see [Configure the terminals for the checkout page](https://github.com/AltaPay/plugin-wordpress/wiki#configure-the-terminals-for-the-checkout-page)
 
