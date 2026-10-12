@@ -218,15 +218,7 @@ class ApplePay {
 		$legacy_flow = $google_pay === null && $this->isLegacyApplePayFlow( $applepay_payment_method );
 
 		if ( ! $legacy_flow ) {
-			if ( $google_pay ) {
-				$altapay_payment_id = $google_pay->createWalletSession( $order, $terminal, $this->getBrowserInfo() );
-
-				if ( ! $altapay_payment_id ) {
-					$this->sendPaymentFailedResponse();
-				}
-			} else {
-				$altapay_payment_id = $order->get_meta( 'altapay_payment_id' );
-			}
+			$altapay_payment_id = $this->getWalletPaymentId( $order, $terminal, $google_pay );
 		}
 
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
@@ -278,6 +270,29 @@ class ApplePay {
 			wc_add_notice( __( 'Payment failed:', 'altapay' ) . ' ' . $e->getMessage(), 'error' );
 			wp_send_json_error( array( 'redirect' => wc_get_cart_url() ) );
 		}
+	}
+
+	/**
+	 * The payment id of the wallet.
+	 *
+	 * @param WC_Order      $order
+	 * @param string        $terminal
+	 * @param GooglePay|null $google_pay
+	 * @return string
+	 */
+	private function getWalletPaymentId( $order, $terminal, $google_pay ) {
+
+		if ( ! $google_pay ) {
+			return $order->get_meta( 'altapay_payment_id' );
+		}
+
+		$altapay_payment_id = $google_pay->createWalletSession( $order, $terminal, $this->getBrowserInfo() );
+
+		if ( ! $altapay_payment_id ) {
+			$this->sendPaymentFailedResponse();
+		}
+
+		return $altapay_payment_id;
 	}
 
 	/**

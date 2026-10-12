@@ -133,62 +133,48 @@ class GooglePay {
 	 * @return string The payment id, or an empty string when the session could not be created.
 	 */
 	public function createWalletSession( $order, $terminal, $browser_info = array() ) {
+
+		$payment_id = '';
+
 		try {
 			$session_id = $this->getCheckoutSessionId( $order, $terminal );
-		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'Google Pay checkout session failed: ', 'altapay' ) . $e->getMessage() );
 
-			return '';
-		}
-		
-		if ( ! $session_id ) {
-			$order->add_order_note( __( 'Google Pay checkout session did not return a session id.', 'altapay' ) );
+			if ( ! $session_id ) {
+				$order->add_order_note( __( 'Google Pay checkout session did not return a session id.', 'altapay' ) );
+			} else {
+				$this->checkout_session_id = $session_id;
 
-			return '';
-		}
+				$request = new CardWalletSession( $this->getAuth() );
+				$request->setTerminal( $terminal )
+					->setShopOrderId( $order->get_id() )
+					->setAmount( (float) $order->get_total() )
+					->setCurrency( $order->get_currency() )
+					->setSessionId( $session_id )
+					->setConfig( $this->getCallbackConfig( $order ) );
 
-		$this->checkout_session_id = $session_id;
+				$customer = $this->getCustomerInfo( $order, $browser_info );
 
-		$request = new CardWalletSession( $this->getAuth() );
-		$request->setTerminal( $terminal )
-			->setShopOrderId( $order->get_id() )
-			->setAmount( (float) $order->get_total() )
-			->setCurrency( $order->get_currency() )
-			->setSessionId( $session_id )
-			->setConfig( $this->getCallbackConfig( $order ) );
+				if ( $customer ) {
+					$request->setCustomerInfo( $customer );
+				}
 
-		$customer = $this->getCustomerInfo( $order, $browser_info );
+				$response    = $request->call();
+				$transaction = ! empty( $response->Transactions ) ? reset( $response->Transactions ) : null;
 
-		if ( $customer ) {
-			$request->setCustomerInfo( $customer );
-		}
+				if ( $response->Result === 'Success' && isset( $transaction->PaymentId ) ) {
+					$payment_id = $transaction->PaymentId;
 
-		try {
-			$response = $request->call();
+					$order->update_meta_data( 'altapay_payment_id', $payment_id );
+					$order->save();
+				} else {
+					$order->add_order_note( __( 'Google Pay session did not return a payment id.', 'altapay' ) );
+				}
+			}
 		} catch ( \Exception $e ) {
 			$order->add_order_note( __( 'Google Pay session failed: ', 'altapay' ) . $e->getMessage() );
-
-			return '';
 		}
 
-		if ( $response->Result !== 'Success' ) {
-			$order->add_order_note( __( 'Google Pay session failed.', 'altapay' ) );
-
-			return '';
-		}
-
-		$transaction = ! empty( $response->Transactions ) ? reset( $response->Transactions ) : null;
-
-		if ( ! isset( $transaction->PaymentId ) ) {
-			$order->add_order_note( __( 'Google Pay session did not return a payment id.', 'altapay' ) );
-
-			return '';
-		}
-
-		$order->update_meta_data( 'altapay_payment_id', $transaction->PaymentId );
-		$order->save();
-
-		return $transaction->PaymentId;
+		return $payment_id;
 	}
 
 	/**
