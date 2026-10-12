@@ -721,7 +721,7 @@ class AltapaySettings {
 	 * @param object $terminal
 	 * @return array<string, array<string, string>>
 	 */
-	static function getMethodConfigurations( $terminal ) {
+	public static function getMethodConfigurations( $terminal ) {
 
 		$configurations = array();
 
@@ -750,7 +750,7 @@ class AltapaySettings {
 	 * @param object $terminal
 	 * @return array<int, string>
 	 */
-	static function getSchemes( $terminal ) {
+	public static function getSchemes( $terminal ) {
 
 		$schemes = array();
 
@@ -769,7 +769,7 @@ class AltapaySettings {
 	 * @param string $terminal_name
 	 * @return array<string, mixed>
 	 */
-	static function getStoredTerminal( $terminal_name ) {
+	public static function getStoredTerminal( $terminal_name ) {
 
 		$terminals = json_decode( get_option( 'altapay_terminals' ), true );
 
@@ -793,7 +793,7 @@ class AltapaySettings {
 	 * @param string $identifier
 	 * @return bool
 	 */
-	static function isWalletTerminal( $terminal_name, $identifier ) {
+	public static function isWalletTerminal( $terminal_name, $identifier ) {
 
 		$terminal = self::getStoredTerminal( $terminal_name );
 
