@@ -5,7 +5,7 @@ jQuery(function ($) {
 
 	// Keep the amount shown in the Google Pay sheet in sync with the cart total.
 	$(document.body).on('updated_checkout', function (event, data) {
-		if (data && data.fragments && data.fragments.altapay_cart_total) {
+		if (data?.fragments?.altapay_cart_total) {
 			altapay_googlepay_obj.subtotal = data.fragments.altapay_cart_total;
 		}
 	});
@@ -38,13 +38,13 @@ jQuery(function ($) {
 		altapayGooglePayLoadPaymentData( altapay_googlepay_obj ).then(function (token) {
 			altapayGooglePaySubmitCheckout( $form, wc_checkout_form, altapay_googlepay_obj, token );
 		}).catch(function (err) {
-			if (err && err.statusCode === 'CANCELED') {
+			if (err?.statusCode === 'CANCELED') {
 				return;
 			}
 
 			wc_checkout_form.submit_error(
 				'<div class="woocommerce-error">' +
-				( ( err && err.statusMessage ) || wc_checkout_params.i18n_checkout_error ) +
+				( err?.statusMessage || wc_checkout_params.i18n_checkout_error ) +
 				'</div>'
 			);
 		});
@@ -53,7 +53,7 @@ jQuery(function ($) {
 	});
 });
 
-var altapay_google_payments_client = null;
+let altapay_google_payments_client = null;
 
 /**
  * A single PaymentsClient is reused for every call.
@@ -147,7 +147,7 @@ function altapayGooglePayLoadPaymentData( googlepay_obj ) {
  * plain location change would turn into a GET.
  */
 function altapayGooglePayRedirect( data ) {
-	if ( ! data || ! data.redirect ) {
+	if ( ! data?.redirect ) {
 		return;
 	}
 
@@ -194,8 +194,7 @@ function altapayGooglePayAuthorize( googlepay_obj, token, order_id ) {
 				screen_width: window.screen.width,
 				screen_height: window.screen.height,
 				color_depth: window.screen.colorDepth,
-				timezone: new Date().getTimezoneOffset(),
-				java_enabled: ( navigator.javaEnabled && navigator.javaEnabled() ) ? 1 : 0
+				timezone: new Date().getTimezoneOffset()
 			}
 		).done( resolve ).fail(function () {
 			resolve( { success: false, data: {} } );
@@ -229,7 +228,7 @@ function altapayGooglePaySubmitCheckout( $form, wc_checkout_form, googlepay_obj,
 			}
 
 			// Attempt to fix the malformed JSON
-			var maybe_valid_json = raw_response.match( /{"result.*}/ );
+			const maybe_valid_json = raw_response.match( /{"result.*}/ );
 
 			if ( null === maybe_valid_json ) {
 				console.log( 'Unable to fix malformed JSON' );
