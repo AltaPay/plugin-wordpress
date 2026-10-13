@@ -87,8 +87,7 @@ const Content = ( props ) => {
 		}
 	});
 
-	// The Google Pay sheet has to be opened from the click on the place order button,
-	// the order is only created once the customer has authorised the payment.
+	// The Google Pay sheet has to be opened from the click on the place order button.
 	jQuery(".wc-block-components-checkout-place-order-button")
 		.off('click.altapayGooglePay')
 		.on('click.altapayGooglePay', function (event) {

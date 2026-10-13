@@ -314,7 +314,6 @@ class ApplePay {
 	 * @return void
 	 */
 	private function sendCardWalletRedirectResponse( $response, $order, $payment_type ) {
-
 		$redirect = $response->RedirectResponse;
 		$data = array();
 		foreach ( (array) $redirect->Data as $item ) {

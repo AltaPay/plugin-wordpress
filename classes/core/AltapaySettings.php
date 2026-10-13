@@ -724,15 +724,11 @@ class AltapaySettings {
 	public static function getMethodConfigurations( $terminal ) {
 
 		$configurations = array();
-
 		foreach ( $terminal->MethodConfigurations ?? array() as $method_config ) {
-
 			$identifier = $method_config->identifier ?? '';
-
 			if ( ! $identifier ) {
 				continue;
 			}
-
 			$configurations[ $identifier ] = array(
 				'method'        => $method_config->method ?? '',
 				'environment'   => $method_config->WalletEnvironment ?? '',
@@ -751,9 +747,7 @@ class AltapaySettings {
 	 * @return array<int, string>
 	 */
 	public static function getSchemes( $terminal ) {
-
 		$schemes = array();
-
 		foreach ( $terminal->Schemes ?? array() as $scheme ) {
 			if ( ! empty( $scheme->code ) ) {
 				$schemes[] = $scheme->code;
@@ -770,9 +764,7 @@ class AltapaySettings {
 	 * @return array<string, mixed>
 	 */
 	public static function getStoredTerminal( $terminal_name ) {
-
 		$terminals = json_decode( get_option( 'altapay_terminals' ), true );
-
 		if ( ! is_array( $terminals ) ) {
 			return array();
 		}
@@ -794,7 +786,6 @@ class AltapaySettings {
 	 * @return bool
 	 */
 	public static function isWalletTerminal( $terminal_name, $identifier ) {
-
 		$terminal = self::getStoredTerminal( $terminal_name );
 
 		return isset( $terminal['method_configs'][ $identifier ] );

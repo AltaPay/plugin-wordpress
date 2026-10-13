@@ -118,9 +118,7 @@ class AltapayTokenControl {
 		$checkout = new WC_Checkout();
 
 		ob_start();
-
 		$creditCard = array( '' => __( 'Select a saved credit card', 'altapay' ), );
-
 		foreach ( $results as $result ) {
 			$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
 		}

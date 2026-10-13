@@ -194,7 +194,6 @@ class GooglePay {
 		}
 
 		$customer = $gateway->setCustomer( $order );
-
 		$customer->setClientJavascriptEnabled( true );
 		$customer->setClientJavaEnabled( ! empty( $browser_info['java_enabled'] ) );
 
@@ -239,7 +238,6 @@ class GooglePay {
 	 * @throws \Exception
 	 */
 	private function getCheckoutSessionId( $order, $terminal ) {
-
 		$order_id   = $order->get_id();
 		$session_key = 'altapay_checkout_session_id_' . $order_id;
 		$session_id = WC()->session ? WC()->session->get( $session_key ) : '';
@@ -277,7 +275,6 @@ class GooglePay {
 	 * @return Config
 	 */
 	private function getCallbackConfig( $order ) {
-
 		$wc_api     = 'WC_Gateway_' . $order->get_payment_method();
 		$return_url = $order->get_checkout_order_received_url();
 
@@ -299,7 +296,6 @@ class GooglePay {
 	 * @return array
 	 */
 	public function googlepay_cart_total_fragment( $fragments ) {
-
 		if ( WC()->cart ) {
 			$fragments['altapay_cart_total'] = WC()->cart->get_total( 'edit' );
 		}
