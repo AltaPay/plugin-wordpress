@@ -820,7 +820,6 @@ class AltapaySettings {
 			'Klarna'      => 'klarna_pink.png',
 			'MobilePay'   => 'mobilepay.png',
 			'OpenBanking' => 'bank.png',
-			'Payconiq'    => 'payconiq.png',
 			'PayPal'      => 'paypal.png',
 			'Przelewy24'  => 'przelewy24.png',
 			'Sepa'        => 'sepa.png',
@@ -829,6 +828,7 @@ class AltapaySettings {
 			'Twint'       => 'twint.png',
 			'ViaBill'     => 'viabill.png',
 			'Vipps'       => 'vipps.png',
+			'Wero'        => 'wero.png',
 		);
 
 		if ( isset( $paymentMethodIcons[ $identifier ] ) ) {
