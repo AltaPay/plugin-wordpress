@@ -96,42 +96,57 @@ class AltapayTokenControl {
 	 * @return string
 	 */
 	public function creditCardCustomDescription( $description, $payment_id ) {
+
+		if ( ! is_user_logged_in() ) {
+			return $description;
+		}
+
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
+		$gateway  = $gateways[ $payment_id ] ?? null;
+
+		if ( ! $gateway || ! isset( $gateway->settings['token_control'] ) || $gateway->settings['token_control'] !== 'yes' ) {
+			return $description;
+		}
+
+		global $wpdb;
+
+		$userID = get_current_user_id();
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID = %d",
+				$userID
+			)
+		);
+
+		if ( empty( $results ) ) {
+			return $description;
+		}
 
 		$checkout = new WC_Checkout();
-		if ( $gateways ) {
-			foreach ( $gateways as $gateway ) {
 
-				if ( $gateway->enabled === 'yes' && isset( $gateway->settings['token_control'] )
-					&& $gateway->settings['token_control'] === 'yes'
-					&& $gateway->id === $payment_id && is_user_logged_in() ) {
-					ob_start();
-					global $wpdb;
+		ob_start();
 
-					$userID  = get_current_user_id();
-					$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID='$userID'" );
+		$creditCard = array(
+			'' => __( 'Select a saved credit card', 'altapay' ),
+		);
 
-					if ( $results ) {
-						$creditCard[] = _( 'Select a saved credit card' );
-						foreach ( $results as $result ) {
-							$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
-						}
-
-						woocommerce_form_field(
-							'savedCreditCard',
-							array(
-								'type'    => 'select',
-								'class'   => array( 'wps-drop' ),
-								'options' => $creditCard,
-								'default' => '',
-							),
-							$checkout->get_value( 'savedCreditCard' )
-						);
-					}
-					$description .= ob_get_clean(); // Append buffered content
-				}
-			}
+		foreach ( $results as $result ) {
+			$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number
 		}
+
+		woocommerce_form_field(
+			'savedCreditCard',
+			array(
+				'type'    => 'select',
+				'class'   => array( 'wps-drop' ),
+				'options' => $creditCard,
+				'default' => '',
+			),
+			$checkout->get_value( 'savedCreditCard' )
+		);
+
+		$description .= ob_get_clean(); // Append buffered content
 
 		return $description;
 	}
