@@ -296,7 +296,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 									->setShopOrderId( $order_id )
 									->setAmount( round( $amount, 2 ) )
 									->setCurrency( $currency )
-									->setSessionId( $hashedOrderKey );
+									->setSessionId( $hashedOrderKey )
+									->setConfig( $config );
 
 					$checkoutSessionResponse = $checkoutSession->call();
 					if ( isset( $checkoutSessionResponse->Session->Id ) ) {
