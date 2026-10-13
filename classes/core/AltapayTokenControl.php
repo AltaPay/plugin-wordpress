@@ -96,7 +96,6 @@ class AltapayTokenControl {
 	 * @return string
 	 */
 	public function creditCardCustomDescription( $description, $payment_id ) {
-
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 		$gateway  = $gateways[ $payment_id ] ?? null;
 
@@ -105,16 +104,13 @@ class AltapayTokenControl {
 		}
 
 		global $wpdb;
-
 		$userID = get_current_user_id();
-
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM {$wpdb->prefix}altapayCreditCardDetails WHERE userID = %d",
 				$userID
 			)
 		);
-
 		if ( empty( $results ) ) {
 			return $description;
 		}
@@ -123,9 +119,7 @@ class AltapayTokenControl {
 
 		ob_start();
 
-		$creditCard = array(
-			'' => __( 'Select a saved credit card', 'altapay' ),
-		);
+		$creditCard = array( '' => __( 'Select a saved credit card', 'altapay' ), );
 
 		foreach ( $results as $result ) {
 			$creditCard[ $result->creditCardNumber ] = $result->creditCardNumber; // masked credit card number

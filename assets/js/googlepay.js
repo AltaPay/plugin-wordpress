@@ -143,8 +143,7 @@ function altapayGooglePayLoadPaymentData( googlepay_obj ) {
 }
 
 /**
- * Follow the redirect the gateway asked for. A 3-D Secure redirect is a POST, which a
- * plain location change would turn into a GET.
+ * Follow the redirect.
  */
 function altapayGooglePayRedirect( data ) {
 	if ( ! data?.redirect ) {
@@ -189,8 +188,6 @@ function altapayGooglePayAuthorize( googlepay_obj, token, order_id ) {
 				provider_data: token,
 				terminal: googlepay_obj.terminal,
 				order_id: order_id,
-				// Fingerprint of the browser, needed by 3-D Secure for the cards Google Pay
-				// hands over without a cryptogram.
 				screen_width: window.screen.width,
 				screen_height: window.screen.height,
 				color_depth: window.screen.colorDepth,

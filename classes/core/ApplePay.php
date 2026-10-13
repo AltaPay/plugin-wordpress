@@ -283,7 +283,6 @@ class ApplePay {
 		}
 
 		$altapay_payment_id = $google_pay->createWalletSession( $order, $terminal, $this->getBrowserInfo() );
-
 		if ( ! $altapay_payment_id ) {
 			$this->sendPaymentFailedResponse();
 		}
@@ -292,7 +291,7 @@ class ApplePay {
 	}
 
 	/**
-	 * The browser details posted with the authorization, used as the 3-D Secure fingerprint.
+	 * The browser details posted with the authorization.
 	 *
 	 * @return array<string, string>
 	 */
@@ -317,9 +316,7 @@ class ApplePay {
 	private function sendCardWalletRedirectResponse( $response, $order, $payment_type ) {
 
 		$redirect = $response->RedirectResponse;
-
 		$data = array();
-
 		foreach ( (array) $redirect->Data as $item ) {
 			if ( isset( $item->key ) ) {
 				$data[ $item->key ] = $item->Item;
