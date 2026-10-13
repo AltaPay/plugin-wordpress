@@ -217,10 +217,6 @@ class ApplePay {
 		$google_pay  = $wallet === 'googlepay' ? new Core\GooglePay() : null;
 		$legacy_flow = $google_pay === null && $this->isLegacyApplePayFlow( $applepay_payment_method );
 
-		if ( ! $legacy_flow ) {
-			$altapay_payment_id = $this->getWalletPaymentId( $order, $terminal, $google_pay );
-		}
-
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		$payment_method   = $order->get_payment_method();
 
@@ -247,7 +243,7 @@ class ApplePay {
 			->setSaleReconciliationIdentifier( wp_generate_uuid4() );
 
 		if ( ! $legacy_flow ) {
-			$request->setPaymentId( $altapay_payment_id );
+			$request->setPaymentId( $this->getWalletPaymentId( $order, $terminal, $google_pay ) );
 		}
 
 		if ( $google_pay ) {
