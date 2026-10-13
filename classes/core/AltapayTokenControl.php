@@ -97,14 +97,10 @@ class AltapayTokenControl {
 	 */
 	public function creditCardCustomDescription( $description, $payment_id ) {
 
-		if ( ! is_user_logged_in() ) {
-			return $description;
-		}
-
 		$gateways = WC()->payment_gateways->get_available_payment_gateways();
 		$gateway  = $gateways[ $payment_id ] ?? null;
 
-		if ( ! $gateway || ! isset( $gateway->settings['token_control'] ) || $gateway->settings['token_control'] !== 'yes' ) {
+		if ( ! is_user_logged_in() || ! $gateway || ( $gateway->settings['token_control'] ?? '' ) !== 'yes' ) {
 			return $description;
 		}
 
