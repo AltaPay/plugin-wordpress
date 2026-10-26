@@ -32,15 +32,16 @@ const Content = ( props ) => {
 	useEffect( () => {
 		const unsubscribe = onCheckoutSuccess( (arg) => {
 			var orderId = arg.processingResponse.paymentDetails.order_id;
+			var orderKey = arg.processingResponse.paymentDetails.order_key;
 			if(settings.is_apple_pay === 'yes'){
-				onApplePayButtonClicked( settings, false, null, orderId );
+				onApplePayButtonClicked( settings, false, null, orderId, orderKey );
 				return {
 					type: emitResponse.responseTypes.SUCCESS
 				};
 			}
 
 			if(settings.is_google_pay === 'yes'){
-				return altapayGooglePayAuthorize( settings, googlePayToken, orderId ).then( ( res ) => {
+				return altapayGooglePayAuthorize( settings, googlePayToken, orderId, orderKey ).then( ( res ) => {
 					googlePayToken = '';
 
 					if ( res.success === true ) {

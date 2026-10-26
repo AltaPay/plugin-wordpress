@@ -177,7 +177,7 @@ function altapayGooglePayRedirect( data ) {
  *
  * @return Promise<object>
  */
-function altapayGooglePayAuthorize( googlepay_obj, token, order_id ) {
+function altapayGooglePayAuthorize( googlepay_obj, token, order_id, order_key ) {
 	return new Promise(function (resolve) {
 		jQuery.post(
 			googlepay_obj.ajax_url,
@@ -188,6 +188,7 @@ function altapayGooglePayAuthorize( googlepay_obj, token, order_id ) {
 				provider_data: token,
 				terminal: googlepay_obj.terminal,
 				order_id: order_id,
+				order_key: order_key,
 				screen_width: window.screen.width,
 				screen_height: window.screen.height,
 				color_depth: window.screen.colorDepth,
@@ -272,7 +273,7 @@ function altapayGooglePaySubmitCheckout( $form, wc_checkout_form, googlepay_obj,
 				return;
 			}
 
-			altapayGooglePayAuthorize( googlepay_obj, token, result.order_id ).then(function (res) {
+			altapayGooglePayAuthorize( googlepay_obj, token, result.order_id, result.order_key ).then(function (res) {
 				wc_checkout_form.$checkout_form.removeClass( 'processing' ).unblock();
 
 				altapayGooglePayRedirect( res.data );

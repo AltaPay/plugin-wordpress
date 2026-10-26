@@ -113,9 +113,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		if ( $this->is_apple_pay === 'yes' || $this->is_google_pay === 'yes' ) {
 			return [
-				'result'   => 'success',
-				'redirect' => null,
-				'order_id' => $order_id,
+				'result'    => 'success',
+				'redirect'  => null,
+				'order_id'  => $order_id,
+				'order_key' => wc_get_order( $order_id )->get_order_key(),
 			];
 		} else {
 			$payment_request = $this->createPaymentRequest( $order_id );
