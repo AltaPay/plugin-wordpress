@@ -32,7 +32,7 @@ const Content = ( props ) => {
 	useEffect( () => {
 		const unsubscribe = onCheckoutSuccess( (arg) => {
 			var orderId = arg.processingResponse.paymentDetails.order_id;
-			var orderKey = arg.processingResponse.paymentDetails.order_key;
+			const orderKey = arg.processingResponse.paymentDetails.order_key;
 			if(settings.is_apple_pay === 'yes'){
 				onApplePayButtonClicked( settings, false, null, orderId, orderKey );
 				return {
