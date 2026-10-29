@@ -121,17 +121,17 @@ class ApplePay {
 		}
 
 		$validation_url = isset( $_POST['validation_url'] ) ? sanitize_text_field( wp_unslash( $_POST['validation_url'] ) ) : '';
-		$applepay_payment_method = isset( $_POST['applepay_payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['applepay_payment_method'] ) ) : '';
 		$order_id       = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
 		$order          = $order_id ? $this->getRequestOrder( 'applepay' ) : false;
 		$terminal       = $order ? $this->getOrderTerminal( $order ) : sanitize_text_field( wp_unslash( $_POST['terminal'] ?? '' ) );
+		$payment_method = $order ? $order->get_payment_method() : sanitize_text_field( wp_unslash( $_POST['applepay_payment_method'] ?? '' ) );
 
 		$request = new CardWalletSession( $this->getAuth() );
 		$request->setTerminal( $terminal )
 			->setValidationUrl( $validation_url )
 			->setDomain( $_SERVER['HTTP_HOST'] );
 
-		if ( ! $this->isLegacyApplePayFlow( $applepay_payment_method ) ) {
+		if ( ! $this->isLegacyApplePayFlow( $payment_method ) ) {
 
 			if ( ! $order ) {
 				$this->sendPaymentFailedResponse();
@@ -213,13 +213,12 @@ class ApplePay {
 		}
 
 		$provider_data = isset( $_POST['provider_data'] ) ? sanitize_text_field( wp_unslash( $_POST['provider_data'] ) ) : '';
-		$applepay_payment_method = isset( $_POST['applepay_payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['applepay_payment_method'] ) ) : '';
 		$order         = $this->getRequestOrder( $wallet );
 		$order_id      = $order->get_id();
 		$terminal      = $this->getOrderTerminal( $order );
 
 		$google_pay  = $wallet === 'googlepay' ? new Core\GooglePay() : null;
-		$legacy_flow = $google_pay === null && $this->isLegacyApplePayFlow( $applepay_payment_method );
+		$legacy_flow = $google_pay === null && $this->isLegacyApplePayFlow( $order->get_payment_method() );
 
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		$payment_method   = $order->get_payment_method();
