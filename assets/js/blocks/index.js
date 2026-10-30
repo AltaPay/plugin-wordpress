@@ -11,6 +11,8 @@ const { useEffect } = window.wp.element;
 
 let session = '';
 
+let googlePayToken = '';
+
 const defaultLabel = __(
 	'AltaPay',
 	'woo-gutenberg-products-block'
@@ -30,11 +32,39 @@ const Content = ( props ) => {
 	useEffect( () => {
 		const unsubscribe = onCheckoutSuccess( (arg) => {
 			var orderId = arg.processingResponse.paymentDetails.order_id;
+			const orderKey = arg.processingResponse.paymentDetails.order_key;
 			if(settings.is_apple_pay === 'yes'){
-				onApplePayButtonClicked( settings, false, null, orderId );
+				onApplePayButtonClicked( settings, false, null, orderId, orderKey );
 				return {
 					type: emitResponse.responseTypes.SUCCESS
 				};
+			}
+
+			if(settings.is_google_pay === 'yes'){
+				return altapayGooglePayAuthorize( settings, googlePayToken, orderId, orderKey ).then( ( res ) => {
+					googlePayToken = '';
+
+					if ( res.success === true ) {
+						if ( res.data.method && res.data.method.toUpperCase() === 'POST' ) {
+							altapayGooglePayRedirect( res.data );
+
+							return {
+								type: emitResponse.responseTypes.SUCCESS
+							};
+						}
+
+						return {
+							type: emitResponse.responseTypes.SUCCESS,
+							redirectUrl: res.data.redirect
+						};
+					}
+
+					return {
+						type: emitResponse.responseTypes.ERROR,
+						message: __( 'Payment failed. Please try again.', 'altapay' ),
+						messageContext: emitResponse.noticeContexts.PAYMENTS
+					};
+				} );
 			}
 
 			return {
@@ -57,6 +87,31 @@ const Content = ( props ) => {
 			onApplePayButtonClicked(settings, true, false);
 		}
 	});
+
+	// The Google Pay sheet has to be opened from the click on the place order button.
+	jQuery(".wc-block-components-checkout-place-order-button")
+		.off('click.altapayGooglePay')
+		.on('click.altapayGooglePay', function (event) {
+			if (settings.is_google_pay !== 'yes' || googlePayToken) {
+				return;
+			}
+
+			if (!jQuery('#radio-control-wc-payment-method-options-' + settings.googlepay_payment_method).is(':checked')) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopImmediatePropagation();
+
+			const placeOrderButton = this;
+
+			altapayGooglePayLoadPaymentData(settings).then(function (token) {
+				googlePayToken = token;
+				placeOrderButton.click();
+			}).catch(function () {
+				googlePayToken = '';
+			});
+		});
 
 	return decodeEntities( settings.description || '' );
 };
@@ -95,7 +150,17 @@ const altapayPaymentMethod = {
 	),
 	content: <Content />,
 	edit: <Content />,
-	canMakePayment: () => true,
+	canMakePayment: () => {
+		if ( settings.is_google_pay !== 'yes' ) {
+			return true;
+		}
+
+		if ( typeof altapayGooglePayIsReadyToPay !== 'function' ) {
+			return false;
+		}
+
+		return altapayGooglePayIsReadyToPay( settings );
+	},
 	ariaLabel: label,
 	supports: {
 		features: settings.supports,

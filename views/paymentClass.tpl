@@ -52,6 +52,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
     public $apple_pay_legacy_flow;
     public $apple_pay_label;
     public $apple_pay_supported_networks;
+    public $is_google_pay;
     public $secret;
     public $apply_surcharge;
 
@@ -74,6 +75,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 		$this->apple_pay_supported_networks = $this->get_option( 'apple_pay_supported_networks' );
 		$this->secret                       = $this->get_option( 'secret' );
 		$this->apply_surcharge              = $this->get_option( 'surcharge' );
+		$this->is_google_pay                = Core\AltapaySettings::isWalletTerminal( $this->terminal, 'GooglePay' ) ? 'yes' : 'no';
 
 
 		// Load form fields
@@ -109,11 +111,12 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 	 * @throws Exception
 	 */
 	public function process_payment( $order_id ) {
-		if ( $this->is_apple_pay === 'yes' ) {
+		if ( $this->is_apple_pay === 'yes' || $this->is_google_pay === 'yes' ) {
 			return [
-				'result'   => 'success',
-				'redirect' => null,
-				'order_id' => $order_id,
+				'result'    => 'success',
+				'redirect'  => null,
+				'order_id'  => $order_id,
+				'order_key' => wc_get_order( $order_id )->get_order_key(),
 			];
 		} else {
 			$payment_request = $this->createPaymentRequest( $order_id );
@@ -294,7 +297,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 									->setShopOrderId( $order_id )
 									->setAmount( round( $amount, 2 ) )
 									->setCurrency( $currency )
-									->setSessionId( $hashedOrderKey );
+									->setSessionId( $hashedOrderKey )
+									->setConfig( $config );
 
 					$checkoutSessionResponse = $checkoutSession->call();
 					if ( isset( $checkoutSessionResponse->Session->Id ) ) {
