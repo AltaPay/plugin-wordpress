@@ -57,6 +57,14 @@ php$1 $(command -v composer) remove humbug/php-scoper
 php$1 $(command -v composer) remove phpstan/extension-installer phpunit/phpunit szepeviktor/phpstan-wordpress --dev
 php$1 $(command -v composer) dump-autoload --working-dir ./ --classmap-authoritative
 zip dist/altapay-for-woocommerce.zip -r * -x "dist/*" "tests/*" "bin/*" "terminal-config/*" "docs/*" "docker/*" wiki.md build.sh scoper.inc.php README.md CHANGELOG.md guide.md .gitignore phpunit.xml.dist phpstan.neon.dist composer.json composer.lock composer.lock.backup @
+(
+  cd dist
+  rm -rf altapay-for-woocommerce
+  unzip -q altapay-for-woocommerce.zip -d altapay-for-woocommerce
+  rm altapay-for-woocommerce.zip
+  zip -qr altapay-for-woocommerce.zip altapay-for-woocommerce
+  rm -rf altapay-for-woocommerce
+)
 
 if [ -f composer.lock.backup ]; then
     rm -rf composer.lock

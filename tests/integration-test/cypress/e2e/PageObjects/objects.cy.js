@@ -17,7 +17,7 @@ class Order {
         cy.xpath('/html/body/div/div[2]/div/div[2]/main/ul/li[2]/a[1]/img').click()
         cy.get('.single_add_to_cart_button').click().wait(3000)
         cy.get('.woocommerce-message > .button').click().wait(3000)
-        cy.contains('Proceed to Checkout').click().wait(3000)
+        cy.contains('Proceed to Checkout').click({ force: true }).wait(3000)
 
     }
 

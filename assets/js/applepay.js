@@ -56,7 +56,7 @@ jQuery(function ($) {
 							if(result.order_total){
 								altapay_applepay_obj.subtotal = result.order_total;
 							}
-							onApplePayButtonClicked( altapay_applepay_obj, false, wc_checkout_form, result.order_id );
+							onApplePayButtonClicked( altapay_applepay_obj, false, wc_checkout_form, result.order_id, result.order_key );
 						} else if ( 'failure' === result.result ) {
 							console.log( 'failure' );
 							throw 'Result failure';
@@ -105,7 +105,7 @@ jQuery(function ($) {
 	});
 });
 
-function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, order_id) {
+function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, order_id, order_key) {
 
 	if ( ! ApplePaySession) {
 		return;
@@ -140,7 +140,8 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 				validation_url: event.validationURL,
 				terminal: applepay_obj.terminal,
 				applepay_payment_method: applepay_obj.applepay_payment_method,
-				order_id: order_id
+				order_id: order_id,
+				order_key: order_key
 			},
 			function (res) {
 				if (res.success === true) {
@@ -188,7 +189,8 @@ function onApplePayButtonClicked(applepay_obj, createSession, wc_checkout_form, 
 				provider_data: JSON.stringify( event.payment.token ),
 				terminal: applepay_obj.terminal,
 				applepay_payment_method: applepay_obj.applepay_payment_method,
-				order_id: order_id
+				order_id: order_id,
+				order_key: order_key
 			},
 			function (res) {
 				let status;

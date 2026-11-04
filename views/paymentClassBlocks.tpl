@@ -63,29 +63,43 @@ final class WC_Gateway_{key}_Blocks_Support extends AbstractPaymentMethodType {
     public function get_payment_method_data() {
 
 		$payment_method_data = array(
-			'title'                   => $this->get_setting( 'title' ),
-			'description'             => $this->get_setting( 'description' ),
-			'supports'                => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
-			'icon'                    => $this->get_icons_data(),
-			'is_apple_pay'            => $this->gateway->is_apple_pay,
-			'applepay_payment_method' => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
+			'title'                    => $this->get_setting( 'title' ),
+			'description'              => $this->get_setting( 'description' ),
+			'supports'                 => array_filter( $this->gateway->supports, array( $this->gateway, 'supports' ) ),
+			'icon'                     => $this->get_icons_data(),
+			'is_apple_pay'             => $this->gateway->is_apple_pay,
+			'applepay_payment_method'  => $this->gateway->is_apple_pay === 'yes' ? $this->gateway->id : '',
+			'is_google_pay'            => $this->gateway->is_google_pay,
+			'googlepay_payment_method' => $this->gateway->is_google_pay === 'yes' ? $this->gateway->id : '',
 		);
 
-		if ( $this->gateway->is_apple_pay === 'yes' ) {
-			$additional_params = array(
-				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
-				'nonce'                        => wp_create_nonce( 'apple-pay' ),
-				'currency'                     => get_woocommerce_currency(),
-				'country'                      => get_option( 'woocommerce_default_country' ),
-				'terminal'                     => $this->gateway->terminal,
-				'apply_pay_label'              => $this->gateway->apple_pay_label,
-				'apple_pay_supported_networks' => $this->gateway->get_option( 'apple_pay_supported_networks' ),
-			);
+		$is_apple_pay  = $this->gateway->is_apple_pay === 'yes';
+		$is_google_pay = $this->gateway->is_google_pay === 'yes';
 
-			return array_merge( $payment_method_data, $additional_params );
+		if ( ! $is_apple_pay && ! $is_google_pay ) {
+			return $payment_method_data;
 		}
 
-		return $payment_method_data;
+		$additional_params = array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( $is_google_pay ? 'google-pay' : 'apple-pay' ),
+			'terminal' => $this->gateway->terminal,
+		);
+
+		if ( $is_google_pay ) {
+			return array_merge(
+				$payment_method_data,
+				$additional_params,
+				\Altapay\Classes\Core\GooglePay::getGooglePayConfig( $this->gateway )
+			);
+		}
+
+		$additional_params['currency']                     = get_woocommerce_currency();
+		$additional_params['country']                      = wc_get_base_location()['country'];
+		$additional_params['apply_pay_label']              = $this->gateway->apple_pay_label;
+		$additional_params['apple_pay_supported_networks'] = $this->gateway->get_option( 'apple_pay_supported_networks' );
+
+		return array_merge( $payment_method_data, $additional_params );
 	}
 
     /**
