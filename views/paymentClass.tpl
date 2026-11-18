@@ -436,6 +436,23 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				);
 				exit;
 			}
+
+			// Only handle callbacks for orders that were placed with this payment method
+			if ( $order->get_payment_method() !== $this->id ) {
+				wc_get_logger()->error(
+					'Callback rejected: order ' . $order->get_id() . ' does not belong to gateway ' . $this->id,
+					array( 'source' => 'altapay' )
+				);
+				exit;
+			}
+
+			// Validate order based on order key
+			$order_key = isset( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : '';
+			if ( $type !== 'subscription_payment' && ! hash_equals( $order->get_order_key(), $order_key ) ) {
+				wc_get_logger()->error( 'Callback rejected: invalid order key for order ' . $order->get_id(), array( 'source' => 'altapay' ) );
+				exit;
+			}
+
 			$transaction_id = $order->get_transaction_id();
 			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
 			$transaction    = array();
