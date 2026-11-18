@@ -69,6 +69,9 @@ $formSettings = array(
 		'description' => __( 'Add the payment method secret as defined in the AltaPay payment gateway.', 'altapay' ),
 		'default'     => '',
 		'desc_tip'    => true,
+		'sanitize_callback' => function ( $value ) {
+			return trim( wp_unslash( (string) $value ) );
+		},
 	),
 	'is_apple_pay'   => array(
 		'title'    => __( 'Is Apple Pay?', 'altapay' ),
