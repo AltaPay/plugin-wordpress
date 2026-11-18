@@ -324,7 +324,7 @@ Minimum system requirements are:
 - PHP-curl MUST be enabled.
 
 The latest tested version is:
-- WordPress 7.0.2, WooCommerce 11.3.0 and PHP 8.4
+- WordPress 7.1.4, WooCommerce 11.3.0 and PHP 8.4
 
 
 ## Troubleshooting
