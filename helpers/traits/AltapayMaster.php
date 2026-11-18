@@ -20,6 +20,7 @@ use AltaPay\vendor\GuzzleHttp\Exception\ClientException;
 use Altapay\Api\Subscription\ChargeSubscription;
 use Altapay\Classes\Core;
 use Altapay\Api\Others\CalculateSurcharge;
+use Altapay\Api\Others\Payments;
 
 trait AltapayMaster {
 
@@ -268,6 +269,32 @@ trait AltapayMaster {
 		}
 
 		return $latest_transaction;
+	}
+
+	/**
+	 * Confirm with the Payments API that the callback transaction belongs to the order and holds a payment.
+	 *
+	 * @param WC_Order $order
+	 * @param string   $txn_id
+	 * @param string   $type
+	 *
+	 * @return bool
+	 */
+	public function verifyCallbackTransaction( $order, $txn_id, $type = '' ) {
+		try {
+			$api = new Payments( $this->getAuth() );
+			$api->setTransaction( $txn_id );
+			foreach ( $api->call() as $payment ) {
+				if ( (string) $payment->ShopOrderId === (string) $order->get_id() ) {
+					return $type === 'subscription' || $payment->ReservedAmount > 0 || $payment->CapturedAmount > 0;
+				}
+			}
+		} catch ( Exception $e ) {
+			wc_get_logger()->error( 'Callback transaction check failed: ' . $e->getMessage(), array( 'source' => 'altapay' ) );
+		}
+
+		wc_get_logger()->error( 'Callback rejected: unverified transaction ' . $txn_id . ' for order ' . $order->get_id(), array( 'source' => 'altapay' ) );
+		return false;
 	}
 
 	/**
