@@ -395,7 +395,8 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 			$altapay_helper = new Helpers\AltapayHelpers();
-			if ( ! empty( $checksum ) and ! empty( $this->secret ) and $altapay_helper->calculateChecksum( $_POST, $this->secret ) !== $checksum ) {
+			if ( ! empty( $this->secret ) and ( empty( $checksum ) or ! hash_equals( $altapay_helper->calculateChecksum( $_POST, $this->secret ), $checksum ) ) ) {
+				wc_get_logger()->error( 'Callback rejected: missing or invalid checksum', array( 'source' => 'altapay' ) );
 				exit;
 			}
 

@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.1]
+- Fix: Reject payment callbacks with a missing or invalid checksum when a secret is configured.
+
 ## [3.9.0]
 - Add support for Google Pay.
 - Add support for the Wero payment method.
