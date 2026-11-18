@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.9.1]
 - Fix: Reject payment callbacks with a missing or invalid checksum when a secret is configured.
+    - Note: If a Secret is set for a terminal in the plugin, the same secret must also be configured for that terminal in AltaPay, otherwise callbacks are rejected.
 
 ## [3.9.0]
 - Add support for Google Pay.
