@@ -395,12 +395,14 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			$checksum       = isset( $_POST['checksum'] ) ? sanitize_text_field( wp_unslash( $_POST['checksum'] ) ) : '';
 			$altapay_helper = new Helpers\AltapayHelpers();
-			if ( ! empty( $checksum ) and ! empty( $this->secret ) and $altapay_helper->calculateChecksum( $_POST, $this->secret ) !== $checksum ) {
+			if ( ! empty( $this->secret ) and ( empty( $checksum ) or ! hash_equals( $altapay_helper->calculateChecksum( $_POST, $this->secret ), $checksum ) ) ) {
+				wc_get_logger()->error( 'Callback rejected: missing or invalid checksum', array( 'source' => 'altapay' ) );
 				exit;
 			}
 
 			$order_id             = isset( $_POST['shop_orderid'] ) ? sanitize_text_field( wp_unslash( $_POST['shop_orderid'] ) ) : '';
 			$txnId                = isset( $_POST['transaction_id'] ) ? sanitize_text_field( wp_unslash( $_POST['transaction_id'] ) ) : '';
+			$postedTxnId          = $txnId;
 			$amount               = isset( $_POST['amount'] ) ? sanitize_text_field( wp_unslash( $_POST['amount'] ) ) : '';
 			$merchantError        = isset( $_POST['merchant_error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['merchant_error_message'] ) ) : '';
 			$errorMessage         = isset( $_POST['error_message'] ) ? sanitize_text_field( wp_unslash( $_POST['error_message'] ) ) : '';
@@ -435,6 +437,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 				);
 				exit;
 			}
+
 			$transaction_id = $order->get_transaction_id();
 			$agreement_id   = $type === 'subscriptionAndCharge' || $type === 'subscription' ? $txnId : '';
 			$transaction    = array();
@@ -521,6 +524,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 				if ( $status === 'succeeded' || $reservedAmount > 0 ) {
 
+					if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) || ( $txnId && $txnId !== $postedTxnId && ! $this->verifyCallbackTransaction( $order, $txnId, $type ) ) ) {
+						exit;
+					}
+
 					$order->update_meta_data( '_agreement_id', $agreement_id );
 					$order->save();
 					$order->set_transaction_id( $txnId );
@@ -576,6 +583,10 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 			}
 
 			if ( $order->has_status( 'pending' ) && ( $status === 'succeeded' || $reservedAmount > 0 ) ) {
+
+				if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) || ( $txnId && $txnId !== $postedTxnId && ! $this->verifyCallbackTransaction( $order, $txnId, $type ) ) ) {
+					exit;
+				}
 
 				$order->set_transaction_id( $txnId );
 				$order->update_meta_data( '_agreement_id', $agreement_id );
