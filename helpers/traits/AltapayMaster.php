@@ -286,7 +286,10 @@ trait AltapayMaster {
 			$api->setTransaction( $txn_id );
 			foreach ( $api->call() as $payment ) {
 				if ( (string) $payment->ShopOrderId === (string) $order->get_id() ) {
-					return $type === 'subscription' || $payment->ReservedAmount > 0 || $payment->CapturedAmount > 0;
+					$is_agreement = $type === 'subscription' && $payment->TransactionStatus === 'recurring_confirmed'
+						&& function_exists( 'wcs_order_contains_subscription' ) && wcs_order_contains_subscription( $order );
+
+					return $is_agreement || $payment->ReservedAmount > 0 || $payment->CapturedAmount > 0;
 				}
 			}
 		} catch ( Exception $e ) {

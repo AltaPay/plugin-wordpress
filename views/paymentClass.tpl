@@ -524,7 +524,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 				if ( $status === 'succeeded' || $reservedAmount > 0 ) {
 
-					if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) ) {
+					if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) || ( $txnId && $txnId !== $postedTxnId && ! $this->verifyCallbackTransaction( $order, $txnId, $type ) ) ) {
 						exit;
 					}
 
@@ -584,7 +584,7 @@ class WC_Gateway_{key} extends WC_Payment_Gateway {
 
 			if ( $order->has_status( 'pending' ) && ( $status === 'succeeded' || $reservedAmount > 0 ) ) {
 
-				if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) ) {
+				if ( ! $this->verifyCallbackTransaction( $order, $postedTxnId, $type ) || ( $txnId && $txnId !== $postedTxnId && ! $this->verifyCallbackTransaction( $order, $txnId, $type ) ) ) {
 					exit;
 				}
 
